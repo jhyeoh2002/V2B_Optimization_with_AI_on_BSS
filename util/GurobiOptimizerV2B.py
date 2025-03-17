@@ -44,6 +44,7 @@ class GurobiOptimizerV2B:
         self.gamma_peak = gamma_peak
         self.gamma_cost = gamma_cost
         self.gamma_carbon = gamma_carbon
+        
     def optimize(self, bldg, elec, carbon, pv, 
                  t_arr, t_dep, soc_arr, soc_dep, available):
         """
