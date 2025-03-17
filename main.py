@@ -6,12 +6,9 @@ import tqdm
 import numpy as np
 import pandas as pd
 
-from scipy.optimize import minimize, basinhopping
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
-from Data.Raw_Data.generatecost import generate_building_cost, generate_ev_cost
-# from functions.immediatecharging import get_EVimmediateCharge
 from functions.optimization import Optimization
 from functions.readcsv import readData
 
@@ -88,6 +85,31 @@ V2B = Optimization(chargingRate = charging_rate, chargingEff = charging_eff ,
                    lowestSoC = EVLowerBoundSoC, highestSoC = EVUpperBoundSoC, projName=projName)
 
 window_length = 6
+import pandas as pd 
+import numpy as np
+
+def readData() -> tuple[np.array, np.array, np.array]:
+    '''
+    Read data from .csv files and return year data 2020 in array format
+    
+    Parameters  
+    None
+    
+    Returns
+    year data(tuple): Building Energy Consumption, PV Generation, Carbon Intensity 
+    
+    '''
+
+BldgEnCon = pd.read_csv(r"Data/Cleaned data/Building Energy Consumption.csv").set_index('Datetime')
+BldgEnCon = np.array(BldgEnCon.iloc[:,4])
+
+PVGen = pd.read_csv(r"Data/Cleaned data/PV generation.csv").set_index('Datetime')
+PVGen = np.array(PVGen.iloc[:,4])
+
+CarbInt = pd.read_csv(r"Data/Cleaned data/Carbon Intensity Data 2020.csv").set_index('Datetime')
+CarbInt = np.array(CarbInt.iloc[:,0])
+
+return BldgEnCon, PVGen, CarbInt
 
 EVChargingV2B = V2B.optimize_ev(days = days, length = window_length, iteration = iteration)
 np.save(projPath + '/npyFiles/EVchargingV2B_'+str(window_length)+'.npy', EVChargingV2B)

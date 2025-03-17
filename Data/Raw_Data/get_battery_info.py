@@ -16,7 +16,7 @@ tnum = 2928
 
 def generate_escooter_data(tnum = tnum, n_station=n_station, SOC_thr=SOC_thr, max_stay_duration=24):
     
-    if os.path.isfile('./Battery_info.csv'):
+    if os.path.isfile('./Battery_info_withoutdep.csv'):
         print("Battery Info found.")
     # Read data
     else:
@@ -93,10 +93,19 @@ def generate_escooter_data(tnum = tnum, n_station=n_station, SOC_thr=SOC_thr, ma
         battery_info = pd.DataFrame({
             "ID": list(range(1, len(t_a_v)+1)),
             "Arrival_hour":t_a_v,
-            "Departure_hour":t_d_v,
             "Arrival_SOC":SOC_a_v,
-            "Departure_SOC":SOC_d_v ,
-            "Availability":a_vt
+
         })
 
-        battery_info.to_csv('./Battery_info.csv',index=False)
+        battery_info.to_csv('./Battery_info_withoutdep.csv',index=False)
+        
+        # battery_info = pd.DataFrame({
+        #     "ID": list(range(1, len(t_a_v)+1)),
+        #     "Arrival_hour":t_a_v,
+        #     "Departure_hour":t_d_v,
+        #     "Arrival_SOC":SOC_a_v,
+        #     "Departure_SOC":SOC_d_v ,
+        #     "Availability":a_vt
+        # })
+
+        # battery_info.to_csv('./Battery_info.csv',index=False)
