@@ -5,112 +5,61 @@ import matplotlib.pyplot as plt
 import tqdm
 import numpy as np
 import pandas as pd
-
+import pandas as pd 
+import numpy as np
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
-from functions.optimization import Optimization
-from functions.readcsv import readData
+from util.GurobiOptimizerV2B import GurobiOptimizerV2B
+from config import PROJECT_NAME, WINDOW_LENGTH, ITERATIONS, BATTERY_CAPACITY, BATTERY_COST, BATTERY_CYCLE_LIFE, DEPTH_OF_DISCHARGE, CHARGING_RATE, CHARGING_EFFICIENCY, DEPARTURE_SOC, MIN_SOC, MAX_SOC, BATTERIES_PER_STATION, NUM_STATIONS, TOTAL_BATTERIES, DAYS, TIME_STEPS
+print(PROJECT_NAME)
 
-from scipy.stats import truncnorm
+# Now you can use these variables in your code
+def main():
 
-# TODO Set parameters (Modifiable)
+    data_path = './Data/Full_Data.csv'
+    batteryinfo_path = './Data/Battery_info.csv'
 
-#Set a name for this run
-projName = 'tempfull'
+    data = pd.read_csv(data_path)
+    batteryinfo = pd.read_csv(batteryinfo_path)
 
-#Charging Rate and Efficiency
-charging_rate = 14       #kW   #Charging rate for gogoro station
-charging_eff = 0.9
+    BldgEnCon = data['energy (kWh)']
+    Temp = data['Temperature,T (deg)']
+    Rad = data['Radiation Intensity, I']
+    CarbInt = data['Carbon Intensity (kgC02eq/kWh)']
 
-#Boundaries for Batteries
-EVLowerBoundSoC = 0.2
-EVUpperBoundSoC = 0.9
+    # Choose the start day
+    start_date = '2024-02-01' 
+    end_date = '2024-02-07' 
 
-#Set number of iteration for basinhopping
-iteration = 1
+    chosen_dateli = []
 
-c_Batt = 9071 # Battery cost per kilowatt-hour ($/kWh)
-pi_Cap = 1.5 # Battery energy capacity (kWh)
-pi_CL = 2020 # Battery lifetime in terms of cycle life
-pi_DoD = 0.7 # DoD for a certain cycle life
-n_station = 38*2 # Number of batteries at the station
-SOC_thr = 0.7 # Required leaving SOC
+    date_range = pd.date_range(start=start_date, end=end_date)
+    for chosen_date in date_range:
+        chosen_dateli.append(chosen_date.strftime('%Y-%m-%d'))
 
-# Choose tnum
-days = int(45)
-tnum = int(days*24) # 24 for a day optimization
+    a_vt = batteryinfo['Availability']
+    t_a_v = batteryinfo['Arrival_hour']
+    t_d_v = batteryinfo['Departure_hour']
+    SOC_a_v = batteryinfo['Arrival_SOC']
+    SOC_d_v = batteryinfo['Departure_SOC']    
+    D_B_t = data['energy (kWh)']
 
-data = pd.read_csv('./Data/Full_Data.csv')
-batteryinfo = pd.read_csv('./Data/Battery_info.csv')
+    projPath = './results/' + PROJECT_NAME
 
-BldgEnCon = data['energy (kWh)']
-Temp = data['Temperature,T (deg)']
-Rad = data['Radiation Intensity, I']
-CarbInt = data['Carbon Intensity (kgC02eq/kWh)']
+    if not os.path.exists(projPath):
+        os.makedirs(projPath + '/figures')
 
-# Choose the start day
-start_date = '2024-02-01' 
-end_date = '2024-02-07' 
+    BldgEnCon = pd.read_csv(r"Data/Cleaned data/Building Energy Consumption.csv").set_index('Datetime')
+    BldgEnCon = np.array(BldgEnCon.iloc[:,4])
 
-chosen_dateli = []
+    PVGen = pd.read_csv(r"Data/Cleaned data/PV generation.csv").set_index('Datetime')
+    PVGen = np.array(PVGen.iloc[:,4])
 
-date_range = pd.date_range(start=start_date, end=end_date)
-for chosen_date in date_range:
-    chosen_dateli.append(chosen_date.strftime('%Y-%m-%d'))
+    CarbInt = pd.read_csv(r"Data/Cleaned data/Carbon Intensity Data 2020.csv").set_index('Datetime')
+    CarbInt = np.array(CarbInt.iloc[:,0])
 
-# global D_B_t, S_R_t, N_V_t, n_total, t_a_v, t_d_v, a_vt, SOC_a_v, SOC_d_v, pi_Cn_t, c_G2B_t, c_G2V_t
+    return BldgEnCon, PVGen, CarbInt
 
-a_vt = batteryinfo['Availability']
-t_a_v = batteryinfo['Arrival_hour']
-t_d_v = batteryinfo['Departure_hour']
-SOC_a_v = batteryinfo['Arrival_SOC']
-SOC_d_v = batteryinfo['Departure_SOC']    
-D_B_t = data['energy (kWh)']
-
-date = pd.date_range(start='2023-06-16', end='2023-06-22', freq='D')
-date_strings = date.strftime('%Y-%m-%d').tolist()
-
-projPath = './results/' + projName
-
-if not os.path.exists(projPath):
-    os.makedirs(projPath + '/npyFiles')
-    os.makedirs(projPath + '/csv')
-    os.makedirs(projPath + '/figures')
-
-####################### V2B Charging/Discharging Slots #######################
-
-V2B = Optimization(chargingRate = charging_rate, chargingEff = charging_eff , 
-                   gammaPeak = 1/3, gammaCost = 1/3, gammaCarbon = 1/3, 
-                   lowestSoC = EVLowerBoundSoC, highestSoC = EVUpperBoundSoC, projName=projName)
-
-window_length = 6
-import pandas as pd 
-import numpy as np
-
-def readData() -> tuple[np.array, np.array, np.array]:
-    '''
-    Read data from .csv files and return year data 2020 in array format
-    
-    Parameters  
-    None
-    
-    Returns
-    year data(tuple): Building Energy Consumption, PV Generation, Carbon Intensity 
-    
-    '''
-
-BldgEnCon = pd.read_csv(r"Data/Cleaned data/Building Energy Consumption.csv").set_index('Datetime')
-BldgEnCon = np.array(BldgEnCon.iloc[:,4])
-
-PVGen = pd.read_csv(r"Data/Cleaned data/PV generation.csv").set_index('Datetime')
-PVGen = np.array(PVGen.iloc[:,4])
-
-CarbInt = pd.read_csv(r"Data/Cleaned data/Carbon Intensity Data 2020.csv").set_index('Datetime')
-CarbInt = np.array(CarbInt.iloc[:,0])
-
-return BldgEnCon, PVGen, CarbInt
-
-EVChargingV2B = V2B.optimize_ev(days = days, length = window_length, iteration = iteration)
-np.save(projPath + '/npyFiles/EVchargingV2B_'+str(window_length)+'.npy', EVChargingV2B)
-print('Saving V2B Charging_'+str(window_length)+'/Discharging Results to ./npyFiles\n')
+# if __name__ == "__main__":
+#     main()
