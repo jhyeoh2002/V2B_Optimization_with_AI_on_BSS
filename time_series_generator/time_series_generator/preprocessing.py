@@ -26,6 +26,7 @@ class DataPrepare:
         # Resample to specified resolution (e.g., '1h')
         tdf_filled = tdf_filled.resample(self.resolution).mean()
         tdf_filled.name = 'raw_data'
+        tdf_filled.to_csv(f'/home/jhern/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/modified_data/resample_data.csv')
 
         # 產生子序列並展開為固定長度
         subseqs = self._generate_valid_subsequences(tdf_filled.values)

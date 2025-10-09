@@ -33,8 +33,6 @@ def main():
     VehCost = data['Vehicle Electricity Cost (NTD/kWh)'] 
     Available = data['Available'] #available battery at the time in station
     
-datetime,Carbon Intensity (kgC02eq/kWh),"Radiation Intensity, I","Temperature,T (deg)",PV Generation (kWh),Building Electricity Cost (NTD/kWh),Vehicle Electricity Cost (NTD/kWh),Available,energy (kWh)
-
     t_a_v = batteryinfo['Arrival_hour']
     SOC_a_v = batteryinfo['Arrival_SOC']
 

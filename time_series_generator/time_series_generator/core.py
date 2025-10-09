@@ -27,10 +27,10 @@ class Generator:
         )
 
     def generate(self):
-        mean_seed, std_seed, X_joint, w_post = self._estimator.estimate_and_correct_distribution(seed=self.seed)
+        mean_seed, std_seed, X_joint, w_post, weight2 = self._estimator.estimate_and_correct_distribution(seed=self.seed)
 
         kde = KernelDensity(kernel='gaussian', bandwidth=self.bandwidth)
-        kde.fit(X_joint, sample_weight=w_post)
+        kde.fit(X_joint, sample_weight=w_post*weight2)
 
         new_samples = kde.sample(n_samples=self.n_sample, random_state=self.random_state)
         new_samples = new_samples * std_seed + mean_seed
@@ -74,7 +74,7 @@ class BayesianDistributionEstimator:
         X_joint = history
         w_prior = np.array(list(p_weighted.values()))
         w_post = w_prior
-
+        print('total:' ,len(keys))
         # Step 2: 根據其他 pattern 修正後驗分布
         for i in range(1, len(keys)):
             key = keys[i]
@@ -82,8 +82,10 @@ class BayesianDistributionEstimator:
             if history.shape[0] < 30:
                 continue
 
+            # print(f'{key}: {history.shape[0]}')
+
             distances = fast_dtw_distance(normal_seed, history)
-            weights = 1 / (distances**2 + 1e-8)
+            weights = 1 / (distances**7 + 1e-8)
             weights /= np.sum(weights)
 
             X_marginal_obs = history
@@ -95,7 +97,7 @@ class BayesianDistributionEstimator:
                 bandwidth=bandwidth
             )
 
-        return mean_seed, std_seed, X_joint, w_post
+        return mean_seed, std_seed, X_joint, w_post, history.shape[0]
 
     def _prepare_data(self):
         self.grouped_samples = self.datapreparer.generate_grouped_subsequences()
