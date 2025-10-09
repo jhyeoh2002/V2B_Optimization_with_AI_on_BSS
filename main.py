@@ -23,18 +23,21 @@ def main():
     data = pd.read_csv(DATA_PATH)
     batteryinfo = pd.read_csv(BATTERYINFO_PATH)
 
+    # Import necessary columns
     BldgEnCon = data['energy (kWh)']
     Temp = data['Temperature,T (deg)']
     Rad = data['Radiation Intensity, I']
     CarbInt = data['Carbon Intensity (kgC02eq/kWh)']
+    PVGen = data['PV Generation (kWh)']
+    BldgCost = data['Building Electricity Cost (NTD/kWh)']
+    VehCost = data['Vehicle Electricity Cost (NTD/kWh)'] 
+    Available = data['Available'] #available battery at the time in station
+    
+datetime,Carbon Intensity (kgC02eq/kWh),"Radiation Intensity, I","Temperature,T (deg)",PV Generation (kWh),Building Electricity Cost (NTD/kWh),Vehicle Electricity Cost (NTD/kWh),Available,energy (kWh)
 
-
-    a_vt = batteryinfo['Availability']
     t_a_v = batteryinfo['Arrival_hour']
-    t_d_v = batteryinfo['Departure_hour']
     SOC_a_v = batteryinfo['Arrival_SOC']
-    SOC_d_v = batteryinfo['Departure_SOC']    
-    D_B_t = data['energy (kWh)']
+
 
 
 if __name__ == "__main__":
