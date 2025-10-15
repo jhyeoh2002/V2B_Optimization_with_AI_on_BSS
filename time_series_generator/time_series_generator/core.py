@@ -14,25 +14,23 @@ def _norm(x):
     return (x - m) / (s + 1e-12)
 
 def _best_lag_xcorr(seed, cand, max_shift):
-    """
-    用正規化互相關在 [-max_shift, max_shift] 內找最佳 lag。
-    回傳 (best_lag, best_corr)
-    """
-    x = _norm(seed)
-    y = _norm(cand)
-    n = len(x)
+    x = _norm(seed).ravel()
+    y = _norm(cand).ravel()
+    n = min(len(x), len(y))
+    x, y = x[:n], y[:n]
+
     best_corr, best_lag = -np.inf, 0
     for lag in range(-max_shift, max_shift + 1):
         if lag >= 0:
-            xs = x[lag:]
-            ys = y[:n - lag]
+            xs, ys = x[lag:], y[:n - lag]
         else:
-            xs = x[:n + lag]
-            ys = y[-lag:]
-        if xs.size < 3:  # 太短就略過
+            xs, ys = x[:n + lag], y[-lag:]
+        mask = np.isfinite(xs) & np.isfinite(ys)
+        if mask.sum() < 2:
             continue
-        # 以皮爾森相關當 NCC 近似
-        c = np.dot(xs, ys) / (np.linalg.norm(xs) * np.linalg.norm(ys) + 1e-12)
+        a, b = xs[mask], ys[mask]
+        denom = (np.linalg.norm(a) * np.linalg.norm(b)) + 1e-12
+        c = float(np.dot(a, b) / denom)
         if c > best_corr:
             best_corr, best_lag = c, lag
     return best_lag, best_corr
@@ -61,11 +59,15 @@ def _apply_lag_roll(arr, lag, mode="roll"):
         return out
     else:
         raise ValueError("mode must be 'roll' or 'crop'")
-
+    
 def _euclidean(a, b):
-    a = np.asarray(a, dtype=float)
-    b = np.asarray(b, dtype=float)
-    return np.sqrt(np.mean((a - b) ** 2))
+    a = np.asarray(a, float)
+    b = np.asarray(b, float)
+    mask = np.isfinite(a) & np.isfinite(b)
+    if mask.sum() < 2:
+        return np.inf
+    d = a[mask] - b[mask]
+    return np.sqrt(np.mean(d*d))
 
 
 class Generator:
@@ -103,7 +105,35 @@ class Generator:
         )
 
         kde = KernelDensity(kernel='gaussian', bandwidth=self.bandwidth)
-        kde.fit(X_joint, sample_weight=w_post)
+       # ---- 先挑出沒有 NaN/Inf 的樣本列 ----
+        row_ok = np.all(np.isfinite(X_joint), axis=1)
+        X_kde = X_joint[row_ok]
+        w_kde = w_post[row_ok]
+
+        # ---- 權重清理（把 NaN/Inf/負值 → 0）----
+        w_kde = np.nan_to_num(w_kde, nan=0.0, posinf=0.0, neginf=0.0)
+        w_kde = np.clip(w_kde, 0.0, None)
+
+        # 若仍全為 0，則退回均勻/常數補值策略
+        if X_kde.shape[0] == 0 or float(w_kde.sum()) == 0.0:
+            # 退而求其次：用補 0 的 X 與均勻權重
+            X_kde = np.nan_to_num(X_joint, nan=0.0, posinf=0.0, neginf=0.0)
+            w_kde = np.ones(X_kde.shape[0], dtype=float)
+
+        # ---- 權重正規化（非必要但穩定）----
+        w_sum = float(w_kde.sum())
+        if w_sum <= 0:
+            w_kde[:] = 1.0 / len(w_kde)
+        else:
+            w_kde = w_kde / w_sum
+
+        # ---- 最終防呆 ----
+        assert np.isfinite(X_kde).all(), "X_kde 仍含 NaN/Inf"
+        assert np.isfinite(w_kde).all(), "w_kde 仍含 NaN/Inf"
+        assert X_kde.shape[0] == w_kde.shape[0], "樣本數與權重數不一致"
+
+        # ---- 擬合 KDE ----
+        kde.fit(X_kde, sample_weight=w_kde)
 
         new_samples = kde.sample(n_samples=self.n_sample, random_state=self.random_state)
         new_samples = new_samples * std_seed + mean_seed
