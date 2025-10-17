@@ -29,7 +29,11 @@ class DataPrepare:
         try:
             tdf_filled.to_csv(f'/home/jhern/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/modified_data/resample_data.csv')
         except:
-            tdf_filled.to_csv(f'/Users/dingjunwei/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/modified_data/resample_data.csv')
+            try:
+                tdf_filled.to_csv(f'/Users/dingjunwei/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/modified_data/resample_data.csv')
+            except:
+                tdf_filled.to_csv(f'/Users/jianhern/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/modified_data/resample_data.csv')
+                
         # 產生子序列並展開為固定長度
         subseqs = self._generate_valid_subsequences(tdf_filled.values)
         all_subseqs = self._expand_all_sequences(subseqs)
