@@ -1,22 +1,32 @@
-1. In ".Data/Full_Data.csv", the below should be listed in full.
+# V2B Optimization with AI on BSS - Data Documentation
 
-- Datetime
-- Carbon Intensity (kgC02eq/kWh)
-- Electricity Rate (NT$/kWh)
-- Radiation Intensity, I
-- Temperature,T (deg)
-- No. of Available Full Battery
-- Building energy Consumption (kWh)
+## Overview
+This repository contains data and scripts for optimizing Vehicle-to-Building (V2B) energy systems using AI techniques. The data spans from **January 2023 to September 2024** and includes weather and building energy usage data.
 
-2. In ".Data/Battery_Info.csv", the below should be listed in full.
+---
 
-Assuming each battery has individual id, 
+## Data Sources
 
-- Battery ID
-- Arrival_hour
-- Departure_hour
-- Arrival_SOC
-- Departure_SOC
-- Availability (1 indicates the battery is available during corresponding slots)
+1. Gogoro Station Data
 
+    **Data Types**: Number of fully charged batteries.
 
+    **Source**: xxx
+1. Weather Data
+
+    **Data Types**: Radiation Data (MJ/㎡) and Temperature Data (℃)
+
+    **Source**: *中央氣象署 (CWA)
+  氣候觀測資料查詢服務 Station Data — 測站編號 466920 臺北*, URL: [CWA Station Data](https://codis.cwa.gov.tw/StationData), Accessed: 19 October 2025。
+
+1. Building Data
+
+    **Data Types**: Electricity Usage (kWh)(度)
+
+    **Source**: *國立台灣大學 推廣中心饋線 用電日報表*, URL: [NTU ePower Platform](https://epower.ga.ntu.edu.tw/fn4/report2.aspx), Accessed: 19 October 2025.
+
+---
+
+## Contact
+This repository is maintained by **JIAN HERN YEOH (r12521626@ntu.edu.tw)** and **JUN-WEI DING (d13521023@ntu.edu.tw)** from **National Taiwan University, Department of Civil Engineering, Computer-Aided Engineering Division**. For questions, feedback, or collaboration inquiries, feel free to open an issue or contact the maintainers directly.
+ 
