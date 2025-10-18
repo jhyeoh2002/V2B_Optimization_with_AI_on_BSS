@@ -26,6 +26,25 @@ This repository contains data and scripts for optimizing Vehicle-to-Building (V2
     **Source**: *國立台灣大學 推廣中心饋線 用電日報表*, URL: [NTU ePower Platform](https://epower.ga.ntu.edu.tw/fn4/report2.aspx), Accessed: 19 October 2025.
 
 ---
+## Time Series Generator
+
+A Bayesian sequence modeling toolkit for generating time series samples based on historical patterns and a given seed sequence.  
+This package estimates the posterior distribution using historical analogs and produces realistic synthetic samples via weighted KDE.
+
+### 📦 Features
+
+- Time series subsequence extraction and alignment
+- Observation-pattern-based grouping
+- Bayesian posterior distribution estimation
+- Weighted KDE sampling
+- Supports missing values (NaN) and non-stationary seed inputs
+
+
+### 📊 Output Example
+Output is a NumPy array of shape (n_sample, window_size)
+Each row is a generated time series sample
+
+---
 
 ## Contact
 This repository is maintained by **JIAN HERN YEOH (r12521626@ntu.edu.tw)** and **JUN-WEI DING (d13521023@ntu.edu.tw)** from **National Taiwan University, Department of Civil Engineering, Computer-Aided Engineering Division**. For questions, feedback, or collaboration inquiries, feel free to open an issue or contact the maintainers directly.
