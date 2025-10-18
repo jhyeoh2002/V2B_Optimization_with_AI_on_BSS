@@ -1,0 +1,12 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.npy
+
+# --- Virtual environments ---
+.venv/
+env/
+venv/
