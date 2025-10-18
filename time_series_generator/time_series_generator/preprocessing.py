@@ -27,7 +27,7 @@ class DataPrepare:
         tdf_filled = tdf_filled.resample(self.resolution).mean()
         tdf_filled.name = 'raw_data'
         try:
-            tdf_filled.to_csv(f'/home/jhern/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/modified_data/resample_data.csv')
+            tdf_filled.to_csv(f'../modified_data/resample_data.csv')
         except:
             try:
                 tdf_filled.to_csv(f'/Users/dingjunwei/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/modified_data/resample_data.csv')
