@@ -1,13 +1,20 @@
+
+from operator import index
 import os
 import sys
 import pandas as pd
+import numpy as np
 
+
+from scipy.stats import truncnorm
 from datetime import datetime
+from math import isnan
 
 sys.path.append(os.path.abspath(".."))
 
 from data.utils.webcrawler import get_building_data
 from data.utils.costgenerator import get_building_cost, get_ev_cost
+from data.utils.battscheduler import schedule_batteries
 
 class DataPreprocessor:
     
@@ -167,3 +174,64 @@ class DataPreprocessor:
         cost_G2V_df.to_csv('./processed/electricitycostG2V_data.csv')
 
         return cost_G2B_df, cost_G2V_df
+
+    def generate_battery_series(self, window_size = 48):
+
+        fully_charged_df = pd.read_csv('../time_series_generator/modified_data/resample_data.csv',index_col=0)
+        fully_charged_df.index = pd.to_datetime(fully_charged_df.index)
+        
+        flat_values = fully_charged_df.values.flatten().tolist()
+        
+        series = []
+
+        for i in range(len(flat_values)-window_size):
+
+            chunk = flat_values[i : i + window_size]
+
+            if any(isnan(k) for k in chunk):
+                continue
+            
+            chunk.insert(0, i)
+            series.append(chunk)
+            
+        series = np.array(series).astype(int)
+
+        np.save(f'./processed/battery_series_window{window_size}.npy', series)
+
+        return series
+
+    def generate_battery_schedule(self, n_station=38*2, SOC_thr=0.9, window_size=48):
+
+        if os.path.isfile(f'./processed/battery_series_window{window_size}.npy'):
+            battery_series = np.load(f'./processed/battery_series_window{window_size}.npy')
+        else:
+            battery_series = self.generate_battery_series(window_size=window_size)
+
+        tnum = battery_series.shape[1] - 1  # Subtract 1 to account for the index column
+        
+        a_vt_list = []
+        SOC_a_v_list = []
+        SOC_d_v_list = []
+        
+        for series in battery_series:
+
+            a_vt, SOC_a_v, SOC_d_v = schedule_batteries(series, n_station, tnum, SOC_thr=SOC_thr)
+            a_vt_arr = np.array(a_vt, dtype=int)
+            SOC_a_v_arr = np.round(np.array(SOC_a_v, dtype=float), 2)
+            SOC_d_v_arr = np.round(np.array(SOC_d_v, dtype=float), 2)
+
+            a_vt_list.append(a_vt_arr)
+            SOC_a_v_list.append(SOC_a_v_arr)
+            SOC_d_v_list.append(SOC_d_v_arr)
+
+        battery_schedule_df = pd.DataFrame(
+            {
+                'a_vt': (a_vt_list),
+                'SOC_a_v': (SOC_a_v_list),
+                'SOC_d_v': (SOC_d_v_list)
+            }
+        )
+        
+        battery_schedule_df.to_csv(f'./processed/battery_schedule_window{window_size}.csv', index=False)
+
+        return battery_schedule_df

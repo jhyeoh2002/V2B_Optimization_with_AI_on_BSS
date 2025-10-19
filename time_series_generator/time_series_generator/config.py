@@ -11,7 +11,7 @@ BANDWIDTH = 0.5
 
 MEAN = 40
 STD = 8
-SEED = np.array([46, 45, 44, 45, 44, 48, 49, 50, 46, 44, 41, 32, 39, 40, 36, 38, 37, 37, 43, 45, 38, 35, 31, 38])
+SEED = np.array([46, 45, 44, 45, 44, 48, 49, 50, 46, 44, 41, 32, 39, 40, 36, 38, 37, 37, 43, 45, 38, 35, 31, 38, 44, 42, 46, 49, 50, 50])
 WINDOW_SIZE = len(SEED)
 
 # SEED = np.random.normal(loc=MEAN, scale=STD, size=WINDOW_SIZE)
