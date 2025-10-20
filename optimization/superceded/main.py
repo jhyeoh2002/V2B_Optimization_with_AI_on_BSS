@@ -10,7 +10,7 @@ import numpy as np
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
-from util.GurobiOptimizerV2B import GurobiOptimizerV2B
+from optimization.util.GurobiOptimizer import GurobiOptimizerV2B
 from optimization.util.config import PROJECT_NAME, WINDOW_LENGTH, ITERATIONS, BATTERY_CAPACITY, BATTERY_COST, BATTERY_CYCLE_LIFE, DEPTH_OF_DISCHARGE, CHARGING_RATE, CHARGING_EFFICIENCY, DEPARTURE_SOC, MIN_SOC, MAX_SOC, BATTERIES_PER_STATION, NUM_STATIONS, TOTAL_BATTERIES, DAYS, TIME_STEPS, DATA_PATH, BATTERYINFO_PATH
 
 # Now you can use these variables in your code

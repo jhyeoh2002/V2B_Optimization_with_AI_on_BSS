@@ -212,26 +212,36 @@ class DataPreprocessor:
         a_vt_list = []
         SOC_a_v_list = []
         SOC_d_v_list = []
+        t_a_v_list = []
+        t_d_v_list = []
         
         for series in battery_series:
 
-            a_vt, SOC_a_v, SOC_d_v = schedule_batteries(series, n_station, tnum, SOC_thr=SOC_thr)
-            a_vt_arr = np.array(a_vt, dtype=int)
+            a_vt, SOC_a_v, SOC_d_v, t_a_v, t_d_v = schedule_batteries(series, n_station, tnum, SOC_thr=SOC_thr)
+            a_vt_arr = np.array(a_vt, dtype=float)
             SOC_a_v_arr = np.round(np.array(SOC_a_v, dtype=float), 2)
             SOC_d_v_arr = np.round(np.array(SOC_d_v, dtype=float), 2)
+            t_a_v_arr = np.array(t_a_v, dtype=float)
+            t_d_v_arr = np.array(t_d_v, dtype=float)
 
             a_vt_list.append(a_vt_arr)
             SOC_a_v_list.append(SOC_a_v_arr)
             SOC_d_v_list.append(SOC_d_v_arr)
+            t_a_v_list.append(t_a_v_arr)
+            t_d_v_list.append(t_d_v_arr)
 
-        battery_schedule_df = pd.DataFrame(
-            {
-                'a_vt': (a_vt_list),
-                'SOC_a_v': (SOC_a_v_list),
-                'SOC_d_v': (SOC_d_v_list)
-            }
-        )
+        # Find the maximum shape[0] across all arrays
+        max_batt = max([arr.shape[0] for arr in a_vt_list])
+
+        a_vt_list_arr = np.array([np.pad(arr, ((0, max_batt - arr.shape[0]), (0, 0)), mode='constant', constant_values=np.nan) for arr in a_vt_list])
+        SOC_a_v_list_arr = np.array([np.pad(arr, (0, max_batt - arr.shape[0]), mode='constant', constant_values=np.nan) for arr in SOC_a_v_list])
+        SOC_d_v_list_arr = np.array([np.pad(arr, (0, max_batt - arr.shape[0]), mode='constant', constant_values=np.nan) for arr in SOC_d_v_list])
+        t_a_v_list_arr = np.array([np.pad(arr, (0, max_batt - arr.shape[0]), mode='constant', constant_values=np.nan) for arr in t_a_v_list])
+        t_d_v_list_arr = np.array([np.pad(arr, (0, max_batt - arr.shape[0]), mode='constant', constant_values=np.nan) for arr in t_d_v_list])
+
+        details = np.array([SOC_a_v_list_arr, SOC_d_v_list_arr, t_a_v_list_arr, t_d_v_list_arr])
         
-        battery_schedule_df.to_csv(f'./processed/battery_schedule_window{window_size}.csv', index=False)
+        np.save(f'./processed/battery_schedule_window{window_size}.npy', a_vt_list_arr)
+        np.save(f'./processed/battery_details_window{window_size}.npy', details)
 
-        return battery_schedule_df
+        return a_vt_list_arr, details

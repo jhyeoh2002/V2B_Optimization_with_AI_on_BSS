@@ -70,4 +70,4 @@ def schedule_batteries(fully_charged_series, n_station, tnum, SOC_thr=0.9, max_s
     truncated_normal_values = truncnorm(a1, b1, loc=mean1, scale=std1).rvs(size=len(t_d_v))
     SOC_d_v = [truncated_normal_values[v] if value == tnum else SOC_thr for v, value in enumerate(t_d_v)]
 
-    return a_vt, SOC_a_v, SOC_d_v
+    return a_vt, SOC_a_v, SOC_d_v, t_a_v, t_d_v

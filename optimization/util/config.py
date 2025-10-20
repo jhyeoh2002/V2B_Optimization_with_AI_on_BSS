@@ -1,9 +1,9 @@
 # ====== Optimization Parameters ======
 
 # Project Settings
-PROJECT_NAME = 'test2'
-WINDOW_LENGTH = 6  # hours
-ITERATIONS = 1
+PROJECT_NAME = 'TEST'
+WINDOW_LENGTH = 24  # hours
+PV_AREA = 130  # m^2
 
 # Battery Parameters
 BATTERY_CAPACITY = 1.5  # kWh
@@ -14,7 +14,7 @@ DEPTH_OF_DISCHARGE = 0.7
 # Charging Parameters
 CHARGING_RATE = 14      # kW
 CHARGING_EFFICIENCY = 0.9
-DEPARTURE_SOC = 0.7
+DEPARTURE_SOC = 0.9
 MIN_SOC = 0.2
 MAX_SOC = 0.9
 
@@ -22,11 +22,3 @@ MAX_SOC = 0.9
 BATTERIES_PER_STATION = 38
 NUM_STATIONS = 2
 TOTAL_BATTERIES = BATTERIES_PER_STATION * NUM_STATIONS
-
-# Time Parameters
-DAYS = 45
-TIME_STEPS = DAYS * 24  # 24 hours per day
-
-# Data Paths
-DATA_PATH = './data/Full_Data.csv'
-BATTERYINFO_PATH = './data/Battery_info.csv'
