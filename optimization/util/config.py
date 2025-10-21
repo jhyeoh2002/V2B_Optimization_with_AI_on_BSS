@@ -3,7 +3,7 @@
 # Project Settings
 PROJECT_NAME = 'TEST'
 WINDOW_LENGTH = 24  # hours
-PV_AREA = 130  # m^2
+PV_AREA = 1300  # m^2
 
 # Battery Parameters
 BATTERY_CAPACITY = 1.5  # kWh
