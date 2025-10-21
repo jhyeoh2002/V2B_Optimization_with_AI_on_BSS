@@ -1,9 +1,10 @@
 # ====== Optimization Parameters ======
 
 # Project Settings
-PROJECT_NAME = 'TEST'
-WINDOW_LENGTH = 30  # hours
-PV_AREA = 200  # m^2
+WINDOW_LENGTH = 48  # hours
+PV_AREA = 400  # m^2
+
+PROJECT_NAME = f'V1_WL{WINDOW_LENGTH}_PV{PV_AREA}'
 
 # Battery Parameters
 BATTERY_CAPACITY = 1.5  # kWh

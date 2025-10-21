@@ -1,5 +1,3 @@
-from tkinter import W
-from matplotlib.style import available
 import pandas as pd
 import numpy as np
 

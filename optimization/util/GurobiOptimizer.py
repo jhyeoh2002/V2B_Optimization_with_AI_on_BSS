@@ -1,3 +1,4 @@
+from math import e
 import gurobipy as gp
 from gurobipy import GRB
 import matplotlib.pyplot as plt
@@ -8,6 +9,8 @@ import pandas as pd
 import numpy as np
 import sys
 import gc, time
+from util.batteryreader import get_battery_details
+from tqdm import tqdm
 
 sys.path.append(os.path.abspath(".."))
 
@@ -45,8 +48,8 @@ class GurobiOptimizer:
 
     def __init__(self, batt_cap = BATTERY_CAPACITY, max_power=CHARGING_RATE, 
                  min_soc=MIN_SOC, max_soc=MAX_SOC,
-                 ch_eff=CHARGING_EFFICIENCY, win_len=WINDOW_LENGTH, 
-                 gamma_peak=1.0, gamma_cost=1.0, gamma_carbon=1.0):
+                 ch_eff=CHARGING_EFFICIENCY, win_len=WINDOW_LENGTH,
+                 proj_name=PROJECT_NAME):
         
         self.batt_cap = batt_cap
         self.max_power = max_power
@@ -54,10 +57,9 @@ class GurobiOptimizer:
         self.max_soc = max_soc
         self.ch_eff = ch_eff
         self.win_len = win_len
-        self.gamma_peak = gamma_peak
-        self.gamma_cost = gamma_cost
-        self.gamma_carbon = gamma_carbon
-    
+        self.proj_name = proj_name
+        self.output_dir = os.path.join(".", "output", self.proj_name)
+        
     def get_building_energy_demand(self):
         building_energy_demand_df = pd.read_csv(f'../data/processed/building_data.csv')
         building_energy_demand_df.set_index('Datetime', inplace=True)
@@ -90,45 +92,7 @@ class GurobiOptimizer:
 
         return pv_generation
 
-    def optimize(self, index, available, t_arr, t_dep, soc_arr, soc_dep):
-        
-        # for i in range(len(available)):  
-        #     print(f"Batt num: {i}")
-        #     print(f"Available: {available[i]}")
-        #     print(f"Arrival Time: {t_arr[i]}")
-        #     print(f"Departure Time: {t_dep[i]}")
-        #     print(f"SOC Arrival: {soc_arr[i]}")
-        #     print(f"SOC Departure: {soc_dep[i]}")
-            
-        """
-        Optimize V2B strategy.
-
-        Parameters:
-        -----------
-        bldg : list
-            Building energy demand per time step (kW).
-        elec : list
-            Electricity price per time step (NTD/kWh).
-        carbon : list
-            Carbon emissions per time step (kg CO2eq/kWh).
-        pv : list
-            PV energy generation per time step (kW).
-        t_arr : list
-            List of vehicle arrival times.
-        t_dep : list
-            List of vehicle departure times.
-        soc_arr : list
-            SOC of vehicles upon arrival.
-        soc_dep : list
-            SOC required at departure.
-        available : list of lists
-            Availability of vehicles per time step.
-
-        Returns:
-        --------
-        solution : list
-            Optimized grid demand values after V2B operation.
-        """
+    def run_single_optimization(self, index, available, t_arr, t_dep, soc_arr, soc_dep):
 
         bldg = self.get_building_energy_demand()[index + 24: index + 24 + self.win_len]
         elec = self.get_electricity_price()[index + 24: index + 24 + self.win_len]
@@ -185,8 +149,8 @@ class GurobiOptimizer:
         # RUN OPTIMIZATION
         # ==============================
 
-
-        print("="*10, f"Index {index}", "="*10)
+        print("-"*60)
+        print("Starting optimization...")
         
         # Set number of threads used
         # model.Params.Threads = 1  # Set to desired number of threads
@@ -198,18 +162,25 @@ class GurobiOptimizer:
             initial_demand = [max(bldg[t] - pv[t], 0) for t in range(self.win_len)]
             final_grid_demand = [gd_t[t].x for t in range(self.win_len)]  
             charging_demand = [sum([ch_t_v[t, v].x - dis_t_v[t, v].x for v in range(n_veh)]) for t in range(self.win_len)]
+            soc_t_v = [[soc_t_v[t, v].x for t in range(self.win_len)] for v in range(n_veh)]
+
+            total_grid_demand = sum(final_grid_demand)
+            total_demand = sum([bldg[t] for t in range(self.win_len)]) + sum([ch_t_v[t, v].x for v in range(n_veh) for t in range(self.win_len)])
+
+            pv_loss = sum([loss_t[t].x for t in range(self.win_len)])
+            pv_generated = sum([pv[t] for t in range(self.win_len)])
+            
+            self_sufficiency = 1 - (total_grid_demand / total_demand) if total_demand > 0 else 0
+            pv_utilization = (pv_generated - pv_loss) / pv_generated if pv_generated > 0 else 0
+
+            print("Optimization completed successfully.")
             
             optimal_objective = model.objVal
             optimization_time = model.Runtime
             mip_gap = model.MIPGap * 100 if model.isMIP else '-'  # Only relevant for MIP problems
-            
-            # --- Clean up after each run ---
-            gp.disposeDefaultEnv()  # releases Gurobi environment from memory
-            gc.collect()            # trigger Python garbage collector
-            time.sleep(0.8)           # wait 0.8 seconds before next optimization
-            
-            return initial_demand, final_grid_demand, charging_demand, pv
-        
+
+            return np.array(initial_demand), np.array(final_grid_demand), np.array(charging_demand), np.array(soc_t_v), optimal_objective, optimization_time, mip_gap, self_sufficiency, pv_utilization
+
         elif model.status == GRB.INFEASIBLE:
             print("Model is infeasible. Computing IIS...")
             model.computeIIS()
@@ -225,3 +196,100 @@ class GurobiOptimizer:
         cost_ob = {t: electricity_cost[t] * gd_t[t] for t in range(self.win_len)}
         total_cost = gp.quicksum(cost_ob.values())  # Total electricity cost
         return cost_ob
+
+    def run_full_optimization(self):
+
+        index, available, SOC_a_v, SOC_d_v, t_a_v, t_d_v = get_battery_details(window_length = self.win_len)
+
+        sys.stdout = open(f'./outputlog/output_log_{self.proj_name}.txt', 'w')
+
+        os.makedirs(self.output_dir, exist_ok=True)
+        
+        initial_demands = []
+        final_grid_demands = []
+        charging_demands = []
+        soc_t_v_s = []
+        optimal_objectives = []
+        optimization_times = []
+        mip_gaps = []
+        self_sufficiencies = []
+        pv_utilizations = []
+
+        for idx in tqdm(range(len(available)), desc='Processing series', unit='series'):  
+            
+            print("="*60)
+            print(f"Starting series num: {idx}, Datetime Index: {index[idx]}")
+            
+            print("-"*60)
+            print("Battery Details:")
+            print("-"*60)
+
+            available_current = np.array(available[idx])
+            SOC_a_v_current = np.array(SOC_a_v[idx])
+            SOC_d_v_current = np.array(SOC_d_v[idx])
+            t_a_v_current = np.array(t_a_v[idx])
+            t_d_v_current = np.array(t_d_v[idx])
+            
+            print(f"Number of available batteries:\n{len(available_current)}")
+            print("-"*20)
+            print(f"Time arrival:\n{t_a_v_current}")
+            print("-"*20)
+            print(f"Time departure:\n{t_d_v_current}")
+            print("-"*20)
+            print(f"State of Charge (SoC) at the beginning of availability:\n{SOC_a_v_current}")
+            print("-"*20)
+            print(f"State of Charge (SoC) at the end of availability:\n{SOC_d_v_current}")
+            
+
+            initial_demand, final_grid_demand, charging_demand, soc_t_v, optimal_objective, optimization_time, mip_gap, self_sufficiency, pv_utilization = self.run_single_optimization(
+                index[idx], available[idx], t_a_v[idx], t_d_v[idx], SOC_a_v[idx], SOC_d_v[idx]
+            )
+
+            initial_demands.append(initial_demand)
+            final_grid_demands.append(final_grid_demand)
+            charging_demands.append(charging_demand)
+            soc_t_v_s.append(soc_t_v)
+            optimal_objectives.append(optimal_objective)
+            optimization_times.append(optimization_time)
+            mip_gaps.append(mip_gap)
+            self_sufficiencies.append(self_sufficiency)
+            pv_utilizations.append(pv_utilization)
+
+            print("-"*60)
+            print("Optimization Results")
+
+            print(f"Initial Demand:\n{np.round(initial_demand, 2)}")
+            print("-"*20)
+            print(f"Final Grid Demand:\n{np.round(final_grid_demand, 2)}")
+            print("-"*20)
+            print(f"Charging Demand:\n{np.round(charging_demand, 2)}")
+            print("-"*20)
+            print(f"Battery State of Charge (SoC):\n{np.round(soc_t_v, 2)}")
+            print("-"*20)
+            print(f"Optimal Objective Value: {optimal_objective}")
+            print(f"Optimization Time (s): {optimization_time}")
+            print(f"MIP Gap (%): {mip_gap}")
+            print(f"Self-Sufficiency: {self_sufficiency:.4f}")
+            print(f"PV Utilization: {pv_utilization:.4f}")
+            
+            print("="*20, f"Series num: {idx} ENDED", "="*20, '\n\n')
+        
+        sys.stdout.close()
+        sys.stdout = sys.__stdout__
+
+        max_batt = max([soc_t_v.shape[0] for soc_t_v in soc_t_v_s])
+        
+        soc_t_v_s = [np.pad(arr, ((0, max_batt - arr.shape[0]),(0, 0)), mode='constant', constant_values=np.nan) for arr in soc_t_v_s]
+        
+        # Save results
+        np.save(os.path.join(self.output_dir, f'initial_demands.npy'), np.array(initial_demands))
+        np.save(os.path.join(self.output_dir, f'final_grid_demands.npy'), np.array(final_grid_demands))
+        np.save(os.path.join(self.output_dir, f'charging_demands.npy'), np.array(charging_demands))
+        np.save(os.path.join(self.output_dir, f'soc_t_v.npy'), np.array(soc_t_v_s))
+        np.save(os.path.join(self.output_dir, f'optimal_objectives.npy'), np.array(optimal_objectives))
+        np.save(os.path.join(self.output_dir, f'optimization_times.npy'), np.array(optimization_times))
+        np.save(os.path.join(self.output_dir, f'mip_gaps.npy'), np.array(mip_gaps))
+        np.save(os.path.join(self.output_dir, f'self_sufficiencies.npy'), np.array(self_sufficiencies))
+        np.save(os.path.join(self.output_dir, f'pv_utilizations.npy'), np.array(pv_utilizations))
+
+        return initial_demands, final_grid_demands, charging_demands, soc_t_v_s, optimal_objectives, optimization_times, mip_gaps, self_sufficiencies, pv_utilizations
