@@ -44,6 +44,30 @@ def merge_and_process(sequence_length=24, save_feature_info=True):
     print(static_df.head())
     static_df = static_df.round(5)
     print(static_df.head())
+    
+    # === Determine index range for embedding quantization ===
+    from itertools import chain
+
+    # Flatten all numeric series you plan to embed
+    all_series = list(chain(
+        building_demand.values.flatten(),
+        radiation.values.flatten(),
+        temperature.values.flatten(),
+        electricity_price.values.flatten(),
+        battery_demand[:, 1:].flatten()
+    ))
+
+    # Quantize using same rule as in model
+    indices = np.round(np.array(all_series) * 1000) + 5000
+    indices = np.clip(indices, 0, None).astype(int)
+
+    num_unique = len(np.unique(indices))
+    print(f"🔢 Unique quantized indices in dataset: {num_unique}")
+
+    # Add ~20% safety margin
+    suggested_num_embeddings = int(num_unique * 1.2)
+    print(f"✅ Suggested num_embeddings: {suggested_num_embeddings}")
+
 
     # === Build merged rows ===
     rows = []

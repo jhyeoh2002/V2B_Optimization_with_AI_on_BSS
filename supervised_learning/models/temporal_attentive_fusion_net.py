@@ -4,18 +4,17 @@ import math
 
 class TemporalAttentiveFusionNet(nn.Module):
     def __init__(self,
-                 num_embeddings=10000,
-                 embedding_dim=128,
+                 num_embeddings=8000,
+                 embedding_dim=64,
                  n_heads=4,
-                 fc_hidden_dim1=64,
-                 fc_hidden_dim2=16,
-                 attention_dropout=0.2,
-                 dropout=0.2):
+                 fc_hidden_dim1=128,
+                 fc_hidden_dim2=64,
+                 fc_hidden_dim3=16,
+                 attention_dropout=0.4,
+                 dropout=0.4):
         """
-        Interpretable temporal attention version:
-        - Uses MultiheadAttention to model 24-hour temporal influence
-        - Each of the 7 time-series (carbon, radiation, temp, etc.) gets an attention summary
-        - Concatenated with static features and passed through FC layers
+        Multihead attention-based fusion of static + temporal inputs.
+        Each 24-hour series passes through interpretable attention, then all summaries are fused.
         """
         super().__init__()
 
@@ -23,7 +22,7 @@ class TemporalAttentiveFusionNet(nn.Module):
         self.num_heads = n_heads
         self.num_embeddings = num_embeddings
 
-        # === Temporal embedding and attention ===
+        # === Temporal embedding + multihead attention ===
         self.seriesEmbedding = nn.Embedding(num_embeddings, embedding_dim)
         self.attn = nn.MultiheadAttention(
             embed_dim=embedding_dim,
@@ -32,75 +31,60 @@ class TemporalAttentiveFusionNet(nn.Module):
             batch_first=True
         )
         self.attn_norm = nn.LayerNorm(embedding_dim)
-        self.attn_fc = nn.Linear(embedding_dim, 1)  # summarize embedding to scalar per series
-
-        # === Dropouts ===
-        self.dropout = nn.Dropout(dropout)
+        self.attn_fc = nn.Linear(embedding_dim, 1)  # summarises attention output
 
         # === Fully connected fusion ===
-        # 12 = number of static features + 7 temporal summaries (each -> 1 scalar)
-        self.fc1 = nn.Linear(12, fc_hidden_dim1)
+        self.dropout = nn.Dropout(dropout)
+        self.fc1 = nn.Linear(4 +(24*5) + 5, fc_hidden_dim1)  # 4 static + 5 temporal summaries
+        self.bn1 = nn.BatchNorm1d(fc_hidden_dim1)
         self.fc2 = nn.Linear(fc_hidden_dim1, fc_hidden_dim2)
-        self.fc3 = nn.Linear(fc_hidden_dim2, fc_hidden_dim2)
-        self.fc4 = nn.Linear(fc_hidden_dim2, 1)
-
-        # === Activation ===
+        self.bn2 = nn.BatchNorm1d(fc_hidden_dim2)
+        self.fc3 = nn.Linear(fc_hidden_dim2, fc_hidden_dim3)
+        self.fc4 = nn.Linear(fc_hidden_dim3, 1)
         self.relu = nn.ReLU()
 
     def forward(self, x, sequence_length=24):
-        # assume x shape = [batch, 2 + 5*sequence_length]
-        static_feats = x[:, :2]  # first 2
-        # now build the series blocks – assume series come in fixed order
-        start = 2
-        series1 = x[:, start : start + sequence_length]
-        start += sequence_length
-        series2 = x[:, start : start + sequence_length]
-        start += sequence_length
-        series3 = x[:, start : start + sequence_length]
-        start += sequence_length
-        series4 = x[:, start : start + sequence_length]
-        start += sequence_length
-        series5 = x[:, start : start + sequence_length]
+        """
+        x shape: [batch_size, total_features]
+        total_features = 4 static + (5 * 24 temporal series)
+        """
+        static_feats = x[:]  # sin/cos features
+        temporal_feats = x[:, 4:].reshape(x.shape[0], 5, sequence_length)
 
-        # get attention‐summaries
-        s1 = self.temporal_attention(series1)
-        s2 = self.temporal_attention(series2)
-        s3 = self.temporal_attention(series3)
-        s4 = self.temporal_attention(series4)
-        s5 = self.temporal_attention(series5)
+        summaries = []
+        for i in range(5):
+            seq = temporal_feats[:, i, :]  # [B, 24]
+            summaries.append(self.temporal_attention(seq))
+        summaries = torch.cat(summaries, dim=1)  # [B, 5]
 
-        # concatenate: static features + each summary scalar
-        layer1 = torch.cat((static_feats, s1, s2, s3, s4, s5), dim=1)
+        # Fuse static + attention summaries
+        fused = torch.cat([static_feats, summaries], dim=1)
+       
+        out = self.fc1(fused)
+        out = self.bn1(out)
+        out = self.relu(out)
+        out = self.dropout(out)
 
-        # then FC layers as before
-        x = self.fc1(layer1)
-        x = self.relu(x)
-        x = self.dropout(x)
-        x = self.fc2(x)
-        x = self.relu(x)
-        x = self.dropout(x)
-        x = self.fc3(x)
-        x = self.relu(x)
-        out = self.fc4(x)
+        out = self.fc2(out)
+        out = self.bn2(out)
+        out = self.relu(out)
+        out = self.dropout(out)
+
+        out = self.fc3(out)
+        out = self.relu(out)
+
+        out = self.fc4(out)
+
         return out
-
 
     def temporal_attention(self, seq):
         """
         seq: [batch, 24]
-        Returns a scalar summary [batch, 1] after attention over 24 hours.
+        Returns [batch, 1] summary after multihead attention
         """
-        # Quantize continuous values for embedding lookup
         seq = ((seq * 1000).round() + 5000).long().clamp(0, self.num_embeddings - 1)
-        emb = self.seriesEmbedding(seq)          # [B, 24, emb_dim]
-
-        # Self-attention (each hour attends to every other)
-        attn_out, attn_weights = self.attn(emb, emb, emb)  # [B, 24, emb_dim], [B, n_heads, 24, 24]
+        emb = self.seriesEmbedding(seq)
+        attn_out, _ = self.attn(emb, emb, emb)
         attn_out = self.attn_norm(attn_out)
-
-        # Mean pooling over time → one embedding per sequence
-        pooled = attn_out.mean(dim=1)  # [B, emb_dim]
-
-        # Optional: you can inspect attn_weights for interpretability per head/hour
-        summary = self.attn_fc(pooled)  # [B, 1]
-        return summary
+        pooled = attn_out.mean(dim=1)
+        return self.attn_fc(pooled)  # [B, 1]
