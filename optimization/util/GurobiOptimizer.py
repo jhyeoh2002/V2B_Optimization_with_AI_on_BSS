@@ -1,3 +1,4 @@
+from calendar import c
 from math import e
 import gurobipy as gp
 from gurobipy import GRB
@@ -98,7 +99,7 @@ class GurobiOptimizer:
         elec = self.get_electricity_price()[index + 24: index + 24 + self.win_len]
         pv = self.get_photovoltaic_generation()[index + 24: index + 24 + self.win_len]
 
-        # M = self.max_power  # Maximum charging/discharging power
+        M = self.batt_cap  # Maximum charging/discharging power
         n_veh = len(soc_arr)  # Number of batteries
         epsilon = 1e-6
 
@@ -135,12 +136,21 @@ class GurobiOptimizer:
                          "Mutual Exclusivity of Charging and Discharging Across Vehicles")
         
         model.addConstrs((soc_t_v[int(t_dep[v]) - 1, v] == soc_dep[v] for v in range(n_veh)), "Leaving SOC")
-        model.addConstrs((soc_t_v[0, v] == soc_arr[v] + (ch_t_v[0, v] / self.batt_cap) * self.ch_eff - (dis_t_v[0, v] / self.batt_cap) / self.ch_eff for v in range(n_veh)), "Arriving SOC")
         
+        model.addConstrs((soc_t_v[0, v] == soc_arr[v] + (ch_t_v[0, v] / self.batt_cap) * self.ch_eff - (dis_t_v[0, v] / self.batt_cap) / self.ch_eff for v in range(n_veh)), "Arriving SOC")
         model.addConstrs((soc_t_v[t, v] == soc_t_v[t - 1, v] + (ch_t_v[t, v] / self.batt_cap) * self.ch_eff - (dis_t_v[t, v] / self.batt_cap) / self.ch_eff for t in range(1, self.win_len) for v in range(n_veh)), "Update SOC")
     
         model.addConstrs((sum(ch_t_v[t, v] for v in range(n_veh)) <= self.max_power for t in range(self.win_len)), "Max Charging Power")
         model.addConstrs((sum(dis_t_v[t, v] for v in range(n_veh)) <= self.max_power for t in range(self.win_len)), "Max Discharging Power")
+        
+        # Link charging and discharging binaries with their continuous powers
+        model.addConstrs(
+            (ch_t_v[t, v] <= M * alpha_ch_t_v[t, v] for t in range(self.win_len) for v in range(n_veh)),
+            "LinkChargeBinary"
+        )
+        model.addConstrs(
+            (dis_t_v[t, v] <= M * alpha_dis_t_v[t, v] for t in range(self.win_len) for v in range(n_veh)),
+            "LinkDischargeBinary")
         
         # Grid demand equation
         model.addConstrs((gd_t[t] == bldg[t] - pv[t] + sum(ch_t_v[t, v] - dis_t_v[t, v] for v in range(n_veh)) + loss_t[t] for t in range(self.win_len)), "Update Grid Demand")
@@ -293,3 +303,161 @@ class GurobiOptimizer:
         np.save(os.path.join(self.output_dir, f'pv_utilizations.npy'), np.array(pv_utilizations))
 
         return initial_demands, final_grid_demands, charging_demands, soc_t_v_s, optimal_objectives, optimization_times, mip_gaps, self_sufficiencies, pv_utilizations
+    
+    
+    def run_immediate_charging(self, index, available, t_arr, t_dep, soc_arr, soc_dep):
+        """
+        Simple heuristic charging routine — immediately charges batteries toward departure SOC
+        within hourly power and efficiency limits. No optimization (rule-based control).
+        """
+
+        bldg = self.get_building_energy_demand()[index + 24: index + 24 + self.win_len]
+        elec = self.get_electricity_price()[index + 24: index + 24 + self.win_len]
+        pv = self.get_photovoltaic_generation()[index + 24: index + 24 + self.win_len]
+
+        n_veh = len(soc_arr)
+        soc_t_v = np.zeros((self.win_len, n_veh))
+        ch_t_v = np.zeros((self.win_len, n_veh))
+        gd_t = np.zeros(self.win_len)
+
+        # initialize with arriving SOCs
+        for i in range(n_veh):
+            soc_t_v[t_arr[i],i] = soc_arr[i].copy()
+            
+
+        for t in range(self.win_len):
+            total_charging_power = 0
+
+            for v in range(n_veh):
+                if t < t_arr[v] or t >= t_dep[v]:
+                    continue  # not available
+
+                # check if SOC < departure target
+                if soc_t_v[t, v] < soc_dep[v] and available[v][t] == 1:
+                    # how much SOC gap remains
+                    delta_soc = soc_dep[v] - soc_t_v[t, v]
+
+                    # power required to reach target
+                    req_power = (delta_soc * self.batt_cap) / self.ch_eff
+
+                    # enforce per-hour limit
+                    charge_power = min(req_power, self.max_power - total_charging_power)
+                    print(f"Time {t}, Vehicle {v}: Charging power set to {charge_power:.2f} kW")
+
+                    if charge_power > 0:
+                        ch_t_v[t, v] = charge_power
+                        total_charging_power += charge_power
+
+                # update SOC for next hour
+                if t < self.win_len - 1:
+                    soc_t_v[t + 1, v] = soc_t_v[t, v] + (ch_t_v[t, v] / self.batt_cap) * self.ch_eff
+                    assert soc_t_v[t + 1, v] <= self.max_soc + 0.001, "Exceeded max SOC!"
+
+            print("Charging profile:", np.array(ch_t_v).shape)
+            # compute grid demand = building - pv + total charging
+            gd_t[t] = bldg[t] - pv[t] + total_charging_power
+
+        # compute total cost
+        total_cost = np.sum(gd_t * elec)
+
+        print(f"Immediate charging run complete. Total cost = {total_cost:.2f}")
+
+        return soc_t_v, ch_t_v, gd_t, total_cost
+    
+    def run_full_immediate_charging(self):
+        """
+        Executes immediate-charging logic for all available battery scenarios,
+        saving results under a new project folder (non-optimization baseline).
+        """
+
+        index, available, SOC_a_v, SOC_d_v, t_a_v, t_d_v = get_battery_details(window_length=self.win_len)
+
+        # === define project/output naming ===
+        self.proj_name_imm = f"{self.proj_name}_immediate"
+        self.output_dir_imm = f"./output_immediate_{self.proj_name}"
+        os.makedirs(self.output_dir_imm, exist_ok=True)
+
+        sys.stdout = open(f'./outputlog/output_log_{self.proj_name_imm}.txt', 'w')
+
+        # === Initialize result containers ===
+        initial_demands = []
+        final_grid_demands = []
+        charging_demands = []
+        soc_t_v_s = []
+        total_costs = []
+        self_sufficiencies = []
+        pv_utilizations = []
+
+        for idx in tqdm(range(len(available)), desc='Processing series (immediate)', unit='series'):
+            print("=" * 60)
+            print(f"[Immediate Charging] Series num: {idx}, Datetime Index: {index[idx]}")
+            print("-" * 60)
+            print("Battery Details:")
+            print(f"  Arrival hours:   {t_a_v[idx]}")
+            print(f"  Departure hours: {t_d_v[idx]}")
+            print(f"  SOC arrival:     {SOC_a_v[idx]}")
+            print(f"  SOC departure:   {SOC_d_v[idx]}")
+            print(f"  Num batteries:   {len(SOC_a_v[idx])}")
+            for i in range(len(available[idx])):
+                print(f"    Battery {i} availability: {available[idx][i]}")
+                # print(f"    Battery {i} SOC: {SOC_a_v[idx][i]} to {SOC_d_v[idx][i]}")
+
+            print("-" * 60)
+
+            soc_t_v, ch_t_v, gd_t, total_cost = self.run_immediate_charging(
+                index[idx],
+                available[idx],
+                t_a_v[idx],
+                t_d_v[idx],
+                SOC_a_v[idx],
+                SOC_d_v[idx]
+            )
+
+            # derived metrics
+            bldg = self.get_building_energy_demand()[index[idx] + 24: index[idx] + 24 + self.win_len]
+            pv = self.get_photovoltaic_generation()[index[idx] + 24: index[idx] + 24 + self.win_len]
+            self_sufficiency = max(0, 1 - (np.sum(gd_t) / np.sum(bldg)))  # share covered by PV + BSS
+            pv_utilization = np.sum(np.minimum(bldg, pv)) / np.sum(pv) if np.sum(pv) > 0 else 0
+
+            # store
+            initial_demands.append(bldg)
+            final_grid_demands.append(gd_t)
+            charging_demands.append(np.sum(ch_t_v, axis=1))
+            soc_t_v_s.append(soc_t_v)
+            total_costs.append(total_cost)
+            self_sufficiencies.append(self_sufficiency)
+            pv_utilizations.append(pv_utilization)
+
+            print(f"Total cost: {total_cost:.2f}")
+            print(f"Self-Sufficiency: {self_sufficiency:.4f}")
+            print(f"PV Utilization:   {pv_utilization:.4f}")
+            print("=" * 20, f"Series num: {idx} ENDED", "=" * 20, "\n\n")
+
+        sys.stdout.close()
+        sys.stdout = sys.__stdout__
+
+        # Pad arrays for consistent saving
+        max_batt = max([soc_t_v.shape[0] for soc_t_v in soc_t_v_s])
+        # soc_t_v_s = [
+        #     np.pad(arr, ((0, max_batt - arr.shape[0]), (0, 0)), mode='constant', constant_values=np.nan)
+        #     for arr in soc_t_v_s
+        # ]
+
+        # === Save results ===
+        np.save(os.path.join(self.output_dir_imm, 'initial_demands.npy'), np.array(initial_demands))
+        np.save(os.path.join(self.output_dir_imm, 'final_grid_demands.npy'), np.array(final_grid_demands))
+        np.save(os.path.join(self.output_dir_imm, 'charging_demands.npy'), np.array(charging_demands))
+        # np.save(os.path.join(self.output_dir_imm, 'soc_t_v.npy'), np.array(soc_t_v_s))
+        np.save(os.path.join(self.output_dir_imm, 'total_costs.npy'), np.array(total_costs))
+        np.save(os.path.join(self.output_dir_imm, 'self_sufficiencies.npy'), np.array(self_sufficiencies))
+        np.save(os.path.join(self.output_dir_imm, 'pv_utilizations.npy'), np.array(pv_utilizations))
+
+        return (
+            initial_demands,
+            final_grid_demands,
+            charging_demands,
+            soc_t_v_s,
+            total_costs,
+            self_sufficiencies,
+            pv_utilizations,
+        )
