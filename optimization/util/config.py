@@ -2,9 +2,9 @@
 
 # Project Settings
 WINDOW_LENGTH = 48  # hours
-PV_AREA = 400  # m^2
+PV_AREA = 500  # m^2
 
-PROJECT_NAME = f'V1_WL{WINDOW_LENGTH}_PV{PV_AREA}'
+PROJECT_NAME = f'V2_FIXED_WL{WINDOW_LENGTH}_PV{PV_AREA}'
 
 # Battery Parameters
 BATTERY_CAPACITY = 1.5  # kWh

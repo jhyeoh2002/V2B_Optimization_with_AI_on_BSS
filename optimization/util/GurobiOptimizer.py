@@ -319,6 +319,7 @@ class GurobiOptimizer:
         soc_t_v = np.zeros((self.win_len, n_veh))
         ch_t_v = np.zeros((self.win_len, n_veh))
         gd_t = np.zeros(self.win_len)
+        loss_t = np.zeros(self.win_len)
 
         # initialize with arriving SOCs
         for i in range(n_veh):
@@ -355,14 +356,15 @@ class GurobiOptimizer:
 
             print("Charging profile:", np.array(ch_t_v).shape)
             # compute grid demand = building - pv + total charging
-            gd_t[t] = bldg[t] - pv[t] + total_charging_power
+            gd_t[t] = max(0, bldg[t] - pv[t] + total_charging_power)
+            loss_t[t] = -min(0, bldg[t] - pv[t] + total_charging_power)
 
         # compute total cost
-        total_cost = np.sum(gd_t * elec)
+        total_cost = np.sum([gd_t[t] * elec[t] for t in range(self.win_len)])
 
         print(f"Immediate charging run complete. Total cost = {total_cost:.2f}")
 
-        return soc_t_v, ch_t_v, gd_t, total_cost
+        return soc_t_v, ch_t_v, gd_t, loss_t, total_cost
     
     def run_full_immediate_charging(self):
         """
@@ -404,7 +406,7 @@ class GurobiOptimizer:
 
             print("-" * 60)
 
-            soc_t_v, ch_t_v, gd_t, total_cost = self.run_immediate_charging(
+            soc_t_v, ch_t_v, gd_t, loss_t, total_cost = self.run_immediate_charging(
                 index[idx],
                 available[idx],
                 t_a_v[idx],
@@ -416,8 +418,8 @@ class GurobiOptimizer:
             # derived metrics
             bldg = self.get_building_energy_demand()[index[idx] + 24: index[idx] + 24 + self.win_len]
             pv = self.get_photovoltaic_generation()[index[idx] + 24: index[idx] + 24 + self.win_len]
-            self_sufficiency = max(0, 1 - (np.sum(gd_t) / np.sum(bldg)))  # share covered by PV + BSS
-            pv_utilization = np.sum(np.minimum(bldg, pv)) / np.sum(pv) if np.sum(pv) > 0 else 0
+            self_sufficiency = max(0, 1 - (np.sum(gd_t) / (np.sum(bldg)+np.sum(ch_t_v))))  # share covered by PV + BSS
+            pv_utilization = 1 - np.sum(loss_t) / np.sum(pv) if np.sum(pv) > 0 else 0
 
             # store
             initial_demands.append(bldg)
