@@ -12,10 +12,10 @@ from datetime import datetime
 
 # === import local modules ===
 from dataloader.loader import get_loaders_from_files
-from models.temporal_attentive_fusion_net import TemporalAttentiveFusionNet
+from models.temporal_attentive_fusion_net_light import TemporalAttentiveFusionNet
 
 # === Configs ===
-RUN_NAME = "LightWeightModel_With_BatchNorm_V9_LowDropout"
+RUN_NAME = "LightWeightModel_ExtraExtraLight_V2_rerun"
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 DATA_CSV = "supervised_learning/training_data/merged_windowed_dataset.csv"
@@ -28,15 +28,15 @@ LOG_FILE = PROJ_OUTPUT_DIR + f"/traininglog.txt"
 
 PLOT_SAVE_PATH = PROJ_OUTPUT_DIR + f"/trainingresults_plot.png"
 
-EPOCHS = 20000
-BATCH_SIZE = 8
-LR = 1e-2
+EPOCHS = 50000
+BATCH_SIZE = 4
+LR = 1e-3
 SEED = 42
 
-STEP_SIZE = 25  # for LR scheduler
-GAMMA = 0.9  # for LR scheduler
+STEP_SIZE = 1000  # for LR scheduler
+GAMMA = 0.5  # for LR scheduler
 
-patience = 1000
+patience = 5000
 no_improve = 0
 
 # Clear checkpoint folder if it exists
@@ -75,18 +75,19 @@ def plot_training_curves():
 
     # RMSE plot
     plt.subplot(2, 1, 1)
-    plt.plot(epochs_range, train_losses_hist, label='Train RMSE', color='blue')
-    plt.plot(epochs_range, val_losses_hist, label='Val RMSE', color='orange')
+    plt.plot(epochs_range, train_losses_hist, label='Train RMSE', color='blue',linewidth=0.8)
+    plt.plot(epochs_range, val_losses_hist, label='Val RMSE', color='orange',linewidth=0.8)
     plt.xlabel('Epoch')
     plt.ylabel('RMSE (kWh)')
+    plt.yscale('log')
     plt.title('Training & Validation RMSE')
     plt.grid(alpha=0.3)
     plt.legend()
 
     # R² plot
     plt.subplot(2, 1, 2)
-    plt.plot(epochs_range, train_r2_hist, label='Train R²', color='green')
-    plt.plot(epochs_range, val_r2_hist, label='Val R²', color='red')
+    plt.plot(epochs_range, train_r2_hist, label='Train R²', color='green',linewidth=0.8)
+    plt.plot(epochs_range, val_r2_hist, label='Val R²', color='red',linewidth=0.8)
     plt.xlabel('Epoch')
     plt.ylabel('R² Score')
     plt.title('Training & Validation R²')
@@ -128,6 +129,7 @@ best_val_loss = float("inf")
 save_path = None
 
 train_losses_hist, val_losses_hist = [], []
+train_mae_hist, val_mae_hist = [], []
 train_r2_hist, val_r2_hist = [], []
 
 
@@ -163,6 +165,7 @@ for epoch in range(EPOCHS):
             val_losses.append(loss.item())
             val_preds.extend(out.cpu().numpy())
             val_labels.extend(y.cpu().numpy())
+            
 
     # val_losses are MSE values per batch -> convert to RMSE
     avg_val_loss = np.sqrt(np.mean(val_losses))
@@ -175,7 +178,9 @@ for epoch in range(EPOCHS):
     val_losses_hist.append(avg_val_loss)
     train_r2_hist.append(train_r2)
     val_r2_hist.append(val_r2)
-
+    train_mae_hist.append(np.mean(np.abs(np.array(train_labels) - np.array(train_preds))))
+    val_mae_hist.append(np.mean(np.abs(np.array(val_labels) - np.array(val_preds))))
+    
     # === Logging ===
     print(f"Epoch {epoch+1}/{EPOCHS} | "
           f"Train RMSE: {avg_train_loss:.5f} kWh | Val RMSE: {avg_val_loss:.5f} kWh | "
@@ -206,8 +211,14 @@ for epoch in range(EPOCHS):
             plot_training_curves()
             break
         
-    if epoch % 25 == 0:
+    if epoch % 50 == 0:
         plot_training_curves()
+        np.save(f"{PROJ_OUTPUT_DIR}/train_losses_hist.npy", np.array(train_losses_hist))
+        np.save(f"{PROJ_OUTPUT_DIR}/val_losses_hist.npy", np.array(val_losses_hist))
+        np.save(f"{PROJ_OUTPUT_DIR}/train_r2_hist.npy", np.array(train_r2_hist))
+        np.save(f"{PROJ_OUTPUT_DIR}/val_r2_hist.npy", np.array(val_r2_hist))
+        np.save(f"{PROJ_OUTPUT_DIR}/train_mae_hist.npy", np.array(train_mae_hist))
+        np.save(f"{PROJ_OUTPUT_DIR}/val_mae_hist.npy", np.array(val_mae_hist))
 
 writer.close()
 

@@ -382,13 +382,15 @@ class GurobiOptimizer:
         sys.stdout = open(f'./outputlog/output_log_{self.proj_name_imm}.txt', 'w')
 
         # === Initialize result containers ===
-        initial_demands = []
+        initial_grid_demands = []
         final_grid_demands = []
         charging_demands = []
         soc_t_v_s = []
         total_costs = []
         self_sufficiencies = []
         pv_utilizations = []
+        building_energy_demands = []
+        pv_generations = []
 
         for idx in tqdm(range(len(available)), desc='Processing series (immediate)', unit='series'):
             print("=" * 60)
@@ -422,13 +424,15 @@ class GurobiOptimizer:
             pv_utilization = 1 - np.sum(loss_t) / np.sum(pv) if np.sum(pv) > 0 else 0
 
             # store
-            initial_demands.append(bldg)
+            initial_grid_demands.append(np.maximum(bldg - pv, 0))
             final_grid_demands.append(gd_t)
             charging_demands.append(np.sum(ch_t_v, axis=1))
             soc_t_v_s.append(soc_t_v)
             total_costs.append(total_cost)
             self_sufficiencies.append(self_sufficiency)
             pv_utilizations.append(pv_utilization)
+            building_energy_demands.append(bldg)
+            pv_generations.append(pv)
 
             print(f"Total cost: {total_cost:.2f}")
             print(f"Self-Sufficiency: {self_sufficiency:.4f}")
@@ -446,16 +450,18 @@ class GurobiOptimizer:
         # ]
 
         # === Save results ===
-        np.save(os.path.join(self.output_dir_imm, 'initial_demands.npy'), np.array(initial_demands))
+        np.save(os.path.join(self.output_dir_imm, 'initial_grid_demands.npy'), np.array(initial_grid_demands))
         np.save(os.path.join(self.output_dir_imm, 'final_grid_demands.npy'), np.array(final_grid_demands))
         np.save(os.path.join(self.output_dir_imm, 'charging_demands.npy'), np.array(charging_demands))
         # np.save(os.path.join(self.output_dir_imm, 'soc_t_v.npy'), np.array(soc_t_v_s))
         np.save(os.path.join(self.output_dir_imm, 'total_costs.npy'), np.array(total_costs))
         np.save(os.path.join(self.output_dir_imm, 'self_sufficiencies.npy'), np.array(self_sufficiencies))
         np.save(os.path.join(self.output_dir_imm, 'pv_utilizations.npy'), np.array(pv_utilizations))
+        np.save(os.path.join(self.output_dir_imm, 'building_energy_demands.npy'), np.array(building_energy_demands))
+        np.save(os.path.join(self.output_dir_imm, 'pv_generations.npy'), np.array(pv_generations))
 
         return (
-            initial_demands,
+            initial_grid_demands,
             final_grid_demands,
             charging_demands,
             soc_t_v_s,

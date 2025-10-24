@@ -79,7 +79,7 @@ def structured_lr_finder(
 
     return log_lrs, losses
 
-from models.temporal_attentive_fusion_net import TemporalAttentiveFusionNet
+from models.temporal_attentive_fusion_net_light import TemporalAttentiveFusionNet
 from dataloader.loader import get_loaders_from_files
 import torch.nn as nn
 import torch.optim as optim
@@ -96,13 +96,13 @@ train_loader, _, _ = get_loaders_from_files(
     merged_csv_path="supervised_learning/training_data/merged_windowed_dataset.csv",
     feature_info_path="supervised_learning/training_data/feature_info.json",
     sequence_length=24,
-    batch_size=16,
+    batch_size=4,
     num_workers=2
 )
 
 log_lrs, losses = structured_lr_finder(
     model, train_loader, optimizer, criterion, DEVICE,
-    lr_start=1e-6, lr_end=1, num_iter=200
+    lr_start=1e-6, lr_end=1, num_iter=500
 )
 
 plt.figure(figsize=(8,6), dpi=150)

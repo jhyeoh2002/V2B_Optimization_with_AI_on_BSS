@@ -10,8 +10,8 @@ class TemporalAttentiveFusionNet(nn.Module):
                  fc_hidden_dim1=128,
                  fc_hidden_dim2=64,
                  fc_hidden_dim3=16,
-                 attention_dropout=0.4,
-                 dropout=0.4):
+                 attention_dropout=0.5,
+                 dropout=0.5):
         """
         Multihead attention-based fusion of static + temporal inputs.
         Each 24-hour series passes through interpretable attention, then all summaries are fused.
