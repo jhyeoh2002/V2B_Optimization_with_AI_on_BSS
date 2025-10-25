@@ -228,6 +228,7 @@ if save_path is not None:
     model.eval()
 
 test_preds, test_labels = [], []
+
 with torch.no_grad():
     for x, y in test_loader:
         x, y = x.to(DEVICE), y.to(DEVICE).unsqueeze(1)
