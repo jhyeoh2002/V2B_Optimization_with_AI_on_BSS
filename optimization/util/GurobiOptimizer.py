@@ -376,7 +376,7 @@ class GurobiOptimizer:
 
         # === define project/output naming ===
         self.proj_name_imm = f"{self.proj_name}_immediate"
-        self.output_dir_imm = f"./output_immediate_{self.proj_name}"
+        self.output_dir_imm = f"./output/immediate_{self.proj_name}"
         os.makedirs(self.output_dir_imm, exist_ok=True)
 
         sys.stdout = open(f'./outputlog/output_log_{self.proj_name_imm}.txt', 'w')
