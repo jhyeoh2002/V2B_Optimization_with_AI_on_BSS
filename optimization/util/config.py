@@ -2,15 +2,14 @@
 
 # Project Settings
 WINDOW_LENGTH = 48  # hours
-PV_AREA = 500  # m^2
+PV_AREA = 700  # m^2
 
-PROJECT_NAME = f'V2_FIXED_WL{WINDOW_LENGTH}_PV{PV_AREA}'
+PROJECT_NAME = f'V3_With_G2Vcost_WL{WINDOW_LENGTH}_PV{PV_AREA}'
 
 # Battery Parameters
 BATTERY_CAPACITY = 1.5  # kWh
 BATTERY_COST = 9071     # $/kWh
 BATTERY_CYCLE_LIFE = 2020  # cycles
-DEPTH_OF_DISCHARGE = 0.7
 
 # Charging Parameters
 CHARGING_RATE = 14      # kW

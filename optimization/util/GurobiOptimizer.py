@@ -70,12 +70,17 @@ class GurobiOptimizer:
         return building_energy_demand_df.values.flatten()
     
     def get_electricity_price(self):
-        electricity_price_df = pd.read_csv(f'../data/processed/electricitycostG2B_data.csv')
-        electricity_price_df.set_index('Datetime', inplace=True)
+        electricity_price_G2B_df = pd.read_csv(f'../data/processed/electricitycostG2B_data.csv')
+        electricity_price_G2B_df.set_index('Datetime', inplace=True)
 
-        electricity_price_df = electricity_price_df.apply(pd.to_numeric, errors='coerce')
+        electricity_price_G2B_df = electricity_price_G2B_df.apply(pd.to_numeric, errors='coerce')
 
-        return electricity_price_df.values.flatten()
+        electricity_price_G2V_df = pd.read_csv(f'../data/processed/electricitycostG2V_data.csv')
+        electricity_price_G2V_df.set_index('Datetime', inplace=True)
+
+        electricity_price_G2V_df = electricity_price_G2V_df.apply(pd.to_numeric, errors='coerce')
+
+        return electricity_price_G2B_df.values.flatten(), electricity_price_G2V_df.values.flatten()
 
     def get_photovoltaic_generation(self):
         radiation_df = pd.read_csv(f'../data/processed/radiation_data.csv')
@@ -94,9 +99,11 @@ class GurobiOptimizer:
         return pv_generation
 
     def run_single_optimization(self, index, available, t_arr, t_dep, soc_arr, soc_dep):
-
+        
+        # Load Parameters and Data
         bldg = self.get_building_energy_demand()[index + 24: index + 24 + self.win_len]
-        elec = self.get_electricity_price()[index + 24: index + 24 + self.win_len]
+        elec_G2B, elec_G2V = self.get_electricity_price()
+        elec_G2B, elec_G2V = elec_G2B[index + 24: index + 24 + self.win_len], elec_G2V[index + 24: index + 24 + self.win_len]
         pv = self.get_photovoltaic_generation()[index + 24: index + 24 + self.win_len]
 
         M = self.batt_cap  # Maximum charging/discharging power
@@ -110,14 +117,23 @@ class GurobiOptimizer:
         gd_t = model.addVars(self.win_len, lb=0, vtype=GRB.CONTINUOUS, name="Grid demand at t")
         loss_t = model.addVars(self.win_len, lb=0, vtype=GRB.CONTINUOUS, name="Loss at t")
 
+        # Energy flow within system
+        G2B_t = model.addVars(self.win_len, lb=0, vtype=GRB.CONTINUOUS, name="Grid to Building")
+        P2B_t = model.addVars(self.win_len, lb=0, vtype=GRB.CONTINUOUS, name="PV to Building")
+        
+        G2V_t_v = model.addVars(self.win_len, n_veh, lb=0, vtype=GRB.CONTINUOUS, name="Grid to Vehicle")
+        P2V_t_v = model.addVars(self.win_len, n_veh, lb=0, vtype=GRB.CONTINUOUS, name="PV to Vehicle")
+        
+        V2B_t_v = model.addVars(self.win_len, n_veh, lb=0, vtype=GRB.CONTINUOUS, name="Vehicle to Building")
+        
         soc_t_v = model.addVars(self.win_len, n_veh, lb=self.min_soc, ub=self.max_soc, vtype=GRB.CONTINUOUS, name="SOC for vehicle")
-        ch_t_v = model.addVars(self.win_len, n_veh, lb=0, vtype=GRB.CONTINUOUS, name="Vehicle charging")
-        dis_t_v = model.addVars(self.win_len, n_veh, lb=0, vtype=GRB.CONTINUOUS, name="Vehicle discharging")
+        # ch_t_v = model.addVars(self.win_len, n_veh, lb=0, vtype=GRB.CONTINUOUS, name="Vehicle charging")
+        # dis_t_v = model.addVars(self.win_len, n_veh, lb=0, vtype=GRB.CONTINUOUS, name="Vehicle discharging")
 
         alpha_ch_t_v = model.addVars(self.win_len, n_veh, vtype=GRB.BINARY, name="Charging Indicator")
         alpha_dis_t_v = model.addVars(self.win_len, n_veh, vtype=GRB.BINARY, name="Discharging Indicator")
-    
-        cost_obj = self.compute_cost_objective(gd_t, elec)
+
+        cost_obj = self.compute_cost_objective(G2V_t_v, elec_G2V, G2B_t, elec_G2B, n_veh)
 
         # ==============================
         # OBJECTIVE FUNCTION
@@ -128,6 +144,14 @@ class GurobiOptimizer:
         # ==============================
         # CONSTRAINTS
         # ==============================
+        
+        # Energy balance constraints
+        model.addConstrs((G2B_t[t] + sum(G2V_t_v[t, v] for v in range(n_veh)) == gd_t[t] for t in range(self.win_len)), "Grid Energy Balance")
+        model.addConstrs((P2B_t[t] + sum(P2V_t_v[t, v] for v in range(n_veh)) + loss_t[t] == pv[t] for t in range(self.win_len)), "PV Energy Balance")
+        
+        model.addConstrs((G2B_t[t] + P2B_t[t] + sum(V2B_t_v[t, v] for v in range(n_veh)) == bldg[t] for t in range(self.win_len)), "Building Energy Balance")
+ 
+        # Charging/discharging constraints
         model.addConstrs((alpha_ch_t_v[t, v] + alpha_dis_t_v[t, v] <= available[v][t] for t in range(self.win_len) for v in range(n_veh)), "Only Charge or Discharge at Available Hour")
         
         model.addConstrs((gp.quicksum(alpha_ch_t_v[t, v] for v in range(n_veh)) * 
@@ -135,25 +159,31 @@ class GurobiOptimizer:
                           for t in range(self.win_len)), 
                          "Mutual Exclusivity of Charging and Discharging Across Vehicles")
         
+        # SOC updating constraints
         model.addConstrs((soc_t_v[int(t_dep[v]) - 1, v] == soc_dep[v] for v in range(n_veh)), "Leaving SOC")
         
-        model.addConstrs((soc_t_v[0, v] == soc_arr[v] + (ch_t_v[0, v] / self.batt_cap) * self.ch_eff - (dis_t_v[0, v] / self.batt_cap) / self.ch_eff for v in range(n_veh)), "Arriving SOC")
-        model.addConstrs((soc_t_v[t, v] == soc_t_v[t - 1, v] + (ch_t_v[t, v] / self.batt_cap) * self.ch_eff - (dis_t_v[t, v] / self.batt_cap) / self.ch_eff for t in range(1, self.win_len) for v in range(n_veh)), "Update SOC")
-    
-        model.addConstrs((sum(ch_t_v[t, v] for v in range(n_veh)) <= self.max_power for t in range(self.win_len)), "Max Charging Power")
-        model.addConstrs((sum(dis_t_v[t, v] for v in range(n_veh)) <= self.max_power for t in range(self.win_len)), "Max Discharging Power")
+        model.addConstrs((soc_t_v[0, v] == soc_arr[v] + 
+                          (G2V_t_v[0, v] + P2V_t_v[0, v] / self.batt_cap) * self.ch_eff - 
+                          (V2B_t_v[0, v] / self.batt_cap) / self.ch_eff for v in range(n_veh)), "Arriving SOC")
+        
+        model.addConstrs((soc_t_v[t, v] == soc_t_v[t - 1, v] + 
+                          (G2V_t_v[t, v] + P2V_t_v[t, v] / self.batt_cap) * self.ch_eff - 
+                          (V2B_t_v[t, v] / self.batt_cap) / self.ch_eff for t in range(1, self.win_len) for v in range(n_veh)), "Update SOC")
+
+        # Power limits
+        model.addConstrs((sum(G2V_t_v[t, v] + P2V_t_v[t, v]for v in range(n_veh)) <= self.max_power for t in range(self.win_len)), "Max Charging Power")
+        model.addConstrs((sum(V2B_t_v[t, v] for v in range(n_veh)) <= self.max_power for t in range(self.win_len)), "Max Discharging Power")
         
         # Link charging and discharging binaries with their continuous powers
         model.addConstrs(
-            (ch_t_v[t, v] <= M * alpha_ch_t_v[t, v] for t in range(self.win_len) for v in range(n_veh)),
+            (G2V_t_v[t, v] + P2V_t_v[t, v] <= M * alpha_ch_t_v[t, v] for t in range(self.win_len) for v in range(n_veh)),
             "LinkChargeBinary"
         )
+        
         model.addConstrs(
-            (dis_t_v[t, v] <= M * alpha_dis_t_v[t, v] for t in range(self.win_len) for v in range(n_veh)),
+            (V2B_t_v[t, v] <= M * alpha_dis_t_v[t, v] for t in range(self.win_len) for v in range(n_veh)),
             "LinkDischargeBinary")
         
-        # Grid demand equation
-        model.addConstrs((gd_t[t] == bldg[t] - pv[t] + sum(ch_t_v[t, v] - dis_t_v[t, v] for v in range(n_veh)) + loss_t[t] for t in range(self.win_len)), "Update Grid Demand")
         
         # ==============================
         # RUN OPTIMIZATION
@@ -171,11 +201,11 @@ class GurobiOptimizer:
         if model.status == GRB.OPTIMAL:
             initial_demand = [max(bldg[t] - pv[t], 0) for t in range(self.win_len)]
             final_grid_demand = [gd_t[t].x for t in range(self.win_len)]  
-            charging_demand = [sum([ch_t_v[t, v].x - dis_t_v[t, v].x for v in range(n_veh)]) for t in range(self.win_len)]
+            charging_demand = [sum([G2V_t_v[t, v].x + P2V_t_v[t, v].x for v in range(n_veh)]) for t in range(self.win_len)]
             soc_t_v = [[soc_t_v[t, v].x for t in range(self.win_len)] for v in range(n_veh)]
 
             total_grid_demand = sum(final_grid_demand)
-            total_demand = sum([bldg[t] for t in range(self.win_len)]) + sum([ch_t_v[t, v].x for v in range(n_veh) for t in range(self.win_len)])
+            total_demand = sum([bldg[t] for t in range(self.win_len)]) + sum([G2V_t_v[t, v].x + P2V_t_v[t, v].x  for v in range(n_veh) for t in range(self.win_len)])
 
             pv_loss = sum([loss_t[t].x for t in range(self.win_len)])
             pv_generated = sum([pv[t] for t in range(self.win_len)])
@@ -201,9 +231,9 @@ class GurobiOptimizer:
             print(f"Optimization ended with status {model.status}")
             return None
         
-    def compute_cost_objective(self, gd_t, electricity_cost):
+    def compute_cost_objective(self, G2V_t_v, elec_G2V, G2B_t, elec_G2B, n_veh=None):
         """Compute electricity cost objective."""
-        cost_ob = {t: electricity_cost[t] * gd_t[t] for t in range(self.win_len)}
+        cost_ob = {t: elec_G2V[t] * sum(G2V_t_v[t,v] for v in range(n_veh)) + elec_G2B[t] * G2B_t[t] for t in range(self.win_len)}
         total_cost = gp.quicksum(cost_ob.values())  # Total electricity cost
         return cost_ob
 
