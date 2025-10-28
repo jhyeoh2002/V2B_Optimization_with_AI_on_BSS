@@ -13,3 +13,6 @@ venv/
 
 # --- VS Code Settings ---
 .vscode/
+
+# --- macOS ---
+.DS_Store
