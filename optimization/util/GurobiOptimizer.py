@@ -1,7 +1,15 @@
 from calendar import c
 from math import e
-import gurobipy as gp
-from gurobipy import GRB
+try:
+    import gurobipy as gp
+    from gurobipy import GRB
+    _gurobi_import_error = None
+except Exception as _e:
+    # Guard against environments where gurobipy is not installed or license is unavailable.
+    gp = None
+    GRB = None
+    _gurobi_import_error = _e
+    
 import matplotlib.pyplot as plt
 import time
 import sys
@@ -60,6 +68,25 @@ class GurobiOptimizer:
         self.win_len = win_len
         self.proj_name = proj_name
         self.output_dir = os.path.join(".", "output", self.proj_name)
+        # Flag to indicate whether gurobipy is available in this runtime
+        self._gurobi_available = gp is not None
+
+    def _require_gurobi(self):
+        """Raise a clear error if gurobipy is not available.
+
+        This prevents the module from crashing the kernel at import time while
+        giving informative errors when optimization methods are invoked.
+        """
+        if not self._gurobi_available:
+            err_msg = (
+                "gurobipy is not available in this Python environment. "
+                "Install Gurobi and ensure the license is configured, or run "
+                "only the non-optimization methods (e.g., immediate charging)."
+            )
+            # Append original import exception message if available
+            if _gurobi_import_error is not None:
+                err_msg += f" Original import error: {_gurobi_import_error!r}"
+            raise RuntimeError(err_msg)
         
     def get_building_energy_demand(self):
         building_energy_demand_df = pd.read_csv(f'../data/processed/building_data.csv')
@@ -99,7 +126,9 @@ class GurobiOptimizer:
         return pv_generation
 
     def run_single_optimization(self, index, available, t_arr, t_dep, soc_arr, soc_dep):
-        
+        # Ensure Gurobi is available before attempting to build a model
+        self._require_gurobi()
+
         # Load Parameters and Data
         bldg = self.get_building_energy_demand()[index + 24: index + 24 + self.win_len]
         elec_G2B, elec_G2V = self.get_electricity_price()
@@ -112,6 +141,8 @@ class GurobiOptimizer:
 
         # Create a new model
         model = gp.Model("V2B_Optimization")
+        model.setParam("Threads", 8)
+        model.setParam("MIPGap", 0.05)
 
         # Define variables
         gd_t = model.addVars(self.win_len, lb=0, vtype=GRB.CONTINUOUS, name="Grid demand at t")
@@ -147,7 +178,7 @@ class GurobiOptimizer:
         
         # Energy balance constraints
         model.addConstrs((G2B_t[t] + sum(G2V_t_v[t, v] for v in range(n_veh)) == gd_t[t] for t in range(self.win_len)), "Grid Energy Balance")
-        model.addConstrs((P2B_t[t] + sum(P2V_t_v[t, v] for v in range(n_veh)) + loss_t[t] == pv[t] for t in range(self.win_len)), "PV Energy Balance")
+        model.addConstrs((P2B_t[t] + sum(P2V_t_v[t, v] for v in range(n_veh)) == pv[t] - loss_t[t] for t in range(self.win_len)), "PV Energy Balance")
         
         model.addConstrs((G2B_t[t] + P2B_t[t] + sum(V2B_t_v[t, v] for v in range(n_veh)) == bldg[t] for t in range(self.win_len)), "Building Energy Balance")
  
@@ -163,11 +194,11 @@ class GurobiOptimizer:
         model.addConstrs((soc_t_v[int(t_dep[v]) - 1, v] == soc_dep[v] for v in range(n_veh)), "Leaving SOC")
         
         model.addConstrs((soc_t_v[0, v] == soc_arr[v] + 
-                          (G2V_t_v[0, v] + P2V_t_v[0, v] / self.batt_cap) * self.ch_eff - 
+                          (G2V_t_v[0, v] + P2V_t_v[0, v]) / self.batt_cap * self.ch_eff - 
                           (V2B_t_v[0, v] / self.batt_cap) / self.ch_eff for v in range(n_veh)), "Arriving SOC")
         
         model.addConstrs((soc_t_v[t, v] == soc_t_v[t - 1, v] + 
-                          (G2V_t_v[t, v] + P2V_t_v[t, v] / self.batt_cap) * self.ch_eff - 
+                          (G2V_t_v[t, v] + P2V_t_v[t, v]) / self.batt_cap * self.ch_eff - 
                           (V2B_t_v[t, v] / self.batt_cap) / self.ch_eff for t in range(1, self.win_len) for v in range(n_veh)), "Update SOC")
 
         # Power limits
@@ -233,6 +264,10 @@ class GurobiOptimizer:
         
     def compute_cost_objective(self, G2V_t_v, elec_G2V, G2B_t, elec_G2B, n_veh=None):
         """Compute electricity cost objective."""
+        # This function is intended to be used while building a Gurobi model.
+        # Ensure gurobipy is available; otherwise return a helpful error.
+        self._require_gurobi()
+
         cost_ob = {t: elec_G2V[t] * sum(G2V_t_v[t,v] for v in range(n_veh)) + elec_G2B[t] * G2B_t[t] for t in range(self.win_len)}
         total_cost = gp.quicksum(cost_ob.values())  # Total electricity cost
         return cost_ob
