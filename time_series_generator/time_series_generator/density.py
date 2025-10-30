@@ -26,7 +26,7 @@ def compute_posterior_weights_from_partial_subseq(
     observed_dims = np.where(~np.isnan(X_marginal_obs[0]))[0]
     assert len(w_prior) == N, "w_prior 長度錯誤"
     assert len(w_obs) == M, "w_obs 長度錯誤"
-
+ 
     # Normalize weights
     w_prior = w_prior / np.sum(w_prior)
     w_obs = w_obs / np.sum(w_obs)
