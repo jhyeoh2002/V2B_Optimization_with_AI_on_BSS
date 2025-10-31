@@ -8,10 +8,13 @@ import time_series_generator.config as cfg
 
 # ========= 新增：相位對齊工具 =========
 
-def _norm(x):
+def _norm(x, eps=1e-8):
     x = np.asarray(x, dtype=float)
-    m, s = np.mean(x), np.std(x)
-    return (x - m) / (s + 1e-12)
+    m = np.nanmean(x)                     # 忽略 NaN
+    s = np.nanstd(x)                      # 忽略 NaN
+    if not np.isfinite(s) or s < eps:
+        s = eps                           # 避免除以 0 或極小值
+    return np.nan_to_num((x - m) / s)     # 把 nan / inf 轉成有限值
 
 def _best_lag_xcorr(seed, cand, max_shift):
     x = _norm(seed).ravel()
@@ -80,7 +83,9 @@ class Generator:
                  random_state=cfg.RANDOM_STATE,
                  max_shift=cfg.MAX_SHIFT if hasattr(cfg, "MAX_SHIFT") else 6,
                  top_k=cfg.TOP_K if hasattr(cfg, "TOP_K") else 200,
-                 align_mode="roll"):
+                 align_mode="roll",
+                 bootstrap_size: int = cfg.BOOTSTRAP_SIZE if hasattr(cfg, "BOOTSTRAP_SIZE") else 20
+                 ):
         self.window_size = window_size
         self.resolution = resolution
         self.seed = seed
@@ -90,6 +95,7 @@ class Generator:
         self.max_shift = max_shift
         self.top_k = top_k
         self.align_mode = align_mode
+        self.bootstrap_size = bootstrap_size 
 
         self._estimator = BayesianDistributionEstimator(
             window_size=self.window_size,
@@ -104,40 +110,50 @@ class Generator:
             seed=self.seed, bandwidth=self.bandwidth
         )
 
+        # ------------------------
+        # 1) 準備 KDE
+        # ------------------------
         kde = KernelDensity(kernel='gaussian', bandwidth=self.bandwidth)
-       # ---- 先挑出沒有 NaN/Inf 的樣本列 ----
+
+        # 只用沒有 NaN 的 rows
         row_ok = np.all(np.isfinite(X_joint), axis=1)
-        X_kde = X_joint[row_ok]
+        X_kde = (X_joint[row_ok] - mean_seed) / (std_seed + 1e-12)
         w_kde = w_post[row_ok]
 
-        # ---- 權重清理（把 NaN/Inf/負值 → 0）----
+        # 權重清理
         w_kde = np.nan_to_num(w_kde, nan=0.0, posinf=0.0, neginf=0.0)
         w_kde = np.clip(w_kde, 0.0, None)
 
-        # 若仍全為 0，則退回均勻/常數補值策略
         if X_kde.shape[0] == 0 or float(w_kde.sum()) == 0.0:
-            # 退而求其次：用補 0 的 X 與均勻權重
             X_kde = np.nan_to_num(X_joint, nan=0.0, posinf=0.0, neginf=0.0)
             w_kde = np.ones(X_kde.shape[0], dtype=float)
 
-        # ---- 權重正規化（非必要但穩定）----
         w_sum = float(w_kde.sum())
         if w_sum <= 0:
             w_kde[:] = 1.0 / len(w_kde)
         else:
             w_kde = w_kde / w_sum
 
-        # ---- 最終防呆 ----
-        assert np.isfinite(X_kde).all(), "X_kde 仍含 NaN/Inf"
-        assert np.isfinite(w_kde).all(), "w_kde 仍含 NaN/Inf"
-        assert X_kde.shape[0] == w_kde.shape[0], "樣本數與權重數不一致"
+        assert np.isfinite(X_kde).all()
+        assert np.isfinite(w_kde).all()
+        assert X_kde.shape[0] == w_kde.shape[0]
 
-        # ---- 擬合 KDE ----
         kde.fit(X_kde, sample_weight=w_kde)
 
-        new_samples = kde.sample(n_samples=self.n_sample, random_state=self.random_state)
-        new_samples = new_samples * std_seed + mean_seed
+        # ------------------------
+        # 2) bootstrap 型生成
+        # ------------------------
+        rng = np.random.RandomState(self.random_state)
+        all_samples = []
+        for _ in range(self.n_sample):
+            boot = kde.sample(n_samples=self.bootstrap_size,
+                              random_state=rng)
+            boot_mean = boot.mean(axis=0)
+            boot_mean = boot_mean * std_seed + mean_seed
+            all_samples.append(boot_mean)
+        new_samples = np.stack(all_samples, axis=0)
         return new_samples
+
 
 
 class BayesianDistributionEstimator:
@@ -230,10 +246,16 @@ class BayesianDistributionEstimator:
                 continue
 
             X_obs = X_joint[mask]  # 該群在 Top-K 的已對齊樣本
+            # for x in X_obs:
+            #     print(x)
+            #     print(_norm(x))
+            # print(normal_seed)
             # 以與 seed 的距離（已對齊）產生觀測權重
             d_obs = np.array([_euclidean(normal_seed, _norm(x)) for x in X_obs], dtype=float)
+            # print(d_obs)
             w_obs = 1.0 / (d_obs**2 + 1e-8)
             w_obs_sum = w_obs.sum()
+            # print(w_obs_sum)
             w_obs = w_obs / (w_obs_sum if w_obs_sum > 0 else 1.0)
 
             # 用既有的部分序列後驗修正函式做細部修正（支撐集固定為 X_joint）
@@ -242,7 +264,6 @@ class BayesianDistributionEstimator:
             )
 
         return mean_seed, std_seed, X_joint, w_post
-
 
     def _prepare_data(self):
         self.grouped_samples = self.datapreparer.generate_grouped_subsequences()
