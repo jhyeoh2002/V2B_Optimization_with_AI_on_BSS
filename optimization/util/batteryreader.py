@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-def get_battery_details(window_length = 30):
+def get_battery_details(window_length):
     
     available = np.load(f"../data/processed/battery_schedule_window{window_length}.npy")
     available = [sample[~np.isnan(sample).any(axis=1)].astype(int) for sample in available]
