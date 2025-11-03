@@ -8,9 +8,9 @@ RESOLUTION = '1h'
 
 BANDWIDTH = 0.01
 
-MEAN = 40
-STD = 8
-RG_WINDOW_SIZE = 36
+MEAN = 27.91
+STD = 10.34
+RG_WINDOW_SIZE = 30
 RG_SEED = np.random.normal(loc=MEAN, scale=STD, size=RG_WINDOW_SIZE)
 
 # window size = 24
