@@ -123,7 +123,7 @@ class GurobiOptimizer:
         model.addConstrs((sum(V2B_t_v[t, v] for v in range(n_veh)) <= M * alpha_dis_t[t] for t in range(self.win_len)), "LinkDischargeBinary")
 
         # SOC updating constraints
-        model.addConstrs((soc_t_v[int(t_dep[v]) - 1, v] + unmet_v[v] >= soc_dep[v] for v in range(n_veh)), "Leaving SOC")
+        model.addConstrs((soc_t_v[int(t_dep[v]) - 1, v] + (unmet_v[v]/self.batt_cap) >= soc_dep[v] for v in range(n_veh)), "Leaving SOC")
         model.addConstrs((soc_t_v[0, v] == soc_arr[v] + (G2V_t_v[0, v] + P2V_t_v[0, v]) / self.batt_cap * self.ch_eff - (V2B_t_v[0, v] / self.batt_cap) / self.ch_eff for v in range(n_veh)), "Arriving SOC")
         model.addConstrs((soc_t_v[t, v] == soc_t_v[t - 1, v] + (G2V_t_v[t, v] + P2V_t_v[t, v]) / self.batt_cap * self.ch_eff - (V2B_t_v[t, v] / self.batt_cap) / self.ch_eff for t in range(1, self.win_len) for v in range(n_veh)), "Update SOC")
 
@@ -169,11 +169,10 @@ class GurobiOptimizer:
 
             # Derived performance metrics
             initial_demand = np.maximum(bldg - pv, 0)
-            final_grid_demand = gd_t_val
             charging_demand = np.sum(G2V_val + P2V_val, axis=1)
 
-            total_grid_demand = np.sum(final_grid_demand)
-            total_demand = np.sum(bldg) + np.sum(G2V_val + P2V_val)
+            total_grid_demand = np.sum(gd_t_val)
+            total_demand = np.sum(G2B_val + P2B_val) + np.sum(G2V_val + P2V_val)
             pv_generated = np.sum(pv)
             pv_loss = np.sum(loss_t_val)
 
@@ -186,34 +185,33 @@ class GurobiOptimizer:
                 if pv_generated > 0 else 0
             )
 
-            # Optimization metadata
-            result_summary = {
-                "objective_value": model.ObjVal,
-                "optimization_time_s": model.Runtime,
-                "mip_gap_percent": model.MIPGap * 100 if model.isMIP else None,
-                "total_cost": total_cost,
-                "self_sufficiency": self_sufficiency,
-                "pv_utilization": pv_utilization,
-            }
-
             # Structured return for downstream saving
-            results = {
-                "grid_demand": gd_t_val,
-                "pv_loss": loss_t_val,
-                "G2B": G2B_val,
-                "P2B": P2B_val,
-                "G2V": G2V_val,
-                "P2V": P2V_val,
-                "V2B": V2B_val,
-                "SOC": SOC_val,
-                "unmet": unmet_val,
-                "initial_demand": initial_demand,
-                "final_grid_demand": final_grid_demand,
-                "charging_demand": charging_demand,
-                "summary": result_summary,
+            result = {
+                "grid_demand": gd_t_val, # Grid demand over time (window length)
+                "pv_loss": loss_t_val, # PV loss over time (window length)
+                "initial_demand": initial_demand, # Initial demand (window length)
+                "charging_demand": charging_demand, # Charging demand (window length)
+                
+                "G2B": G2B_val, # Grid to Building flows (window length)
+                "P2B": P2B_val, # PV to Building flows (window length)
+                
+                "G2V": G2V_val, # Grid to Vehicle flows (n_vehicle x window length)
+                "P2V": P2V_val, # PV to Vehicle flows (n_vehicle x window length)
+                "V2B": V2B_val, # Vehicle to Building flows (n_vehicle x window length)
+
+                "SOC": SOC_val, # State of Charge over time (n_vehicle x window length)
+                "unmet": unmet_val, # Unmet demand per vehicle (n_vehicle)
+
+                "objective_value": model.ObjVal, # Final objective value (scalar)
+                "optimization_time_s": model.Runtime, # Optimization time in seconds (scalar)
+                "mip_gap_percent": model.MIPGap * 100 if model.isMIP else None, # MIP gap percentage (scalar)
+                
+                "total_cost": total_cost, # Total cost incurred (scalar)
+                "self_sufficiency": self_sufficiency, # Self-sufficiency metric (scalar)
+                "pv_utilization": pv_utilization, # PV utilization metric (scalar)
             }
 
-            return results
+            return result
 
         else:
             
