@@ -2,7 +2,7 @@
 
 # Project Settings
 WINDOW_LENGTH = 30  # hours
-PV_AREA = 1300  # m^2
+PV_AREA = 500  # m^2
 
 PROJECT_DETAIL = "Test"
 PROJECT_NAME = f'WL{WINDOW_LENGTH}_PV{PV_AREA}_{PROJECT_DETAIL}'
