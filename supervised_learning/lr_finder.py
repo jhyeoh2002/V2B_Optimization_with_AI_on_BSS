@@ -79,7 +79,7 @@ def structured_lr_finder(
 
     return log_lrs, losses
 
-from models.temporal_attentive_fusion_net_light import TemporalAttentiveFusionNet
+from supervised_learning.models.STAF_V2 import TemporalAttentiveFusionNet
 from dataloader.loader import get_loaders_from_files
 import torch.nn as nn
 import torch.optim as optim

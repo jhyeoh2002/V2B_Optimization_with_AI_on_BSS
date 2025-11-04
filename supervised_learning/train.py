@@ -12,14 +12,14 @@ from datetime import datetime
 
 # === import local modules ===
 from dataloader.loader import get_loaders_from_files
-from models.temporal_attentive_fusion_net_light import TemporalAttentiveFusionNet
+from models.STAF_V2 import TemporalAttentiveFusionNet
 
 # === Configs ===
-RUN_NAME = "LightWeightModel_ExtraExtraLight_V2_rerun"
+RUN_NAME = "new_STAF"
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-DATA_CSV = "supervised_learning/training_data/merged_windowed_dataset.csv"
-FEATURE_INFO = "supervised_learning/training_data/feature_info.json"
+DATA_CSV = "supervised_learning/dataloader/merged_windowed_datasetV2.csv"
+FEATURE_INFO = "supervised_learning/dataloader/feature_infoV2.json"
 
 PROJ_OUTPUT_DIR = f"supervised_learning/output/{RUN_NAME}"
 CHECKPOINT_DIR = f"supervised_learning/output/{RUN_NAME}/checkpoints"
@@ -29,8 +29,8 @@ LOG_FILE = PROJ_OUTPUT_DIR + f"/traininglog.txt"
 PLOT_SAVE_PATH = PROJ_OUTPUT_DIR + f"/trainingresults_plot.png"
 
 EPOCHS = 50000
-BATCH_SIZE = 4
-LR = 1e-3
+BATCH_SIZE = 16
+LR = 1e-4
 SEED = 42
 
 STEP_SIZE = 1000  # for LR scheduler
@@ -79,7 +79,7 @@ def plot_training_curves():
     plt.plot(epochs_range, val_losses_hist, label='Val RMSE', color='orange',linewidth=0.8)
     plt.xlabel('Epoch')
     plt.ylabel('RMSE (kWh)')
-    plt.yscale('log')
+    # plt.yscale('log')
     plt.title('Training & Validation RMSE')
     plt.grid(alpha=0.3)
     plt.legend()
