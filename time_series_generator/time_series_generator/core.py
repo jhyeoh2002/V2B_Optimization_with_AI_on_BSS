@@ -17,6 +17,9 @@ def _norm(x, eps=1e-8):
     return np.nan_to_num((x - m) / s)     # 把 nan / inf 轉成有限值
 
 def _best_lag_xcorr(seed, cand, max_shift):
+    '''
+    計算不同相位差下的相似度，找到最佳解
+    '''
     x = _norm(seed).ravel()
     y = _norm(cand).ravel()
     n = min(len(x), len(y))
@@ -40,7 +43,7 @@ def _best_lag_xcorr(seed, cand, max_shift):
 
 def _apply_lag_roll(arr, lag, mode="roll"):
     """
-    對候選序列套用 lag 來對齊 seed。
+    根據_best_lag_xcorr的結果，對時序進行時間平移
     - mode="roll": 環狀平移（快、長度不變；對週期性片段通常可接受）
     - mode="crop": 依 lag 取交集區間並回填到原長度（邊界以端點延伸）
     """
@@ -222,8 +225,7 @@ class BayesianDistributionEstimator:
             aligned = _apply_lag_roll(X_pool[i], lag, mode=self.align_mode)
             # 對齊後用 Euclidean（不允許再時間扭曲）評分；先做標準化避免幅度影響
             scores[i] = _euclidean(normal_seed, _norm(aligned))
-
-        k = min(self.top_k, N)
+        k = max(self.top_k, N)
         top_idx = np.argsort(scores)[:k]
 
         # 形成已對齊的 Top-K 訓練母體
@@ -237,31 +239,27 @@ class BayesianDistributionEstimator:
         w_prior = w_prior / (w_prior_sum if w_prior_sum > 0 else 1.0)
         w_post = w_prior.copy()
 
-        # ---- 階段 2：在 Top-K 上做群組視角的後驗微調（不再允許大位移）----
-        top_groups = group_ids[top_idx]
-        for k_key in keys:
-            gid = key2id[k_key]
-            mask = (top_groups == gid)
-            if not np.any(mask):
-                continue
+        # # ---- 階段 2：在 Top-K 上做群組視角的後驗微調（不再允許大位移）----
+        # top_groups = group_ids[top_idx]
+        # for k_key in keys:
+        #     gid = key2id[k_key]
+        #     mask = (top_groups == gid)
+        #     if not np.any(mask):
+        #         continue
 
-            X_obs = X_joint[mask]  # 該群在 Top-K 的已對齊樣本
-            # for x in X_obs:
-            #     print(x)
-            #     print(_norm(x))
-            # print(normal_seed)
-            # 以與 seed 的距離（已對齊）產生觀測權重
-            d_obs = np.array([_euclidean(normal_seed, _norm(x)) for x in X_obs], dtype=float)
-            # print(d_obs)
-            w_obs = 1.0 / (d_obs**2 + 1e-8)
-            w_obs_sum = w_obs.sum()
-            # print(w_obs_sum)
-            w_obs = w_obs / (w_obs_sum if w_obs_sum > 0 else 1.0)
+        #     X_obs = X_joint[mask]  # 該群在 Top-K 的已對齊樣本
+        #     # 以與 seed 的距離（已對齊）產生觀測權重
+        #     d_obs = np.array([_euclidean(normal_seed, _norm(x)) for x in X_obs], dtype=float)
+        #     # print(d_obs)
+        #     w_obs = 1.0 / (d_obs**2 + 1e-8)
+        #     w_obs_sum = w_obs.sum()
+        #     # print(w_obs_sum)
+        #     w_obs = w_obs / (w_obs_sum if w_obs_sum > 0 else 1.0)
 
-            # 用既有的部分序列後驗修正函式做細部修正（支撐集固定為 X_joint）
-            w_post = compute_posterior_weights_from_partial_subseq(
-                X_joint, w_post, X_obs, w_obs, bandwidth=bandwidth
-            )
+        #     # 用既有的部分序列後驗修正函式做細部修正（支撐集固定為 X_joint）
+        #     w_post = compute_posterior_weights_from_partial_subseq(
+        #         X_joint, w_post, X_obs, w_obs, bandwidth=bandwidth
+        #     )
 
         return mean_seed, std_seed, X_joint, w_post
 
