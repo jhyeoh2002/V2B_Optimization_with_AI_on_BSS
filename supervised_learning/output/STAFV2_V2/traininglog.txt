@@ -1,0 +1,205 @@
+=== Training Log Started: 2025-11-06 14:49:08.998269 ===
+Run Name: STAFV2_V2
+Device: cuda
+Data Source: supervised_learning/dataloader/merged_windowed_datasetV2.csv
+Feature Info: supervised_learning/dataloader/feature_infoV2.json
+Output Directory: supervised_learning/output/STAFV2_V2
+Checkpoint Directory: supervised_learning/output/STAFV2_V2/checkpoints
+Plot Save Path: supervised_learning/output/STAFV2_V2/trainingresults_plot.png
+Epochs: 50000, Batch Size: 128, Learning Rate: 0.0005
+LR Scheduler: Step Size = 50, Gamma = 0.9
+============================================================
+✅ Dataset split: 261 train, 47 val
+✅ Scalers fitted and saved.
+
+✅ Model initialized with 2084004 trainable parameters.
+
+TemporalAttentiveFusionNet(
+  (seriesEmbedding): Embedding(10000, 64)
+  (attn): MultiheadAttention(
+    (out_proj): NonDynamicallyQuantizableLinear(in_features=64, out_features=64, bias=True)
+  )
+  (attn_norm): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+  (attn_fc): Linear(in_features=64, out_features=1, bias=True)
+  (dropout): Dropout(p=0.5, inplace=False)
+  (bn0): BatchNorm1d(433, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (fc1): Linear(in_features=433, out_features=2048, bias=True)
+  (bn1): BatchNorm1d(2048, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (fc2): Linear(in_features=2048, out_features=256, bias=True)
+  (bn2): BatchNorm1d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (fc3): Linear(in_features=256, out_features=32, bias=True)
+  (bn3): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (fc4): Linear(in_features=32, out_features=1, bias=True)
+  (relu): ReLU()
+)
+StepLR Scheduler: step_size = 50 , gamma = 0.9
+============================================================
+Starting training...
+
+Epoch 1/50000 | LR: 0.000500 | Train RMSE: 7.93633 kWh | Val RMSE: 6.91374 kWh | Train R²: -1.194 | Val R²: -0.715 | Patience: 0/5000 | 
+Epoch 2/50000 | LR: 0.000500 | Train RMSE: 7.17548 kWh | Val RMSE: 6.38185 kWh | Train R²: -0.773 | Val R²: -0.461 | Patience: 0/5000 | 
+Epoch 3/50000 | LR: 0.000500 | Train RMSE: 7.26845 kWh | Val RMSE: 5.58846 kWh | Train R²: -0.333 | Val R²: -0.120 | Patience: 0/5000 | 
+Epoch 4/50000 | LR: 0.000500 | Train RMSE: 5.28892 kWh | Val RMSE: 4.93514 kWh | Train R²: 0.021 | Val R²: 0.126 | Patience: 0/5000 | 
+Epoch 5/50000 | LR: 0.000500 | Train RMSE: 4.36806 kWh | Val RMSE: 4.85218 kWh | Train R²: 0.310 | Val R²: 0.155 | Patience: 0/5000 | 
+Epoch 6/50000 | LR: 0.000500 | Train RMSE: 6.03810 kWh | Val RMSE: 4.98453 kWh | Train R²: 0.319 | Val R²: 0.109 | Patience: 0/5000 | 
+Epoch 7/50000 | LR: 0.000500 | Train RMSE: 4.37463 kWh | Val RMSE: 4.86879 kWh | Train R²: 0.282 | Val R²: 0.150 | Patience: 1/5000 | 
+Epoch 8/50000 | LR: 0.000500 | Train RMSE: 4.81115 kWh | Val RMSE: 4.50892 kWh | Train R²: 0.353 | Val R²: 0.271 | Patience: 2/5000 | 
+Epoch 9/50000 | LR: 0.000500 | Train RMSE: 4.83311 kWh | Val RMSE: 4.12459 kWh | Train R²: 0.395 | Val R²: 0.390 | Patience: 0/5000 | 
+Epoch 10/50000 | LR: 0.000500 | Train RMSE: 4.37718 kWh | Val RMSE: 4.04325 kWh | Train R²: 0.488 | Val R²: 0.414 | Patience: 0/5000 | 
+Epoch 11/50000 | LR: 0.000500 | Train RMSE: 3.83467 kWh | Val RMSE: 4.09178 kWh | Train R²: 0.522 | Val R²: 0.399 | Patience: 0/5000 | 
+Epoch 12/50000 | LR: 0.000500 | Train RMSE: 5.05722 kWh | Val RMSE: 4.26200 kWh | Train R²: 0.521 | Val R²: 0.348 | Patience: 1/5000 | 
+Epoch 13/50000 | LR: 0.000500 | Train RMSE: 3.80324 kWh | Val RMSE: 4.19947 kWh | Train R²: 0.486 | Val R²: 0.367 | Patience: 2/5000 | 
+Epoch 14/50000 | LR: 0.000500 | Train RMSE: 5.20912 kWh | Val RMSE: 4.19201 kWh | Train R²: 0.536 | Val R²: 0.370 | Patience: 3/5000 | 
+Epoch 15/50000 | LR: 0.000500 | Train RMSE: 5.45459 kWh | Val RMSE: 4.17265 kWh | Train R²: 0.540 | Val R²: 0.375 | Patience: 4/5000 | 
+Epoch 16/50000 | LR: 0.000500 | Train RMSE: 4.57515 kWh | Val RMSE: 4.25497 kWh | Train R²: 0.579 | Val R²: 0.350 | Patience: 5/5000 | 
+Epoch 17/50000 | LR: 0.000500 | Train RMSE: 3.94913 kWh | Val RMSE: 4.11455 kWh | Train R²: 0.565 | Val R²: 0.393 | Patience: 6/5000 | 
+Epoch 18/50000 | LR: 0.000500 | Train RMSE: 3.54390 kWh | Val RMSE: 4.02943 kWh | Train R²: 0.623 | Val R²: 0.418 | Patience: 7/5000 | 
+Epoch 19/50000 | LR: 0.000500 | Train RMSE: 4.16762 kWh | Val RMSE: 4.07604 kWh | Train R²: 0.634 | Val R²: 0.404 | Patience: 0/5000 | 
+Epoch 20/50000 | LR: 0.000500 | Train RMSE: 3.01365 kWh | Val RMSE: 4.16700 kWh | Train R²: 0.662 | Val R²: 0.377 | Patience: 1/5000 | 
+Epoch 21/50000 | LR: 0.000500 | Train RMSE: 3.49674 kWh | Val RMSE: 4.18928 kWh | Train R²: 0.653 | Val R²: 0.370 | Patience: 2/5000 | 
+Epoch 22/50000 | LR: 0.000500 | Train RMSE: 3.75364 kWh | Val RMSE: 4.20294 kWh | Train R²: 0.639 | Val R²: 0.366 | Patience: 3/5000 | 
+Epoch 23/50000 | LR: 0.000500 | Train RMSE: 3.34055 kWh | Val RMSE: 4.19288 kWh | Train R²: 0.673 | Val R²: 0.369 | Patience: 4/5000 | 
+Epoch 24/50000 | LR: 0.000500 | Train RMSE: 3.33471 kWh | Val RMSE: 4.17576 kWh | Train R²: 0.713 | Val R²: 0.374 | Patience: 5/5000 | 
+Epoch 25/50000 | LR: 0.000500 | Train RMSE: 4.02503 kWh | Val RMSE: 4.35907 kWh | Train R²: 0.712 | Val R²: 0.318 | Patience: 6/5000 | 
+Epoch 26/50000 | LR: 0.000500 | Train RMSE: 3.21028 kWh | Val RMSE: 4.39168 kWh | Train R²: 0.713 | Val R²: 0.308 | Patience: 7/5000 | 
+Epoch 27/50000 | LR: 0.000500 | Train RMSE: 3.90309 kWh | Val RMSE: 4.23846 kWh | Train R²: 0.716 | Val R²: 0.356 | Patience: 8/5000 | 
+Epoch 28/50000 | LR: 0.000500 | Train RMSE: 2.97808 kWh | Val RMSE: 4.25292 kWh | Train R²: 0.724 | Val R²: 0.351 | Patience: 9/5000 | 
+Epoch 29/50000 | LR: 0.000500 | Train RMSE: 2.70357 kWh | Val RMSE: 4.18063 kWh | Train R²: 0.753 | Val R²: 0.373 | Patience: 10/5000 | 
+Epoch 30/50000 | LR: 0.000500 | Train RMSE: 3.03479 kWh | Val RMSE: 4.16773 kWh | Train R²: 0.728 | Val R²: 0.377 | Patience: 11/5000 | 
+Epoch 31/50000 | LR: 0.000500 | Train RMSE: 2.81902 kWh | Val RMSE: 4.14634 kWh | Train R²: 0.783 | Val R²: 0.383 | Patience: 12/5000 | 
+Epoch 32/50000 | LR: 0.000500 | Train RMSE: 3.09233 kWh | Val RMSE: 4.30181 kWh | Train R²: 0.759 | Val R²: 0.336 | Patience: 13/5000 | 
+Epoch 33/50000 | LR: 0.000500 | Train RMSE: 2.62587 kWh | Val RMSE: 4.55191 kWh | Train R²: 0.756 | Val R²: 0.257 | Patience: 14/5000 | 
+Epoch 34/50000 | LR: 0.000500 | Train RMSE: 3.33686 kWh | Val RMSE: 4.70363 kWh | Train R²: 0.742 | Val R²: 0.206 | Patience: 15/5000 | 
+Epoch 35/50000 | LR: 0.000500 | Train RMSE: 3.11522 kWh | Val RMSE: 4.42582 kWh | Train R²: 0.759 | Val R²: 0.297 | Patience: 16/5000 | 
+Epoch 36/50000 | LR: 0.000500 | Train RMSE: 3.25446 kWh | Val RMSE: 4.43858 kWh | Train R²: 0.791 | Val R²: 0.293 | Patience: 17/5000 | 
+Epoch 37/50000 | LR: 0.000500 | Train RMSE: 2.85016 kWh | Val RMSE: 4.49596 kWh | Train R²: 0.808 | Val R²: 0.275 | Patience: 18/5000 | 
+Epoch 38/50000 | LR: 0.000500 | Train RMSE: 2.10983 kWh | Val RMSE: 4.63621 kWh | Train R²: 0.842 | Val R²: 0.229 | Patience: 19/5000 | 
+Epoch 39/50000 | LR: 0.000500 | Train RMSE: 2.27162 kWh | Val RMSE: 4.79468 kWh | Train R²: 0.829 | Val R²: 0.175 | Patience: 20/5000 | 
+Epoch 40/50000 | LR: 0.000500 | Train RMSE: 3.30978 kWh | Val RMSE: 4.89329 kWh | Train R²: 0.799 | Val R²: 0.141 | Patience: 21/5000 | 
+Epoch 41/50000 | LR: 0.000500 | Train RMSE: 2.53997 kWh | Val RMSE: 4.84221 kWh | Train R²: 0.818 | Val R²: 0.159 | Patience: 22/5000 | 
+Epoch 42/50000 | LR: 0.000500 | Train RMSE: 2.84673 kWh | Val RMSE: 4.68641 kWh | Train R²: 0.834 | Val R²: 0.212 | Patience: 23/5000 | 
+Epoch 43/50000 | LR: 0.000500 | Train RMSE: 3.23578 kWh | Val RMSE: 4.56104 kWh | Train R²: 0.826 | Val R²: 0.254 | Patience: 24/5000 | 
+Epoch 44/50000 | LR: 0.000500 | Train RMSE: 3.22570 kWh | Val RMSE: 4.44945 kWh | Train R²: 0.820 | Val R²: 0.290 | Patience: 25/5000 | 
+Epoch 45/50000 | LR: 0.000500 | Train RMSE: 3.00990 kWh | Val RMSE: 4.52468 kWh | Train R²: 0.769 | Val R²: 0.266 | Patience: 26/5000 | 
+Epoch 46/50000 | LR: 0.000500 | Train RMSE: 2.69982 kWh | Val RMSE: 4.54687 kWh | Train R²: 0.820 | Val R²: 0.258 | Patience: 27/5000 | 
+Epoch 47/50000 | LR: 0.000500 | Train RMSE: 2.97991 kWh | Val RMSE: 4.62181 kWh | Train R²: 0.817 | Val R²: 0.234 | Patience: 28/5000 | 
+Epoch 48/50000 | LR: 0.000500 | Train RMSE: 3.49351 kWh | Val RMSE: 4.60537 kWh | Train R²: 0.822 | Val R²: 0.239 | Patience: 29/5000 | 
+Epoch 49/50000 | LR: 0.000500 | Train RMSE: 2.36990 kWh | Val RMSE: 4.77239 kWh | Train R²: 0.823 | Val R²: 0.183 | Patience: 30/5000 | 
+Epoch 50/50000 | LR: 0.000450 | Train RMSE: 3.07801 kWh | Val RMSE: 5.26447 kWh | Train R²: 0.836 | Val R²: 0.006 | Patience: 31/5000 | 
+Epoch 51/50000 | LR: 0.000450 | Train RMSE: 2.30910 kWh | Val RMSE: 5.45072 kWh | Train R²: 0.793 | Val R²: -0.066 | Patience: 32/5000 | 
+Epoch 52/50000 | LR: 0.000450 | Train RMSE: 3.00437 kWh | Val RMSE: 5.37211 kWh | Train R²: 0.786 | Val R²: -0.035 | Patience: 33/5000 | 
+Epoch 53/50000 | LR: 0.000450 | Train RMSE: 2.35237 kWh | Val RMSE: 5.06885 kWh | Train R²: 0.833 | Val R²: 0.078 | Patience: 34/5000 | 
+Epoch 54/50000 | LR: 0.000450 | Train RMSE: 2.54837 kWh | Val RMSE: 4.90227 kWh | Train R²: 0.857 | Val R²: 0.138 | Patience: 35/5000 | 
+Epoch 55/50000 | LR: 0.000450 | Train RMSE: 2.02550 kWh | Val RMSE: 4.92216 kWh | Train R²: 0.862 | Val R²: 0.131 | Patience: 36/5000 | 
+Epoch 56/50000 | LR: 0.000450 | Train RMSE: 2.23192 kWh | Val RMSE: 4.95727 kWh | Train R²: 0.879 | Val R²: 0.118 | Patience: 37/5000 | 
+Epoch 57/50000 | LR: 0.000450 | Train RMSE: 3.72746 kWh | Val RMSE: 4.90584 kWh | Train R²: 0.862 | Val R²: 0.137 | Patience: 38/5000 | 
+Epoch 58/50000 | LR: 0.000450 | Train RMSE: 1.98764 kWh | Val RMSE: 4.98642 kWh | Train R²: 0.859 | Val R²: 0.108 | Patience: 39/5000 | 
+Epoch 59/50000 | LR: 0.000450 | Train RMSE: 2.63736 kWh | Val RMSE: 5.02613 kWh | Train R²: 0.872 | Val R²: 0.094 | Patience: 40/5000 | 
+Epoch 60/50000 | LR: 0.000450 | Train RMSE: 2.17838 kWh | Val RMSE: 4.99658 kWh | Train R²: 0.869 | Val R²: 0.104 | Patience: 41/5000 | 
+Epoch 61/50000 | LR: 0.000450 | Train RMSE: 1.94794 kWh | Val RMSE: 4.94881 kWh | Train R²: 0.884 | Val R²: 0.121 | Patience: 42/5000 | 
+Epoch 62/50000 | LR: 0.000450 | Train RMSE: 2.49803 kWh | Val RMSE: 4.89727 kWh | Train R²: 0.876 | Val R²: 0.140 | Patience: 43/5000 | 
+Epoch 63/50000 | LR: 0.000450 | Train RMSE: 2.22817 kWh | Val RMSE: 4.71872 kWh | Train R²: 0.894 | Val R²: 0.201 | Patience: 44/5000 | 
+Epoch 64/50000 | LR: 0.000450 | Train RMSE: 1.97136 kWh | Val RMSE: 4.74134 kWh | Train R²: 0.888 | Val R²: 0.193 | Patience: 45/5000 | 
+Epoch 65/50000 | LR: 0.000450 | Train RMSE: 2.16486 kWh | Val RMSE: 4.78836 kWh | Train R²: 0.896 | Val R²: 0.177 | Patience: 46/5000 | 
+Epoch 66/50000 | LR: 0.000450 | Train RMSE: 2.14516 kWh | Val RMSE: 4.79883 kWh | Train R²: 0.881 | Val R²: 0.174 | Patience: 47/5000 | 
+Epoch 67/50000 | LR: 0.000450 | Train RMSE: 3.15223 kWh | Val RMSE: 4.81937 kWh | Train R²: 0.904 | Val R²: 0.167 | Patience: 48/5000 | 
+Epoch 68/50000 | LR: 0.000450 | Train RMSE: 2.58950 kWh | Val RMSE: 4.94341 kWh | Train R²: 0.889 | Val R²: 0.123 | Patience: 49/5000 | 
+Epoch 69/50000 | LR: 0.000450 | Train RMSE: 2.04457 kWh | Val RMSE: 4.89295 kWh | Train R²: 0.888 | Val R²: 0.141 | Patience: 50/5000 | 
+Epoch 70/50000 | LR: 0.000450 | Train RMSE: 2.07083 kWh | Val RMSE: 4.88901 kWh | Train R²: 0.897 | Val R²: 0.142 | Patience: 51/5000 | 
+Epoch 71/50000 | LR: 0.000450 | Train RMSE: 2.66529 kWh | Val RMSE: 4.88201 kWh | Train R²: 0.904 | Val R²: 0.145 | Patience: 52/5000 | 
+Epoch 72/50000 | LR: 0.000450 | Train RMSE: 1.85744 kWh | Val RMSE: 4.88679 kWh | Train R²: 0.893 | Val R²: 0.143 | Patience: 53/5000 | 
+Epoch 73/50000 | LR: 0.000450 | Train RMSE: 2.32811 kWh | Val RMSE: 4.96406 kWh | Train R²: 0.863 | Val R²: 0.116 | Patience: 54/5000 | 
+Epoch 74/50000 | LR: 0.000450 | Train RMSE: 2.92714 kWh | Val RMSE: 4.96491 kWh | Train R²: 0.869 | Val R²: 0.116 | Patience: 55/5000 | 
+Epoch 75/50000 | LR: 0.000450 | Train RMSE: 2.40773 kWh | Val RMSE: 5.09356 kWh | Train R²: 0.887 | Val R²: 0.069 | Patience: 56/5000 | 
+Epoch 76/50000 | LR: 0.000450 | Train RMSE: 1.77452 kWh | Val RMSE: 5.11128 kWh | Train R²: 0.900 | Val R²: 0.063 | Patience: 57/5000 | 
+Epoch 77/50000 | LR: 0.000450 | Train RMSE: 2.36974 kWh | Val RMSE: 5.30284 kWh | Train R²: 0.882 | Val R²: -0.009 | Patience: 58/5000 | 
+Epoch 78/50000 | LR: 0.000450 | Train RMSE: 2.01943 kWh | Val RMSE: 5.36748 kWh | Train R²: 0.866 | Val R²: -0.034 | Patience: 59/5000 | 
+Epoch 79/50000 | LR: 0.000450 | Train RMSE: 2.18176 kWh | Val RMSE: 5.47136 kWh | Train R²: 0.891 | Val R²: -0.074 | Patience: 60/5000 | 
+Epoch 80/50000 | LR: 0.000450 | Train RMSE: 3.54088 kWh | Val RMSE: 5.37864 kWh | Train R²: 0.870 | Val R²: -0.038 | Patience: 61/5000 | 
+Epoch 81/50000 | LR: 0.000450 | Train RMSE: 3.36927 kWh | Val RMSE: 4.99459 kWh | Train R²: 0.878 | Val R²: 0.105 | Patience: 62/5000 | 
+Epoch 82/50000 | LR: 0.000450 | Train RMSE: 2.58886 kWh | Val RMSE: 4.71310 kWh | Train R²: 0.855 | Val R²: 0.203 | Patience: 63/5000 | 
+Epoch 83/50000 | LR: 0.000450 | Train RMSE: 2.46864 kWh | Val RMSE: 4.59446 kWh | Train R²: 0.830 | Val R²: 0.243 | Patience: 64/5000 | 
+Epoch 84/50000 | LR: 0.000450 | Train RMSE: 3.67769 kWh | Val RMSE: 4.56020 kWh | Train R²: 0.839 | Val R²: 0.254 | Patience: 65/5000 | 
+Epoch 85/50000 | LR: 0.000450 | Train RMSE: 2.55435 kWh | Val RMSE: 4.66825 kWh | Train R²: 0.862 | Val R²: 0.218 | Patience: 66/5000 | 
+Epoch 86/50000 | LR: 0.000450 | Train RMSE: 2.44875 kWh | Val RMSE: 4.99641 kWh | Train R²: 0.856 | Val R²: 0.104 | Patience: 67/5000 | 
+Epoch 87/50000 | LR: 0.000450 | Train RMSE: 1.81201 kWh | Val RMSE: 5.32270 kWh | Train R²: 0.882 | Val R²: -0.016 | Patience: 68/5000 | 
+Epoch 88/50000 | LR: 0.000450 | Train RMSE: 1.98589 kWh | Val RMSE: 5.44858 kWh | Train R²: 0.884 | Val R²: -0.065 | Patience: 69/5000 | 
+Epoch 89/50000 | LR: 0.000450 | Train RMSE: 2.49983 kWh | Val RMSE: 5.46607 kWh | Train R²: 0.882 | Val R²: -0.072 | Patience: 70/5000 | 
+Epoch 90/50000 | LR: 0.000450 | Train RMSE: 2.31223 kWh | Val RMSE: 5.21681 kWh | Train R²: 0.889 | Val R²: 0.024 | Patience: 71/5000 | 
+Epoch 91/50000 | LR: 0.000450 | Train RMSE: 2.49238 kWh | Val RMSE: 4.98620 kWh | Train R²: 0.899 | Val R²: 0.108 | Patience: 72/5000 | 
+Epoch 92/50000 | LR: 0.000450 | Train RMSE: 2.62154 kWh | Val RMSE: 4.79065 kWh | Train R²: 0.891 | Val R²: 0.177 | Patience: 73/5000 | 
+Epoch 93/50000 | LR: 0.000450 | Train RMSE: 2.26331 kWh | Val RMSE: 4.78662 kWh | Train R²: 0.884 | Val R²: 0.178 | Patience: 74/5000 | 
+Epoch 94/50000 | LR: 0.000450 | Train RMSE: 2.12748 kWh | Val RMSE: 4.83476 kWh | Train R²: 0.855 | Val R²: 0.161 | Patience: 75/5000 | 
+Epoch 95/50000 | LR: 0.000450 | Train RMSE: 2.90004 kWh | Val RMSE: 4.81558 kWh | Train R²: 0.854 | Val R²: 0.168 | Patience: 76/5000 | 
+Epoch 96/50000 | LR: 0.000450 | Train RMSE: 2.48772 kWh | Val RMSE: 4.75426 kWh | Train R²: 0.892 | Val R²: 0.189 | Patience: 77/5000 | 
+Epoch 97/50000 | LR: 0.000450 | Train RMSE: 2.10558 kWh | Val RMSE: 4.75427 kWh | Train R²: 0.888 | Val R²: 0.189 | Patience: 78/5000 | 
+Epoch 98/50000 | LR: 0.000450 | Train RMSE: 2.36423 kWh | Val RMSE: 4.77576 kWh | Train R²: 0.873 | Val R²: 0.182 | Patience: 79/5000 | 
+Epoch 99/50000 | LR: 0.000450 | Train RMSE: 2.21164 kWh | Val RMSE: 4.81251 kWh | Train R²: 0.863 | Val R²: 0.169 | Patience: 80/5000 | 
+Epoch 100/50000 | LR: 0.000405 | Train RMSE: 2.73574 kWh | Val RMSE: 4.93736 kWh | Train R²: 0.847 | Val R²: 0.125 | Patience: 81/5000 | 
+Epoch 101/50000 | LR: 0.000405 | Train RMSE: 3.34908 kWh | Val RMSE: 4.88352 kWh | Train R²: 0.870 | Val R²: 0.144 | Patience: 82/5000 | 
+Epoch 102/50000 | LR: 0.000405 | Train RMSE: 3.03542 kWh | Val RMSE: 4.88619 kWh | Train R²: 0.859 | Val R²: 0.143 | Patience: 83/5000 | 
+Epoch 103/50000 | LR: 0.000405 | Train RMSE: 2.50918 kWh | Val RMSE: 4.94630 kWh | Train R²: 0.883 | Val R²: 0.122 | Patience: 84/5000 | 
+Epoch 104/50000 | LR: 0.000405 | Train RMSE: 1.90879 kWh | Val RMSE: 5.15454 kWh | Train R²: 0.880 | Val R²: 0.047 | Patience: 85/5000 | 
+Epoch 105/50000 | LR: 0.000405 | Train RMSE: 2.19831 kWh | Val RMSE: 5.26072 kWh | Train R²: 0.855 | Val R²: 0.007 | Patience: 86/5000 | 
+Epoch 106/50000 | LR: 0.000405 | Train RMSE: 2.24084 kWh | Val RMSE: 5.18433 kWh | Train R²: 0.878 | Val R²: 0.036 | Patience: 87/5000 | 
+Epoch 107/50000 | LR: 0.000405 | Train RMSE: 2.22926 kWh | Val RMSE: 4.99606 kWh | Train R²: 0.889 | Val R²: 0.105 | Patience: 88/5000 | 
+Epoch 108/50000 | LR: 0.000405 | Train RMSE: 2.18796 kWh | Val RMSE: 5.04969 kWh | Train R²: 0.918 | Val R²: 0.085 | Patience: 89/5000 | 
+Epoch 109/50000 | LR: 0.000405 | Train RMSE: 2.22071 kWh | Val RMSE: 5.01630 kWh | Train R²: 0.911 | Val R²: 0.097 | Patience: 90/5000 | 
+Epoch 110/50000 | LR: 0.000405 | Train RMSE: 2.18896 kWh | Val RMSE: 4.91886 kWh | Train R²: 0.904 | Val R²: 0.132 | Patience: 91/5000 | 
+Epoch 111/50000 | LR: 0.000405 | Train RMSE: 1.73778 kWh | Val RMSE: 4.94290 kWh | Train R²: 0.903 | Val R²: 0.123 | Patience: 92/5000 | 
+Epoch 112/50000 | LR: 0.000405 | Train RMSE: 2.58857 kWh | Val RMSE: 4.94960 kWh | Train R²: 0.885 | Val R²: 0.121 | Patience: 93/5000 | 
+Epoch 113/50000 | LR: 0.000405 | Train RMSE: 2.49890 kWh | Val RMSE: 4.92843 kWh | Train R²: 0.879 | Val R²: 0.129 | Patience: 94/5000 | 
+Epoch 114/50000 | LR: 0.000405 | Train RMSE: 2.00996 kWh | Val RMSE: 5.00550 kWh | Train R²: 0.902 | Val R²: 0.101 | Patience: 95/5000 | 
+Epoch 115/50000 | LR: 0.000405 | Train RMSE: 1.99340 kWh | Val RMSE: 4.95002 kWh | Train R²: 0.907 | Val R²: 0.121 | Patience: 96/5000 | 
+Epoch 116/50000 | LR: 0.000405 | Train RMSE: 2.04501 kWh | Val RMSE: 4.86701 kWh | Train R²: 0.891 | Val R²: 0.150 | Patience: 97/5000 | 
+Epoch 117/50000 | LR: 0.000405 | Train RMSE: 2.16304 kWh | Val RMSE: 4.87093 kWh | Train R²: 0.892 | Val R²: 0.149 | Patience: 98/5000 | 
+Epoch 118/50000 | LR: 0.000405 | Train RMSE: 3.05828 kWh | Val RMSE: 4.84431 kWh | Train R²: 0.855 | Val R²: 0.158 | Patience: 99/5000 | 
+Epoch 119/50000 | LR: 0.000405 | Train RMSE: 2.46575 kWh | Val RMSE: 5.02097 kWh | Train R²: 0.880 | Val R²: 0.096 | Patience: 100/5000 | 
+Epoch 120/50000 | LR: 0.000405 | Train RMSE: 1.76681 kWh | Val RMSE: 5.07710 kWh | Train R²: 0.905 | Val R²: 0.075 | Patience: 101/5000 | 
+Epoch 121/50000 | LR: 0.000405 | Train RMSE: 2.23336 kWh | Val RMSE: 5.02777 kWh | Train R²: 0.900 | Val R²: 0.093 | Patience: 102/5000 | 
+Epoch 122/50000 | LR: 0.000405 | Train RMSE: 2.16930 kWh | Val RMSE: 5.04029 kWh | Train R²: 0.899 | Val R²: 0.089 | Patience: 103/5000 | 
+Epoch 123/50000 | LR: 0.000405 | Train RMSE: 3.06385 kWh | Val RMSE: 5.12660 kWh | Train R²: 0.892 | Val R²: 0.057 | Patience: 104/5000 | 
+Epoch 124/50000 | LR: 0.000405 | Train RMSE: 3.47502 kWh | Val RMSE: 5.04771 kWh | Train R²: 0.895 | Val R²: 0.086 | Patience: 105/5000 | 
+Epoch 125/50000 | LR: 0.000405 | Train RMSE: 1.93480 kWh | Val RMSE: 5.20710 kWh | Train R²: 0.905 | Val R²: 0.027 | Patience: 106/5000 | 
+Epoch 126/50000 | LR: 0.000405 | Train RMSE: 1.94378 kWh | Val RMSE: 5.38729 kWh | Train R²: 0.908 | Val R²: -0.041 | Patience: 107/5000 | 
+Epoch 127/50000 | LR: 0.000405 | Train RMSE: 1.77399 kWh | Val RMSE: 5.39330 kWh | Train R²: 0.905 | Val R²: -0.044 | Patience: 108/5000 | 
+Epoch 128/50000 | LR: 0.000405 | Train RMSE: 2.21979 kWh | Val RMSE: 5.22501 kWh | Train R²: 0.894 | Val R²: 0.021 | Patience: 109/5000 | 
+Epoch 129/50000 | LR: 0.000405 | Train RMSE: 2.10660 kWh | Val RMSE: 5.00698 kWh | Train R²: 0.882 | Val R²: 0.101 | Patience: 110/5000 | 
+Epoch 130/50000 | LR: 0.000405 | Train RMSE: 2.38004 kWh | Val RMSE: 4.81905 kWh | Train R²: 0.904 | Val R²: 0.167 | Patience: 111/5000 | 
+Epoch 131/50000 | LR: 0.000405 | Train RMSE: 1.66877 kWh | Val RMSE: 4.81965 kWh | Train R²: 0.911 | Val R²: 0.167 | Patience: 112/5000 | 
+Epoch 132/50000 | LR: 0.000405 | Train RMSE: 1.99068 kWh | Val RMSE: 4.94860 kWh | Train R²: 0.907 | Val R²: 0.121 | Patience: 113/5000 | 
+Epoch 133/50000 | LR: 0.000405 | Train RMSE: 2.51371 kWh | Val RMSE: 5.04008 kWh | Train R²: 0.897 | Val R²: 0.089 | Patience: 114/5000 | 
+Epoch 134/50000 | LR: 0.000405 | Train RMSE: 1.94825 kWh | Val RMSE: 4.96000 kWh | Train R²: 0.912 | Val R²: 0.117 | Patience: 115/5000 | 
+Epoch 135/50000 | LR: 0.000405 | Train RMSE: 2.19497 kWh | Val RMSE: 4.91016 kWh | Train R²: 0.914 | Val R²: 0.135 | Patience: 116/5000 | 
+Epoch 136/50000 | LR: 0.000405 | Train RMSE: 1.58914 kWh | Val RMSE: 5.00219 kWh | Train R²: 0.915 | Val R²: 0.102 | Patience: 117/5000 | 
+Epoch 137/50000 | LR: 0.000405 | Train RMSE: 1.50347 kWh | Val RMSE: 5.04985 kWh | Train R²: 0.925 | Val R²: 0.085 | Patience: 118/5000 | 
+Epoch 138/50000 | LR: 0.000405 | Train RMSE: 1.50664 kWh | Val RMSE: 5.01628 kWh | Train R²: 0.916 | Val R²: 0.097 | Patience: 119/5000 | 
+Epoch 139/50000 | LR: 0.000405 | Train RMSE: 1.89673 kWh | Val RMSE: 5.00142 kWh | Train R²: 0.920 | Val R²: 0.103 | Patience: 120/5000 | 
+Epoch 140/50000 | LR: 0.000405 | Train RMSE: 2.63851 kWh | Val RMSE: 4.97424 kWh | Train R²: 0.904 | Val R²: 0.112 | Patience: 121/5000 | 
+Epoch 141/50000 | LR: 0.000405 | Train RMSE: 2.98805 kWh | Val RMSE: 4.87578 kWh | Train R²: 0.900 | Val R²: 0.147 | Patience: 122/5000 | 
+Epoch 142/50000 | LR: 0.000405 | Train RMSE: 3.20613 kWh | Val RMSE: 4.89227 kWh | Train R²: 0.874 | Val R²: 0.141 | Patience: 123/5000 | 
+Epoch 143/50000 | LR: 0.000405 | Train RMSE: 1.96995 kWh | Val RMSE: 4.87269 kWh | Train R²: 0.907 | Val R²: 0.148 | Patience: 124/5000 | 
+Epoch 144/50000 | LR: 0.000405 | Train RMSE: 2.84963 kWh | Val RMSE: 4.90960 kWh | Train R²: 0.896 | Val R²: 0.135 | Patience: 125/5000 | 
+Epoch 145/50000 | LR: 0.000405 | Train RMSE: 2.14514 kWh | Val RMSE: 5.06278 kWh | Train R²: 0.885 | Val R²: 0.080 | Patience: 126/5000 | 
+Epoch 146/50000 | LR: 0.000405 | Train RMSE: 2.02655 kWh | Val RMSE: 5.15503 kWh | Train R²: 0.899 | Val R²: 0.047 | Patience: 127/5000 | 
+Epoch 147/50000 | LR: 0.000405 | Train RMSE: 2.53631 kWh | Val RMSE: 5.19016 kWh | Train R²: 0.918 | Val R²: 0.034 | Patience: 128/5000 | 
+Epoch 148/50000 | LR: 0.000405 | Train RMSE: 2.95907 kWh | Val RMSE: 5.09571 kWh | Train R²: 0.900 | Val R²: 0.068 | Patience: 129/5000 | 
+Epoch 149/50000 | LR: 0.000405 | Train RMSE: 2.55293 kWh | Val RMSE: 4.94215 kWh | Train R²: 0.899 | Val R²: 0.124 | Patience: 130/5000 | 
+Epoch 150/50000 | LR: 0.000365 | Train RMSE: 3.38028 kWh | Val RMSE: 4.81170 kWh | Train R²: 0.897 | Val R²: 0.169 | Patience: 131/5000 | 
+Epoch 151/50000 | LR: 0.000365 | Train RMSE: 1.95578 kWh | Val RMSE: 4.68223 kWh | Train R²: 0.909 | Val R²: 0.213 | Patience: 132/5000 | 
+Epoch 152/50000 | LR: 0.000365 | Train RMSE: 2.58979 kWh | Val RMSE: 4.66625 kWh | Train R²: 0.891 | Val R²: 0.219 | Patience: 133/5000 | 
+Epoch 153/50000 | LR: 0.000365 | Train RMSE: 2.13322 kWh | Val RMSE: 4.71343 kWh | Train R²: 0.905 | Val R²: 0.203 | Patience: 134/5000 | 
+Epoch 154/50000 | LR: 0.000365 | Train RMSE: 2.29980 kWh | Val RMSE: 4.72724 kWh | Train R²: 0.890 | Val R²: 0.198 | Patience: 135/5000 | 
+Epoch 155/50000 | LR: 0.000365 | Train RMSE: 2.62921 kWh | Val RMSE: 4.80988 kWh | Train R²: 0.909 | Val R²: 0.170 | Patience: 136/5000 | 
+Epoch 156/50000 | LR: 0.000365 | Train RMSE: 2.24801 kWh | Val RMSE: 4.93856 kWh | Train R²: 0.903 | Val R²: 0.125 | Patience: 137/5000 | 
+Epoch 157/50000 | LR: 0.000365 | Train RMSE: 2.32944 kWh | Val RMSE: 5.04833 kWh | Train R²: 0.905 | Val R²: 0.086 | Patience: 138/5000 | 
+Epoch 158/50000 | LR: 0.000365 | Train RMSE: 2.74479 kWh | Val RMSE: 5.24055 kWh | Train R²: 0.899 | Val R²: 0.015 | Patience: 139/5000 | 
+Epoch 159/50000 | LR: 0.000365 | Train RMSE: 2.54603 kWh | Val RMSE: 5.09545 kWh | Train R²: 0.899 | Val R²: 0.069 | Patience: 140/5000 | 
+Epoch 160/50000 | LR: 0.000365 | Train RMSE: 2.30121 kWh | Val RMSE: 4.98650 kWh | Train R²: 0.899 | Val R²: 0.108 | Patience: 141/5000 | 
+Epoch 161/50000 | LR: 0.000365 | Train RMSE: 2.02702 kWh | Val RMSE: 4.97011 kWh | Train R²: 0.892 | Val R²: 0.114 | Patience: 142/5000 | 
+Epoch 162/50000 | LR: 0.000365 | Train RMSE: 2.19974 kWh | Val RMSE: 4.99758 kWh | Train R²: 0.915 | Val R²: 0.104 | Patience: 143/5000 | 
+Epoch 163/50000 | LR: 0.000365 | Train RMSE: 1.58536 kWh | Val RMSE: 4.94315 kWh | Train R²: 0.916 | Val R²: 0.123 | Patience: 144/5000 | 
+Epoch 164/50000 | LR: 0.000365 | Train RMSE: 1.78136 kWh | Val RMSE: 4.97204 kWh | Train R²: 0.895 | Val R²: 0.113 | Patience: 145/5000 | 
+Epoch 165/50000 | LR: 0.000365 | Train RMSE: 2.15953 kWh | Val RMSE: 5.08714 kWh | Train R²: 0.916 | Val R²: 0.072 | Patience: 146/5000 | 
+Epoch 166/50000 | LR: 0.000365 | Train RMSE: 1.71501 kWh | Val RMSE: 5.14244 kWh | Train R²: 0.930 | Val R²: 0.051 | Patience: 147/5000 | 
+Epoch 167/50000 | LR: 0.000365 | Train RMSE: 2.89459 kWh | Val RMSE: 5.07969 kWh | Train R²: 0.908 | Val R²: 0.074 | Patience: 148/5000 | 

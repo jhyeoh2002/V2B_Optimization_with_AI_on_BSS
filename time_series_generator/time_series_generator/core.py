@@ -1,10 +1,14 @@
+import sys
 import numpy as np
 from collections import defaultdict
+import os
 from sklearn.neighbors import KernelDensity
-from time_series_generator.preprocessing  import DataPrepare
-from time_series_generator.metrics import fast_dtw_distance  # 仍可用在後驗細修時的輔助
-from time_series_generator.density import compute_posterior_weights_from_partial_subseq
-import time_series_generator.config as cfg
+
+import os, sys
+from time_series_generator.time_series_generator.preprocessing  import DataPrepare
+from time_series_generator.time_series_generator.metrics import fast_dtw_distance  # 仍可用在後驗細修時的輔助
+from time_series_generator.time_series_generator.density import compute_posterior_weights_from_partial_subseq
+import time_series_generator.time_series_generator.config as cfg
 
 # ========= 規一化與相位對齊工具 =========
 

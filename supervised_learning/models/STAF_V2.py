@@ -4,12 +4,12 @@ import math
 
 class TemporalAttentiveFusionNet(nn.Module):
     def __init__(self,
-                 num_embeddings=8000,
+                 num_embeddings=10000,
                  embedding_dim=64,
                  n_heads=4,
-                 fc_hidden_dim1=512,
-                 fc_hidden_dim2=16,
-                 fc_hidden_dim3=4,
+                 fc_hidden_dim1=2048,
+                 fc_hidden_dim2=256,
+                 fc_hidden_dim3=32,
                  attention_dropout=0.5,
                  dropout=0.5):
         """
@@ -40,9 +40,9 @@ class TemporalAttentiveFusionNet(nn.Module):
         self.bn1 = nn.BatchNorm1d(fc_hidden_dim1)
         self.fc2 = nn.Linear(fc_hidden_dim1, fc_hidden_dim2)
         self.bn2 = nn.BatchNorm1d(fc_hidden_dim2)
-        # self.fc3 = nn.Linear(fc_hidden_dim2, fc_hidden_dim3)
-        # self.bn3 = nn.BatchNorm1d(fc_hidden_dim3)
-        self.fc4 = nn.Linear(fc_hidden_dim2, 1)
+        self.fc3 = nn.Linear(fc_hidden_dim2, fc_hidden_dim3)
+        self.bn3 = nn.BatchNorm1d(fc_hidden_dim3)
+        self.fc4 = nn.Linear(fc_hidden_dim3, 1)
         self.relu = nn.ReLU()
 
     def forward(self, x, sequence_length=24):
@@ -68,11 +68,11 @@ class TemporalAttentiveFusionNet(nn.Module):
         out = self.dropout(out)
 
         out = self.fc2(out)
-        out = self.bn2(out)
+        # out = self.bn2(out)
         out = self.relu(out)
-        # out = self.dropout(out)
+        out = self.dropout(out)
 
-        # out = self.fc3(out)
+        out = self.fc3(out)
         # out = self.bn3(out)
         # out = self.dropout(out)
 

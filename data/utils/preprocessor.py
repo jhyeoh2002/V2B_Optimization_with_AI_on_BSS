@@ -1,4 +1,3 @@
-
 from operator import index
 import os
 import sys
@@ -15,6 +14,7 @@ sys.path.append(os.path.abspath(".."))
 from data.utils.webcrawler import get_building_data
 from data.utils.costgenerator import get_building_cost, get_ev_cost
 from data.utils.battscheduler import schedule_batteries
+import time_series_generator.time_series_generator.core as tsg
 
 class DataPreprocessor:
     
@@ -175,7 +175,7 @@ class DataPreprocessor:
 
         return cost_G2B_df, cost_G2V_df
 
-    def generate_battery_series(self, window_size = 48):
+    def generate_battery_series(self, window_size = 48, tolerance = 6):
 
         fully_charged_df = pd.read_csv('../time_series_generator/modified_data/resample_data.csv',index_col=0)
         fully_charged_df.index = pd.to_datetime(fully_charged_df.index)
@@ -183,22 +183,47 @@ class DataPreprocessor:
         flat_values = fully_charged_df.values.flatten().tolist()
         
         series = []
+        series_with_nan = []
 
         for i in range(len(flat_values)-window_size):
 
             chunk = flat_values[i : i + window_size]
-
-            if any(isnan(k) for k in chunk):
-                continue
+            nan_count = np.count_nonzero(np.isnan(chunk))
             
-            chunk.insert(0, i)
-            series.append(chunk)
+            if nan_count == 0:
+                chunk.insert(0, i)
+                series.append(chunk)
             
+            elif nan_count <= tolerance and not (np.isnan(chunk[0]) or np.isnan(chunk[-1])):
+                artificial_series = self.generate_artificial_battery_data(chunk)
+                
+                for artificial in artificial_series:
+                    np.insert(artificial, 0, i)
+                    series_with_nan.append(artificial)
+                                
         series = np.array(series).astype(int)
-
+        series_with_nan =  np.array(series_with_nan).astype(int)
+        
+        np.save(f'./processed/battery_series_with_nan_window{window_size}.npy', series_with_nan)        
         np.save(f'./processed/battery_series_window{window_size}.npy', series)
 
-        return series
+        return series, series_with_nan
+
+    def generate_artificial_battery_data(self, list):
+
+        generator = tsg.Generator(
+            window_size=len(list),       # Length of each time series subsequence (default: 24)
+            seed=list,                     # Input seed sequence (default: sampled from N(mean=40, std=20, size=window_size))
+            n_sample=25              # Number of new samples to generate (default: 500)
+        )
+        
+        artificial_series = generator.generate()
+        # print(f"Seed Series: {np.array(list)}")
+        
+        # for i in range(len(artificial_series)):
+            # print(f"Artificial Series {i+1}: {np.array(artificial_series[i]).astype(int)}")
+            
+        return artificial_series
 
     def generate_battery_schedule(self, n_station=38*2, SOC_thr=0.9, window_size=48):
 

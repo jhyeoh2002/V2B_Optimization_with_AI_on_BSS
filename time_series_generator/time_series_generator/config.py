@@ -1,8 +1,11 @@
 import numpy as np
+import os 
 
+base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+raw_data_dir = os.path.join(base_dir, "Raw_Data", "Gogoro")
 
-A_PATH_TEMPLATE = '../Raw_Data/Gogoro/台北市大安區_臺大二活停車場站A ({:02d}).csv'
-B_PATH_TEMPLATE = '../Raw_Data/Gogoro/台北市大安區_臺大二活停車場站B ({:02d}).csv'
+A_PATH_TEMPLATE = os.path.join(raw_data_dir, '台北市大安區_臺大二活停車場站A ({:02d}).csv')
+B_PATH_TEMPLATE = os.path.join(raw_data_dir, '台北市大安區_臺大二活停車場站B ({:02d}).csv')
 
 RESOLUTION = '1h'
 

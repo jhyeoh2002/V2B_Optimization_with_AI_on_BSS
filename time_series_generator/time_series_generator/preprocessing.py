@@ -2,7 +2,11 @@ import numpy as np
 import pandas as pd
 from collections import defaultdict
 from typing import List, Optional, Dict
-import time_series_generator.config as cfg
+import time_series_generator.time_series_generator.config as cfg
+import os, sys
+
+sys.path.append(os.path.dirname(__file__))
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))  # Add the parent directory
 
 class DataPrepare:
     def __init__(self, window_size: int = 24, resolution: str = '1h'):
@@ -26,13 +30,14 @@ class DataPrepare:
         # Resample to specified resolution (e.g., '1h')
         tdf_filled = tdf_filled.resample(self.resolution).mean()
         tdf_filled.name = 'raw_data'
+        
+        base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+        save_dir = os.path.join(base_dir, 'modified_data')
+
         try:
-            tdf_filled.to_csv(f'../modified_data/resample_data.csv')
+            tdf_filled.to_csv(os.path.join(save_dir, f'resampled_data_{self.resolution}.csv'))
         except:
-            try:
-                tdf_filled.to_csv(f'/Users/dingjunwei/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/modified_data/resample_data.csv')
-            except:
-                tdf_filled.to_csv(f'/Users/jianhern/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/modified_data/resample_data.csv')
+            print(f"Cannot save resampled data to {os.path.join(save_dir, f'resampled_data_{self.resolution}.csv')}.")
                 
         # 產生子序列並展開為固定長度
         subseqs = self._generate_valid_subsequences(tdf_filled.values)
@@ -64,6 +69,7 @@ class DataPrepare:
                 df = df[~df.index.duplicated()]
                 tdf = pd.concat([tdf, df])
             except Exception:
+                # print(f"Failed to load data from {path}")
                 continue
         tdf = tdf[~tdf.index.duplicated()]
         tdf.sort_index(inplace=True)

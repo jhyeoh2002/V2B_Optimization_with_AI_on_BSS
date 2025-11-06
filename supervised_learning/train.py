@@ -15,7 +15,7 @@ from dataloader.loader import get_loaders_from_files
 from models.STAF_V2 import TemporalAttentiveFusionNet
 
 # === Configs ===
-RUN_NAME = "new_STAFV2"
+RUN_NAME = "STAFV2_V2"
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 DATA_CSV = "supervised_learning/dataloader/merged_windowed_datasetV2.csv"
@@ -29,12 +29,12 @@ LOG_FILE = PROJ_OUTPUT_DIR + f"/traininglog.txt"
 PLOT_SAVE_PATH = PROJ_OUTPUT_DIR + f"/trainingresults_plot.png"
 
 EPOCHS = 50000
-BATCH_SIZE = 64
-LR = 1e-3
+BATCH_SIZE = 128
+LR = 5e-4
 SEED = 42
 
 STEP_SIZE = 50  # for LR scheduler
-GAMMA = 0.75  # for LR scheduler
+GAMMA = 0.9  # for LR scheduler
 
 patience = 5000
 no_improve = 0
@@ -102,7 +102,7 @@ def plot_training_curves():
     return None
 
 # === Load data ===
-train_loader, val_loader, test_loader = get_loaders_from_files(
+train_loader, val_loader = get_loaders_from_files(
     merged_csv_path=DATA_CSV,
     feature_info_path=FEATURE_INFO,
     sequence_length=24,
@@ -131,8 +131,6 @@ save_path = None
 train_losses_hist, val_losses_hist = [], []
 train_mae_hist, val_mae_hist = [], []
 train_r2_hist, val_r2_hist = [], []
-
-
 
 for epoch in range(EPOCHS):
     model.train()
@@ -180,16 +178,15 @@ for epoch in range(EPOCHS):
     val_r2_hist.append(val_r2)
     train_mae_hist.append(np.mean(np.abs(np.array(train_labels) - np.array(train_preds))))
     val_mae_hist.append(np.mean(np.abs(np.array(val_labels) - np.array(val_preds))))
-    
+    current_lr = optimizer.param_groups[0]["lr"]
+
     # === Logging ===
     print(f"Epoch {epoch+1}/{EPOCHS} | "
+          f"LR: {current_lr:.6f} | "
           f"Train RMSE: {avg_train_loss:.5f} kWh | Val RMSE: {avg_val_loss:.5f} kWh | "
           f"Train R²: {train_r2:.3f} | Val R²: {val_r2:.3f} | "
-          f"Patience: {no_improve}/{patience}")
-
-    # Log RMSE to TensorBoard (kWh)
-    # writer.add_scalars("RMSE_kWh", {"Train": avg_train_loss, "Val": avg_val_loss}, epoch)
-    # writer.add_scalars("R2", {"Train": train_r2, "Val": val_r2}, epoch)
+          f"Patience: {no_improve}/{patience} | "
+          )
 
     # === Save best model ===
     if avg_val_loss < best_val_loss:
@@ -211,7 +208,7 @@ for epoch in range(EPOCHS):
             plot_training_curves()
             break
         
-    if epoch % 10 == 0:
+    if epoch % 10 == 9:
         plot_training_curves()
         np.save(f"{PROJ_OUTPUT_DIR}/train_losses_hist.npy", np.array(train_losses_hist))
         np.save(f"{PROJ_OUTPUT_DIR}/val_losses_hist.npy", np.array(val_losses_hist))
@@ -227,16 +224,16 @@ if save_path is not None:
 
 test_preds, test_labels = [], []
 
-with torch.no_grad():
-    for x, y in test_loader:
-        x, y = x.to(DEVICE), y.to(DEVICE).unsqueeze(1)
-        out = model(x)
-        test_preds.extend(out.cpu().numpy())
-        test_labels.extend(y.cpu().numpy())
+# with torch.no_grad():
+#     for x, y in test_loader:
+#         x, y = x.to(DEVICE), y.to(DEVICE).unsqueeze(1)
+#         out = model(x)
+#         test_preds.extend(out.cpu().numpy())
+#         test_labels.extend(y.cpu().numpy())
 
-test_r2 = r2_score(test_labels, test_preds)
-test_mae = np.mean(np.abs(np.array(test_labels) - np.array(test_preds)))
-# Compute RMSE on test set
-test_mse = np.mean((np.array(test_labels) - np.array(test_preds))**2)
-test_rmse = np.sqrt(test_mse)
-print(f"\n✅ Test R²: {test_r2:.4f}, MAE: {test_mae:.4f} kWh, RMSE: {test_rmse:.4f} kWh")
+# test_r2 = r2_score(test_labels, test_preds)
+# test_mae = np.mean(np.abs(np.array(test_labels) - np.array(test_preds)))
+# # Compute RMSE on test set
+# test_mse = np.mean((np.array(test_labels) - np.array(test_preds))**2)
+# test_rmse = np.sqrt(test_mse)
+# print(f"\n✅ Test R²: {test_r2:.4f}, MAE: {test_mae:.4f} kWh, RMSE: {test_rmse:.4f} kWh")
