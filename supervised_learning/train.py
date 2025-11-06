@@ -15,7 +15,7 @@ from dataloader.loader import get_loaders_from_files
 from models.STAF_V2 import TemporalAttentiveFusionNet
 
 # === Configs ===
-RUN_NAME = "new_STAF"
+RUN_NAME = "new_STAFV2"
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 DATA_CSV = "supervised_learning/dataloader/merged_windowed_datasetV2.csv"
@@ -29,12 +29,12 @@ LOG_FILE = PROJ_OUTPUT_DIR + f"/traininglog.txt"
 PLOT_SAVE_PATH = PROJ_OUTPUT_DIR + f"/trainingresults_plot.png"
 
 EPOCHS = 50000
-BATCH_SIZE = 16
-LR = 1e-4
+BATCH_SIZE = 64
+LR = 1e-3
 SEED = 42
 
-STEP_SIZE = 1000  # for LR scheduler
-GAMMA = 0.5  # for LR scheduler
+STEP_SIZE = 50  # for LR scheduler
+GAMMA = 0.75  # for LR scheduler
 
 patience = 5000
 no_improve = 0
@@ -122,7 +122,7 @@ print("StepLR Scheduler: step_size =", STEP_SIZE, ", gamma =", GAMMA)
 print("="*60)
 print("Starting training...\n")
 # === TensorBoard ===
-writer = SummaryWriter(log_dir="runs/TemporalFusionNet")
+# writer = SummaryWriter(log_dir="runs/TemporalFusionNet")
 
 # === Training loop ===
 best_val_loss = float("inf")
@@ -188,8 +188,8 @@ for epoch in range(EPOCHS):
           f"Patience: {no_improve}/{patience}")
 
     # Log RMSE to TensorBoard (kWh)
-    writer.add_scalars("RMSE_kWh", {"Train": avg_train_loss, "Val": avg_val_loss}, epoch)
-    writer.add_scalars("R2", {"Train": train_r2, "Val": val_r2}, epoch)
+    # writer.add_scalars("RMSE_kWh", {"Train": avg_train_loss, "Val": avg_val_loss}, epoch)
+    # writer.add_scalars("R2", {"Train": train_r2, "Val": val_r2}, epoch)
 
     # === Save best model ===
     if avg_val_loss < best_val_loss:
@@ -211,7 +211,7 @@ for epoch in range(EPOCHS):
             plot_training_curves()
             break
         
-    if epoch % 50 == 0:
+    if epoch % 10 == 0:
         plot_training_curves()
         np.save(f"{PROJ_OUTPUT_DIR}/train_losses_hist.npy", np.array(train_losses_hist))
         np.save(f"{PROJ_OUTPUT_DIR}/val_losses_hist.npy", np.array(val_losses_hist))
@@ -219,8 +219,6 @@ for epoch in range(EPOCHS):
         np.save(f"{PROJ_OUTPUT_DIR}/val_r2_hist.npy", np.array(val_r2_hist))
         np.save(f"{PROJ_OUTPUT_DIR}/train_mae_hist.npy", np.array(train_mae_hist))
         np.save(f"{PROJ_OUTPUT_DIR}/val_mae_hist.npy", np.array(val_mae_hist))
-
-writer.close()
 
 # === Final Test Evaluation ===
 if save_path is not None:

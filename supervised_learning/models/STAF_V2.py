@@ -8,10 +8,10 @@ class TemporalAttentiveFusionNet(nn.Module):
                  embedding_dim=64,
                  n_heads=4,
                  fc_hidden_dim1=512,
-                 fc_hidden_dim2=128,
-                 fc_hidden_dim3=32,
-                 attention_dropout=0.2,
-                 dropout=0.2):
+                 fc_hidden_dim2=16,
+                 fc_hidden_dim3=4,
+                 attention_dropout=0.5,
+                 dropout=0.5):
         """
         Multihead attention-based fusion of static + temporal inputs.
         Each 24-hour series passes through interpretable attention, then all summaries are fused.
@@ -35,13 +35,14 @@ class TemporalAttentiveFusionNet(nn.Module):
 
         # === Fully connected fusion ===
         self.dropout = nn.Dropout(dropout)
+        self.bn0 = nn.BatchNorm1d(4 +(24*5) + 5 + (76*4))
         self.fc1 = nn.Linear(4 +(24*5) + 5 + (76*4), fc_hidden_dim1)  # 4 static + 5 temporal summaries
         self.bn1 = nn.BatchNorm1d(fc_hidden_dim1)
         self.fc2 = nn.Linear(fc_hidden_dim1, fc_hidden_dim2)
         self.bn2 = nn.BatchNorm1d(fc_hidden_dim2)
-        self.fc3 = nn.Linear(fc_hidden_dim2, fc_hidden_dim3)
-        self.bn3 = nn.BatchNorm1d(fc_hidden_dim3)
-        self.fc4 = nn.Linear(fc_hidden_dim3, 1)
+        # self.fc3 = nn.Linear(fc_hidden_dim2, fc_hidden_dim3)
+        # self.bn3 = nn.BatchNorm1d(fc_hidden_dim3)
+        self.fc4 = nn.Linear(fc_hidden_dim2, 1)
         self.relu = nn.ReLU()
 
     def forward(self, x, sequence_length=24):
@@ -60,7 +61,8 @@ class TemporalAttentiveFusionNet(nn.Module):
 
         # Fuse static + attention summaries
         fused = torch.cat([static_feats, summaries], dim=1)
-       
+        out = self.bn0(fused)
+
         out = self.fc1(fused)
         out = self.bn1(out)
         out = self.dropout(out)
@@ -68,11 +70,11 @@ class TemporalAttentiveFusionNet(nn.Module):
         out = self.fc2(out)
         out = self.bn2(out)
         out = self.relu(out)
-        out = self.dropout(out)
+        # out = self.dropout(out)
 
-        out = self.fc3(out)
-        out = self.bn3(out)
-        out = self.dropout(out)
+        # out = self.fc3(out)
+        # out = self.bn3(out)
+        # out = self.dropout(out)
 
         out = self.fc4(out)
 
