@@ -1,10 +1,15 @@
 # ====== Optimization Parameters ======
 
 # Project Settings
-WINDOW_LENGTH = 30  # hours
+from encodings.punycode import T
+
+
+WINDOW_LENGTH = 48  # hours
 PV_AREA = 500  # m^2
 
-PROJECT_DETAIL = "Test"
+TOLERANCE_NAN = 7  # Number of NaNs tolerated in battery series
+# PROJECT_DETAIL = f"{TOLERANCE_NAN}nan_run2"
+PROJECT_DETAIL = f"TESTDATA"
 PROJECT_NAME = f'WL{WINDOW_LENGTH}_PV{PV_AREA}_{PROJECT_DETAIL}'
 
 # Battery Parameters
@@ -23,3 +28,6 @@ MAX_SOC = 0.9
 BATTERIES_PER_STATION = 38
 NUM_STATIONS = 2
 TOTAL_BATTERIES = BATTERIES_PER_STATION * NUM_STATIONS
+
+
+TEST_MODE = True  # If True, use test data files

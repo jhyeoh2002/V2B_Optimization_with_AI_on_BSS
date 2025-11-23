@@ -26,6 +26,12 @@ This repository contains data and scripts for optimizing Vehicle-to-Building (V2
     **Source**: *國立台灣大學 推廣中心饋線 用電日報表*, URL: [NTU ePower Platform](https://epower.ga.ntu.edu.tw/fn4/report2.aspx), Accessed: 19 October 2025.
 
 ---
+## Generate Data
+
+      nohup python3 generate_data.py > logs/run_$(date +%Y%m%d_%H%M%S).log 2>&1 &
+
+Class 
+
 ## Time Series Generator
 
 A Bayesian sequence modeling toolkit for generating time series samples based on historical patterns and a given seed sequence.  

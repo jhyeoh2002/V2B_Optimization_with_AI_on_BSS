@@ -14,21 +14,21 @@ OUTPUT_OPT_DIR = os.path.join(PROJECT_ROOT, "optimization", "output")
 sys.path.append(os.path.abspath(".."))
 
 
-def merge_and_process(sequence_length=24, save_feature_info=True):
+def merge_and_process(sequence_length=24, save_feature_info=True, tolerance=4, window_size=48, optimization_folder="WL48_PV500_48H_with_2nan", dataset_name="merged_windowed_datasetV3.csv", feature_info_name="feature_infoV3.json"):
     """Merge npy + CSV time-series into one supervised learning dataset."""
 
     # === Load npy arrays ===
-    battery_demand = np.load(os.path.join(DATA_PROCESSED_DIR, "battery_series_window30.npy"))
-    battery_details = np.load(os.path.join(DATA_PROCESSED_DIR, "battery_details_window30.npy"))
-    battery_schedule = np.load(os.path.join(DATA_PROCESSED_DIR, "battery_schedule_window30.npy"))  # availability schedule
-    
+    battery_demand = np.concatenate((np.load(os.path.join(DATA_PROCESSED_DIR, f"battery_series_window{window_size}.npy")), np.load(os.path.join(DATA_PROCESSED_DIR, f"battery_series_with_{tolerance}nan_window{window_size}.npy"))), axis=0)
+    battery_details = np.load(os.path.join(DATA_PROCESSED_DIR, f"battery_details_{tolerance}nan_window{window_size}.npy"))
+    battery_schedule = np.load(os.path.join(DATA_PROCESSED_DIR, f"battery_schedule_{tolerance}nan_window{window_size}.npy"))  # availability schedule
+
     arrival_soc = battery_details[0]
     departure_soc = battery_details[1]
     arrival_times = battery_details[2]
     departure_times = battery_details[3]
 
-    ground_truth = np.load(os.path.join(OUTPUT_OPT_DIR, "WL30_PV500_Test/optimization/charging_demand.npy"))
-    SOC = np.load(os.path.join(OUTPUT_OPT_DIR, "WL30_PV500_Test/optimization/SOC.npy"))
+    ground_truth = np.load(os.path.join(OUTPUT_OPT_DIR, f"{optimization_folder}/optimization/charging_demand.npy"))
+    SOC = np.load(os.path.join(OUTPUT_OPT_DIR, f"{optimization_folder}/optimization/SOC.npy"))
 
     # === Load CSV data ===
     def read_clean_csv(path):
@@ -70,11 +70,14 @@ def merge_and_process(sequence_length=24, save_feature_info=True):
     # === Determine n_veh from existing data ===
     n_veh = SOC.shape[2] if SOC.ndim == 3 else SOC.shape[1]
 
+    assert battery_schedule.shape[0] == battery_demand.shape[0] == ground_truth.shape[0] == SOC.shape[0], f"Mismatched sample counts among datasets. {battery_schedule.shape[0]} != {battery_demand.shape[0]} != {ground_truth.shape[0]} != {SOC.shape[0]}"
+
     # === Build dataset ===
     rows = []
     valid_count = 0
     
     for i in range(battery_demand.shape[0]):
+        
         start_idx = int(battery_demand[i, 0])
         end_idx = start_idx + sequence_length
         if end_idx > len(building_demand):
@@ -87,11 +90,22 @@ def merge_and_process(sequence_length=24, save_feature_info=True):
         price_window = electricity_price.iloc[start_idx:end_idx, 0].values
         battery_window = battery_demand[i, 1:1 + sequence_length]
 
+
         # === Vehicle-level data ===
         sched = battery_schedule[i].copy()          # (n_veh, window_len)
         sched = sched[~np.isnan(sched).any(axis=1)] # drop NaN rows
         SOC_row = SOC[i].copy().T
         SOC_row = SOC_row[~np.isnan(SOC_row).any(axis=1)]  # same filtering
+
+        # If still mismatched, log difference and break early for inspection
+        if sched.shape[0] != SOC_row.shape[0]:
+            print(f"❌ Mismatch detected at index {i}")
+            diff = abs(sched.shape[0] - SOC_row.shape[0])
+            print(f"  Difference in vehicle count: {diff}")
+            print("  Possible cause: truncated NaN filtering or schedule padding.")
+            np.save(f"debug_sched_{i}.npy", sched)
+            np.save(f"debug_soc_{i}.npy", SOC_row)
+            raise ValueError(f"[Index {i}] schedule/SOC mismatch: {sched.shape} vs {SOC_row.shape}")
 
         if sched.shape[0] != SOC_row.shape[0]:
             raise ValueError(f"[Index {i}] schedule/SOC mismatch: {sched.shape} vs {SOC_row.shape}")
@@ -148,7 +162,7 @@ def merge_and_process(sequence_length=24, save_feature_info=True):
     df_processed = pd.DataFrame(rows, columns=cols)
 
     # === Save outputs ===
-    output_path = os.path.join(BASE_DIR, "merged_windowed_datasetV2.csv")
+    output_path = os.path.join(BASE_DIR, dataset_name)
     df_processed.to_csv(output_path, index=False)
     print(f"✅ Saved merged dataset: {output_path}  (shape: {df_processed.shape})")
 
@@ -160,7 +174,7 @@ def merge_and_process(sequence_length=24, save_feature_info=True):
             "target_col": "target",
             "num_embeddings": suggested_num_embeddings
         }
-        json_path = os.path.join(BASE_DIR, "feature_infoV2.json")
+        json_path = os.path.join(BASE_DIR, feature_info_name)
         with open(json_path, "w") as f:
             json.dump(feature_info, f, indent=4)
         print(f"✅ Saved feature metadata: {json_path}")
@@ -168,5 +182,3 @@ def merge_and_process(sequence_length=24, save_feature_info=True):
     return df_processed
 
 
-if __name__ == "__main__":
-    merge_and_process()

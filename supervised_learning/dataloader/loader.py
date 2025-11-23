@@ -109,7 +109,7 @@ def get_loaders_from_files(
     target_col = feature_info["target_col"]
 
     # --- Split data ---
-    train_df, val_df = train_test_split(df, test_size=0.15, random_state=random_seed, shuffle=True)
+    train_df, val_df = train_test_split(df, test_size=0.3, random_state=random_seed, shuffle=True)
 
     print(f"✅ Dataset split: {len(train_df)} train, {len(val_df)} val")
 
@@ -137,14 +137,3 @@ def get_loaders_from_files(
 
     return train_loader, val_loader
 
-
-if __name__ == "__main__":
-    # Example usage
-    train_loader, val_loader = get_loaders_from_files(
-        merged_csv_path="merged_windowed_datasetV2.csv",
-        feature_info_path="feature_infoV2.json",
-        sequence_length=24,
-        batch_size=32,
-        scaler_dir="scalers",
-        fit_scaler=True,  # set to False when reloading later
-    )

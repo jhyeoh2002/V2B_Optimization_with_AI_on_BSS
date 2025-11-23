@@ -20,11 +20,12 @@ class EnergyAllocator:
         """
         self.proj_name = cfg.PROJECT_NAME
         self.win_len = cfg.WINDOW_LENGTH
+        self.tolerance = cfg.TOLERANCE_NAN
         self.output_dir = os.path.join(".", "output", self.proj_name)
         os.makedirs(self.output_dir, exist_ok=True)
 
         # Load data
-        index, available, SOC_a_v, SOC_d_v, t_a_v, t_d_v = batteryreader.get_battery_details(self.win_len)
+        index, available, SOC_a_v, SOC_d_v, t_a_v, t_d_v = batteryreader.get_battery_details(self.win_len, self.tolerance, Test=cfg.TEST_MODE)
         self.bldg = DataReader.get_building_energy_demand()
         self.elec_G2B, self.elec_G2V = DataReader.get_electricity_price()
         self.pv = DataReader.get_photovoltaic_generation()
@@ -38,63 +39,74 @@ class EnergyAllocator:
         self.t_d_v = t_d_v
         self.n_list = len(index)
         self.max_vehicles = max(len(list) for list in SOC_a_v)
-
-    def run_iterations(self, mode="optimization"):
+        
+    def run_iterations(self, mode="optimization", rerun=False, checkpoint_interval=15):
         """
-        Run iterations for either optimization or immediate charging.
-
+        Run iterations for either optimization or immediate charging, with crash-safe checkpointing.
+        
         Parameters:
             mode (str): "optimization" or "immediate_charging".
-
+            rerun (bool): If True, ignore any existing checkpoint and start fresh.
+            checkpoint_interval (int): Save a checkpoint every N iterations.
+        
         Returns:
             dict: Aggregated results for all iterations.
         """
 
+        # Setup paths
+        checkpoint_base = os.path.join(self.output_dir, f"{mode}_checkpoint")
+        checkpoint_file = checkpoint_base + ".npz"
+        tmp_file        = checkpoint_base + ".tmp.npz"
+
+        # Redirect stdout to log for this mode
         sys.stdout = open(os.path.join(self.output_dir, f"{mode}_log.txt"), "w")
-        
-        # Initialize result containers
-        results = {
-            "grid_demand": [], # Grid demand over time (window length)
-            "pv_loss": [], # PV loss over time (window length)
-            "initial_demand": [], # Initial demand (window length)
-            "charging_demand": [], # Charging demand (window length)
+
+        # Prepare result containers
+        result_keys = [
+            "grid_demand","pv_loss","initial_demand","charging_demand",
+            "G2B","P2B","G2V","P2V","V2B","SOC","unmet","objective_value",
+            "optimization_time_s","mip_gap_percent","total_cost",
+            "self_sufficiency","pv_utilization"
+        ]
+        results = { key: [] for key in result_keys }
+
+        # Determine starting iteration
+        start_n = 0
+           
+        if (not rerun) and os.path.exists(checkpoint_file):
+            print(f"[INFO] Found checkpoint: {checkpoint_file}")
+            ckpt = np.load(checkpoint_file, allow_pickle=True)
             
-            "G2B": [], # Grid to Building flows (window length)
-            "P2B": [], # PV to Building flows (window length)
+            # Load partial results back into memory
+            for key in result_keys:
+                if key in ckpt:
+                    results[key] = ckpt[key].tolist()
+                else:
+                    results[key] = []
             
-            "G2V": [], # Grid to Vehicle flows (n_vehicle x window length)
-            "P2V": [], # PV to Vehicle flows (n_vehicle x window length)
-            "V2B": [], # Vehicle to Building flows (n_vehicle x window length)
+            last_n = int(ckpt["last_n"])
+            start_n = last_n + 1
+            print(f"[INFO] Resuming from iteration {start_n}")
+        else:
+            print(f"[INFO] Starting fresh run: mode={mode}")
 
-            "SOC": [], # State of Charge over time (n_vehicle x window length)
-            "unmet": [], # Unmet demand per vehicle (n_vehicle)
-
-            "objective_value":[], # Final objective value (scalar)
-            "optimization_time_s": [], # Optimization time in seconds (scalar)
-            "mip_gap_percent": [], # MIP gap percentage (scalar)
-            "total_cost": [], # Total cost incurred (scalar)
-            "self_sufficiency": [], # Self-sufficiency metric (scalar)
-            "pv_utilization": [], # PV utilization metric (scalar)
-        }
-
-        for n in tqdm(range(self.n_list), desc=f"Processing {mode} series", unit="series"):
-            # Extract current data for the iteration
-            index_current = self.window_index[n]
+        # Main loop
+        for n in tqdm(range(start_n, self.n_list), desc=f"Processing {mode} series", unit="series"):
+            index_current        = self.window_index[n]
             availability_current = np.array(self.available[n])
-            SOC_a_v_current = np.array(self.SOC_a_v[n])
-            SOC_d_v_current = np.array(self.SOC_d_v[n])
-            t_d_v_current = np.array(self.t_d_v[n])
+            SOC_a_v_current      = np.array(self.SOC_a_v[n])
+            SOC_d_v_current      = np.array(self.SOC_d_v[n])
+            t_d_v_current        = np.array(self.t_d_v[n])
 
-            bldg_current = self.bldg[index_current : index_current + self.win_len]
+            bldg_current    = self.bldg[index_current : index_current + self.win_len]
             elec_G2B_current = self.elec_G2B[index_current : index_current + self.win_len]
             elec_G2V_current = self.elec_G2V[index_current : index_current + self.win_len]
-            pv_current = self.pv[index_current : index_current + self.win_len]
+            pv_current      = self.pv[index_current : index_current + self.win_len]
 
-            print("=" * 60)
+            print("="*60)
             print(f"Starting series num: {n}, Datetime Index: {index_current}")
-            print("-" * 60)
+            print("-"*60)
 
-            # Run the appropriate method based on the mode
             if mode == "optimization":
                 optimizer = GurobiOptimizer()
                 result = optimizer.optimize(
@@ -105,9 +117,8 @@ class EnergyAllocator:
                     bldg=bldg_current,
                     elec_G2B=elec_G2B_current,
                     elec_G2V=elec_G2V_current,
-                    pv=pv_current,
+                    pv=pv_current
                 )
-                
             elif mode == "immediate_charging":
                 allocator = ImmediateCharging()
                 result = allocator.allocate(
@@ -118,33 +129,58 @@ class EnergyAllocator:
                     bldg=bldg_current,
                     elec_G2B=elec_G2B_current,
                     elec_G2V=elec_G2V_current,
-                    pv=pv_current,
+                    pv=pv_current
                 )
-                
             else:
                 raise ValueError(f"Unknown mode: {mode}")
 
-            # Append results
             if result:
                 for key in results:
                     results[key].append(result[key])
+                    
+                    if key == "objective_value":
+                        print(f"length of optimization values: {len(results[key])}")
+                    
             
+            # --- 5. Checkpoint every few iterations ---
+            if ((n + 1) % checkpoint_interval == 0) or (n == self.n_list - 1):
+                try:
+                    # Pad irregular arrays using your internal function
+                    save_dict = {}
+                    for k, v in results.items():
+                        if k in ["unmet", "G2V", "P2V", "V2B", "SOC"]:
+                            padded_v = self.pad_vehicle_dimension(v)
+                            save_dict[k] = padded_v
+                        else:
+                            save_dict[k] = np.array(v)
+                    save_dict["last_n"] = n
+
+                    np.savez_compressed(tmp_file, **save_dict)
+                    os.replace(tmp_file, checkpoint_file)
+                    print(f"[CHECKPOINT] Saved checkpoint at iteration {n}")
+                except Exception as e:
+                    print(f"[ERROR] Checkpoint save failed at iteration {n}: {e}")
+
+        # After loop: convert & save full results
         for key, value in results.items():
             print(f"\n\nSaving {key} results...\n")
-            
             if key in ["unmet", "G2V", "P2V", "V2B", "SOC"]:
                 value = self.pad_vehicle_dimension(value)
-                
             else:
                 value = np.array(value)
-
-            print(value)
-            print(f"\nShape: {np.array(value).shape}\n")
             results[key] = value
-            
             self.save_results(key, value, mode)
 
+        # Clean up checkpoint
+        if os.path.exists(checkpoint_file):
+            try:
+                os.remove(checkpoint_file)
+                print("[INFO] Deleted checkpoint after full completion.")
+            except Exception as e:
+                print(f"[WARN] Could not delete checkpoint file: {e}")
+
         return results
+
 
     def save_results(self, key, value, mode):
         """

@@ -4,7 +4,7 @@ import sys
 import pandas as pd
 import numpy as np
 
-
+from tqdm import tqdm
 from scipy.stats import truncnorm
 from datetime import datetime
 from math import isnan
@@ -14,7 +14,7 @@ sys.path.append(os.path.abspath(".."))
 from data.utils.webcrawler import get_building_data
 from data.utils.costgenerator import get_building_cost, get_ev_cost
 from data.utils.battscheduler import schedule_batteries
-import time_series_generator.time_series_generator.core as tsg
+# import time_series_generator.time_series_generator.core as tsg
 
 class DataPreprocessor:
     
@@ -175,98 +175,4 @@ class DataPreprocessor:
 
         return cost_G2B_df, cost_G2V_df
 
-    def generate_battery_series(self, window_size = 48, tolerance = 6):
-
-        fully_charged_df = pd.read_csv('../time_series_generator/modified_data/resample_data.csv',index_col=0)
-        fully_charged_df.index = pd.to_datetime(fully_charged_df.index)
-        
-        flat_values = fully_charged_df.values.flatten().tolist()
-        
-        series = []
-        series_with_nan = []
-
-        for i in range(len(flat_values)-window_size):
-
-            chunk = flat_values[i : i + window_size]
-            nan_count = np.count_nonzero(np.isnan(chunk))
-            
-            if nan_count == 0:
-                chunk.insert(0, i)
-                series.append(chunk)
-            
-            elif nan_count <= tolerance and not (np.isnan(chunk[0]) or np.isnan(chunk[-1])):
-                artificial_series = self.generate_artificial_battery_data(chunk)
-                
-                for artificial in artificial_series:
-                    np.insert(artificial, 0, i)
-                    series_with_nan.append(artificial)
-                                
-        series = np.array(series).astype(int)
-        series_with_nan =  np.array(series_with_nan).astype(int)
-        
-        np.save(f'./processed/battery_series_with_nan_window{window_size}.npy', series_with_nan)        
-        np.save(f'./processed/battery_series_window{window_size}.npy', series)
-
-        return series, series_with_nan
-
-    def generate_artificial_battery_data(self, list):
-
-        generator = tsg.Generator(
-            window_size=len(list),       # Length of each time series subsequence (default: 24)
-            seed=list,                     # Input seed sequence (default: sampled from N(mean=40, std=20, size=window_size))
-            n_sample=25              # Number of new samples to generate (default: 500)
-        )
-        
-        artificial_series = generator.generate()
-        # print(f"Seed Series: {np.array(list)}")
-        
-        # for i in range(len(artificial_series)):
-            # print(f"Artificial Series {i+1}: {np.array(artificial_series[i]).astype(int)}")
-            
-        return artificial_series
-
-    def generate_battery_schedule(self, n_station=38*2, SOC_thr=0.9, window_size=48):
-
-        if os.path.isfile(f'./processed/battery_series_window{window_size}.npy'):
-            battery_series = np.load(f'./processed/battery_series_window{window_size}.npy')
-        else:
-            battery_series = self.generate_battery_series(window_size=window_size)
-
-        tnum = battery_series.shape[1] - 1  # Subtract 1 to account for the index column
-        
-        a_vt_list = []
-        SOC_a_v_list = []
-        SOC_d_v_list = []
-        t_a_v_list = []
-        t_d_v_list = []
-        
-        for series in battery_series:
-
-            a_vt, SOC_a_v, SOC_d_v, t_a_v, t_d_v = schedule_batteries(series, n_station, tnum, SOC_thr=SOC_thr)
-            a_vt_arr = np.array(a_vt, dtype=float)
-            SOC_a_v_arr = np.round(np.array(SOC_a_v, dtype=float), 2)
-            SOC_d_v_arr = np.round(np.array(SOC_d_v, dtype=float), 2)
-            t_a_v_arr = np.array(t_a_v, dtype=float)
-            t_d_v_arr = np.array(t_d_v, dtype=float)
-
-            a_vt_list.append(a_vt_arr)
-            SOC_a_v_list.append(SOC_a_v_arr)
-            SOC_d_v_list.append(SOC_d_v_arr)
-            t_a_v_list.append(t_a_v_arr)
-            t_d_v_list.append(t_d_v_arr)
-
-        # Find the maximum shape[0] across all arrays
-        max_batt = max([arr.shape[0] for arr in a_vt_list])
-
-        a_vt_list_arr = np.array([np.pad(arr, ((0, max_batt - arr.shape[0]), (0, 0)), mode='constant', constant_values=np.nan) for arr in a_vt_list])
-        SOC_a_v_list_arr = np.array([np.pad(arr, (0, max_batt - arr.shape[0]), mode='constant', constant_values=np.nan) for arr in SOC_a_v_list])
-        SOC_d_v_list_arr = np.array([np.pad(arr, (0, max_batt - arr.shape[0]), mode='constant', constant_values=np.nan) for arr in SOC_d_v_list])
-        t_a_v_list_arr = np.array([np.pad(arr, (0, max_batt - arr.shape[0]), mode='constant', constant_values=np.nan) for arr in t_a_v_list])
-        t_d_v_list_arr = np.array([np.pad(arr, (0, max_batt - arr.shape[0]), mode='constant', constant_values=np.nan) for arr in t_d_v_list])
-
-        details = np.array([SOC_a_v_list_arr, SOC_d_v_list_arr, t_a_v_list_arr, t_d_v_list_arr])
-        
-        np.save(f'./processed/battery_schedule_window{window_size}.npy', a_vt_list_arr)
-        np.save(f'./processed/battery_details_window{window_size}.npy', details)
-
-        return a_vt_list_arr, details
+   

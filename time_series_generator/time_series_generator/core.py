@@ -5,11 +5,21 @@ import os
 from sklearn.neighbors import KernelDensity
 
 import os, sys
-from time_series_generator.time_series_generator.preprocessing  import DataPrepare
-from time_series_generator.time_series_generator.metrics import fast_dtw_distance  # 仍可用在後驗細修時的輔助
-from time_series_generator.time_series_generator.density import compute_posterior_weights_from_partial_subseq
-import time_series_generator.time_series_generator.config as cfg
 
+sys.path.append(os.path.dirname(__file__))
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))  # Add the parent directory
+
+# try:
+from time_series_generator.preprocessing  import DataPrepare
+from time_series_generator.metrics import fast_dtw_distance  # 仍可用在後驗細修時的輔助
+from time_series_generator.density import compute_posterior_weights_from_partial_subseq
+import time_series_generator.config as cfg
+    
+# except ImportError:
+#     from time_series_generator.time_series_generator.preprocessing  import DataPrepare
+#     from time_series_generator.time_series_generator.metrics import fast_dtw_distance  # 仍可用在後驗細修時的輔助
+#     from time_series_generator.time_series_generator.density import compute_posterior_weights_from_partial_subseq
+#     import time_series_generator.time_series_generator.config as cfg
 # ========= 規一化與相位對齊工具 =========
 
 def _norm(x, eps=1e-8):
@@ -92,12 +102,13 @@ class Generator:
                  bandwidth=cfg.BANDWIDTH,
                  random_state=cfg.RANDOM_STATE,
                  max_shift=cfg.MAX_SHIFT if hasattr(cfg, "MAX_SHIFT") else 6,
-                 top_k=cfg.TOP_K if hasattr(cfg, "TOP_K") else 200,
+                 top_k=cfg.TOP_K,
                  align_mode="roll",
                  bootstrap_size: int = cfg.BOOTSTRAP_SIZE if hasattr(cfg, "BOOTSTRAP_SIZE") else 20,
                  alpha_prior: float = getattr(cfg, "ALPHA_PRIOR", 2.0),
                  beta_lik: float = getattr(cfg, "BETA_LIK", 2.0),
                  ):
+        
         self.window_size = window_size
         self.resolution = resolution
         self.seed = seed
@@ -132,7 +143,7 @@ class Generator:
         h = self.bandwidth
 
         # Dirichlet 溫度：越小→越尖銳（越接近少數 analog）
-        tau = 50.0
+        tau = 5000.0
         alpha = np.clip(w_global, 1e-8, None) * tau
 
         samples = []
@@ -378,7 +389,9 @@ class BayesianDistributionEstimator:
     # ---------- DataPrepare 介面 ----------
     def _prepare_data(self):
         # 你的 DataPrepare 應提供 generate_grouped_subsequences()
-        self.grouped_samples = self.datapreparer.generate_grouped_subsequences()
+        self.grouped_samples = self.datapreparer.generate_grouped_subsequences(
+            remove_dates=['2024-03-15','2024-03-16', '2024-03-29', '2024-03-30'],  # drop specific bad days
+        )
 
     # ---------- seed 的 z-score ----------
     def _normalize_seed(self, seed):
