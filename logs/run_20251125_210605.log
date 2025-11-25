@@ -1,0 +1,29 @@
+nohup: ignoring input
+==================================================
+PART 1: Starting data preprocess for 2023-01-01 00:00:00 to 2024-09-30 23:00:00...
+==================================================
+
+	1.1 Preprocessing radiation data...
+		[INFO] Radiation data already exists at './data/timeseries/radiation_data.csv'
+
+	1.2 Preprocessing temperature data...
+		[INFO] Temperature data already exists at './data/timeseries/temperature_data.csv'
+
+	1.3 Preprocessing building data...
+		[INFO] Building data already exists at './data/timeseries/building_data.csv'
+
+	1.4 Preprocessing electricity cost data...
+		[INFO] Electricity cost data already exists at './data/timeseries/electricitycostG2B_data.csv' and './data/timeseries/electricitycostG2V_data.csv'
+
+	1.5 Preprocessing battery demand series data...
+		[INFO] Found existing battery data at './data/battery_demand_tol22/resample_full.csv' and './data/battery_demand_tol22/resample_train.csv'
+
+		[INFO] Number of series for clean windows = (168, 37)
+		[INFO] Number of eligible series for Case 2 = (1377, 37)
+		[INFO] Number of seeds ready for Case 3  = (2000, 36)
+
+		[INFO] Case 1 exists — loaded battery demand with shape (168, 37).
+		[INFO] Building Case 2 (fill NaN)
+		[INFO] Resuming Case 2 from checkpoint: './data/battery_demand_tol22/case2_nan_filled/battery_demand_ckpt.npz'
+		[INFO] Case 2 resume index = 511, current series shape = (679, 37)
+		[INFO] Case 2 generating:   0%|          | 0/866 [00:00<?, ?it/s]		[INFO] Case 2 generating:   0%|          | 1/866 [00:17<4:19:20, 17.99s/it]		[INFO] Case 2 generating:   0%|          | 2/866 [00:37<4:34:27, 19.06s/it]		[INFO] Case 2 generating:   0%|          | 3/866 [01:16<6:39:55, 27.80s/it]		[INFO] Case 2 generating:   0%|          | 4/866 [01:55<7:43:41, 32.28s/it]		[INFO] Case 2 generating:   1%|          | 5/866 [02:33<8:16:51, 34.62s/it]		[INFO] Case 2 generating:   1%|          | 6/866 [03:12<8:36:44, 36.05s/it]		[INFO] Case 2 generating:   1%|          | 7/866 [03:51<8:49:14, 36.97s/it]		[INFO] Case 2 generating:   1%|          | 8/866 [04:30<8:57:26, 37.58s/it]		[INFO] Case 2 generating:   1%|          | 9/866 [04:54<7:55:50, 33.31s/it]		[INFO] Case 2 generating:   1%|          | 10/866 [05:13<6:53:33, 28.99s/it]		[INFO] Case 2 generating:   1%|▏         | 11/866 [05:30<6:01:04, 25.34s/it]		[INFO] Case 2 generating:   1%|▏         | 12/866 [05:45<5:13:40, 22.04s/it]		[INFO] Case 2 generating:   2%|▏         | 13/866 [05:59<4:41:05, 19.77s/it]		[INFO] Case 2 generating:   2%|▏         | 14/866 [06:14<4:18:31, 18.21s/it]		[INFO] Case 2 generating:   2%|▏         | 15/866 [06:31<4:13:53, 17.90s/it]		[INFO] Case 2 generating:   2%|▏         | 16/866 [06:46<3:59:32, 16.91s/it]		[INFO] Case 2 generating:   2%|▏         | 17/866 [07:00<3:49:28, 16.22s/it]		[INFO] Case 2 generating:   2%|▏         | 18/866 [07:15<3:41:59, 15.71s/it]		[INFO] Case 2 generating:   2%|▏         | 19/866 [07:29<3:36:59, 15.37s/it]		[INFO] Case 2 generating:   2%|▏         | 20/866 [07:44<3:32:47, 15.09s/it]		[INFO] Case 2 generating:   2%|▏         | 21/866 [08:03<3:49:42, 16.31s/it]		[INFO] Case 2 generating:   3%|▎         | 22/866 [08:19<3:49:47, 16.34s/it]		[INFO] Case 2 generating:   3%|▎         | 23/866 [08:34<3:43:51, 15.93s/it]		[INFO] Case 2 generating:   3%|▎         | 24/866 [08:49<3:39:00, 15.61s/it]		[INFO] Case 2 generating:   3%|▎         | 25/866 [09:07<3:46:36, 16.17s/it]		[INFO] Case 2 generating:   3%|▎         | 26/866 [09:22<3:43:11, 15.94s/it]		[INFO] Case 2 generating:   3%|▎         | 27/866 [09:37<3:37:37, 15.56s/it]		[INFO] Case 2 generating:   3%|▎         | 28/866 [09:51<3:32:46, 15.23s/it]		[INFO] Case 2 generating:   3%|▎         | 29/866 [10:06<3:29:42, 15.03s/it]
