@@ -6,7 +6,7 @@ START_DATE = "2023-01-01 00:00:00"
 END_DATE = "2024-09-30 23:00:00"
 
 WINDOW_SIZE = 36
-TOLERANCE = 26  # Allow up to one-third of the window to be NaN
+TOLERANCE = 25  # Allow up to one-third of the window to be NaN
 
 
 # Gogoro Battery Parameters

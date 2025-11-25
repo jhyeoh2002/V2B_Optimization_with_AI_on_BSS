@@ -1,0 +1,31 @@
+nohup: ignoring input
+==================================================
+PART 1: Starting data preprocess for 2023-01-01 00:00:00 to 2024-09-30 23:00:00...
+==================================================
+
+	1.1 Preprocessing radiation data...
+		[INFO] Radiation data already exists at './data/timeseries/radiation_data.csv'
+
+	1.2 Preprocessing temperature data...
+		[INFO] Temperature data already exists at './data/timeseries/temperature_data.csv'
+
+	1.3 Preprocessing building data...
+		[INFO] Building data already exists at './data/timeseries/building_data.csv'
+
+	1.4 Preprocessing electricity cost data...
+		[INFO] Electricity cost data already exists at './data/timeseries/electricitycostG2B_data.csv' and './data/timeseries/electricitycostG2V_data.csv'
+
+	1.5 Preprocessing battery demand series data...
+		[INFO] Found existing battery data at './data/battery_demand_tol26/resample_full.csv' and './data/battery_demand_tol26/resample_train.csv'
+
+		[INFO] Number of series for clean windows = (168, 37)
+		[INFO] Number of eligible series for Case 2 = (1378, 37)
+		[INFO] Number of seeds ready for Case 3  = (2000, 36)
+
+		[INFO] Case 1 exists — loaded battery demand with shape (168, 37).
+		[INFO] Case 2 exists — loaded battery demand with shape (1546, 37).
+		[INFO] Building Case 3 (extended random-seed generation)
+		[INFO] Case 3 will generate 2000 new series from random seeds
+		[INFO] Resuming Case 3 from checkpoint: './data/battery_demand_tol26/case3_extended_generated/battery_demand_ckpt.npz'
+		[INFO] Case 3 resume index = 1851, current series shape = (3397, 37)
+		[INFO] Case 3 generating from random seeds:   0%|          | 0/149 [00:00<?, ?it/s]		[INFO] Case 3 generating from random seeds:   1%|          | 1/149 [00:24<1:01:11, 24.81s/it]		[INFO] Case 3 generating from random seeds:   1%|▏         | 2/149 [00:45<54:54, 22.41s/it]  
