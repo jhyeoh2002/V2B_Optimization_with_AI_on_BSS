@@ -1,0 +1,12 @@
+nohup: ignoring input
+Crash diagnostics ON
+Traceback (most recent call last):
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/optimization/optimize.py", line 7, in <module>
+    energy_allocator = EnergyAllocator()
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/optimization/util/EnergyAllocator.py", line 28, in __init__
+    index, available, SOC_a_v, SOC_d_v, t_a_v, t_d_v = batteryreader.get_battery_details(self.win_len, self.tolerance)
+                                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/optimization/util/batteryreader.py", line 50, in get_battery_details
+    assert n_schedule == n_details == n_index, (
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Length mismatch: schedule=2314, details=2314, index=2008

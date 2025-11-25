@@ -28,7 +28,7 @@ This repository contains data and scripts for optimizing Vehicle-to-Building (V2
 ---
 ## Generate Data
 
-      nohup python3 generate_data.py > logs/run_$(date +%Y%m%d_%H%M%S).log 2>&1 &
+      nohup python3 main.py > logs/run_$(date +%Y%m%d_%H%M%S).log 2>&1 &
 
 Class 
 

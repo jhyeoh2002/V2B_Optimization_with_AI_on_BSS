@@ -1,0 +1,90 @@
+nohup: ignoring input
+==================================================
+PART 1: Starting data preprocess for 2023-01-01 00:00:00 to 2024-09-30 23:00:00...
+==================================================
+
+	1.1 Preprocessing radiation data...
+		[INFO] Radiation data already exists at './data/timeseries/radiation_data.csv'
+
+	1.2 Preprocessing temperature data...
+		[INFO] Temperature data already exists at './data/timeseries/temperature_data.csv'
+
+	1.3 Preprocessing building data...
+		[INFO] Building data already exists at './data/timeseries/building_data.csv'
+
+	1.4 Preprocessing electricity cost data...
+		[INFO] Electricity cost data already exists at './data/timeseries/electricitycostG2B_data.csv' and './data/timeseries/electricitycostG2V_data.csv'
+
+	1.5 Preprocessing battery demand series data...
+		[INFO] Found existing battery data at './data/battery_demand_tol22/resample_full.csv' and './data/battery_demand_tol22/resample_train.csv'
+
+		[INFO] Number of series for clean windows = (168, 37)
+		[INFO] Number of eligible series for Case 2 = (1377, 37)
+		[INFO] Number of seeds ready for Case 3  = (2000, 36)
+
+		[INFO] Case 1 exists — loaded battery demand with shape (168, 37).
+		[INFO] Building Case 2 (fill NaN)
+		[INFO] Resuming Case 2 from checkpoint: './data/battery_demand_tol22/case2_nan_filled/battery_demand_ckpt.npz'
+		[INFO] Case 2 resume index = 366, current series shape = (534, 37)
+		[INFO] Case 2 generating:   0%|          | 0/1011 [00:00<?, ?it/s]		[INFO] Case 2 generating:   0%|          | 1/1011 [00:13<3:55:15, 13.98s/it]		[INFO] Case 2 generating:   0%|          | 2/1011 [00:28<3:59:43, 14.26s/it]		[INFO] Case 2 generating:   0%|          | 3/1011 [00:42<4:01:43, 14.39s/it]		[INFO] Case 2 generating:   0%|          | 4/1011 [00:57<4:00:29, 14.33s/it]		[INFO] Case 2 generating:   0%|          | 5/1011 [01:11<3:59:24, 14.28s/it]		[INFO] Case 2 generating:   1%|          | 6/1011 [01:25<3:58:50, 14.26s/it]		[INFO] Case 2 generating:   1%|          | 7/1011 [01:39<3:58:19, 14.24s/it]		[INFO] Case 2 generating:   1%|          | 8/1011 [01:54<3:57:53, 14.23s/it]		[INFO] Case 2 generating:   1%|          | 9/1011 [02:08<3:57:17, 14.21s/it]		[INFO] Case 2 generating:   1%|          | 10/1011 [02:22<3:56:38, 14.18s/it]		[INFO] Case 2 generating:   1%|          | 11/1011 [02:36<3:56:16, 14.18s/it]		[INFO] Case 2 generating:   1%|          | 12/1011 [02:50<3:55:51, 14.17s/it]		[INFO] Case 2 generating:   1%|▏         | 13/1011 [03:04<3:56:14, 14.20s/it]		[INFO] Case 2 generating:   1%|▏         | 14/1011 [03:19<3:57:19, 14.28s/it]		[INFO] Case 2 generating:   1%|▏         | 15/1011 [03:33<3:57:30, 14.31s/it]		[INFO] Case 2 generating:   2%|▏         | 16/1011 [03:48<3:57:46, 14.34s/it]		[INFO] Case 2 generating:   2%|▏         | 17/1011 [04:02<3:58:02, 14.37s/it]		[INFO] Case 2 generating:   2%|▏         | 18/1011 [04:16<3:57:53, 14.37s/it]		[INFO] Case 2 generating:   2%|▏         | 19/1011 [04:31<3:57:53, 14.39s/it]		[INFO] Case 2 generating:   2%|▏         | 20/1011 [04:45<3:57:38, 14.39s/it]		[INFO] Case 2 generating:   2%|▏         | 21/1011 [05:00<3:58:21, 14.45s/it]		[INFO] Case 2 generating:   2%|▏         | 22/1011 [05:14<3:58:13, 14.45s/it]		[INFO] Case 2 generating:   2%|▏         | 23/1011 [05:29<3:57:49, 14.44s/it]		[INFO] Case 2 generating:   2%|▏         | 24/1011 [05:43<3:56:53, 14.40s/it]		[INFO] Case 2 generating:   2%|▏         | 25/1011 [05:58<3:57:01, 14.42s/it]		[INFO] Case 2 generating:   3%|▎         | 26/1011 [06:12<3:57:26, 14.46s/it]		[INFO] Case 2 generating:   3%|▎         | 27/1011 [06:26<3:56:43, 14.43s/it]		[INFO] Case 2 generating:   3%|▎         | 28/1011 [06:41<3:58:08, 14.54s/it]		[INFO] Case 2 generating:   3%|▎         | 29/1011 [06:56<3:59:41, 14.64s/it]		[INFO] Case 2 generating:   3%|▎         | 30/1011 [07:11<4:00:12, 14.69s/it]		[INFO] Case 2 generating:   3%|▎         | 31/1011 [07:26<4:00:19, 14.71s/it]		[INFO] Case 2 generating:   3%|▎         | 32/1011 [07:41<4:01:27, 14.80s/it]		[INFO] Case 2 generating:   3%|▎         | 33/1011 [07:56<4:01:53, 14.84s/it]		[INFO] Case 2 generating:   3%|▎         | 34/1011 [08:10<4:01:11, 14.81s/it]		[INFO] Case 2 generating:   3%|▎         | 35/1011 [08:25<3:59:34, 14.73s/it]		[INFO] Case 2 generating:   4%|▎         | 36/1011 [08:39<3:57:53, 14.64s/it]		[INFO] Case 2 generating:   4%|▎         | 37/1011 [08:54<3:56:15, 14.55s/it]		[INFO] Case 2 generating:   4%|▍         | 38/1011 [09:08<3:55:09, 14.50s/it]		[INFO] Case 2 generating:   4%|▍         | 39/1011 [09:22<3:53:59, 14.44s/it]Fatal Python error: _PyEval_EvalFrameDefault: Executing a cache.
+Python runtime state: initialized
+
+Thread 0x00007b5255a81640 (most recent call first):
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/threading.py", line 363 in wait
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/threading.py", line 659 in wait
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/site-packages/tqdm/_monitor.py", line 60 in run
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/threading.py", line 1043 in _bootstrap_inner
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/threading.py", line 1014 in _bootstrap
+
+Current thread 0x00007b5305154440 (most recent call first):
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/site-packages/numpy/_core/multiarray.py", line 383 in where
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/preprocessing.py", line 60 in generate_grouped_subsequences
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/core.py", line 386 in _prepare_data
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/core.py", line 223 in estimate_and_correct_distribution_phase_locked
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/core.py", line 131 in generate
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/preprocess/batterygenerator.py", line 288 in generate_artificial_battery_data
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/preprocess/batterygenerator.py", line 189 in generate_battery_series
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/preprocess/preprocessor.py", line 231 in preprocess
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/main.py", line 8 in main
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/main.py", line 12 in <module>
+
+Extension modules: numpy._core._multiarray_umath, numpy.linalg._umath_linalg, numpy.random._common, numpy.random.bit_generator, numpy.random._bounded_integers, numpy.random._mt19937, numpy.random.mtrand, numpy.random._philox, numpy.random._pcg64, numpy.random._sfc64, numpy.random._generator, pandas._libs.tslibs.ccalendar, pandas._libs.tslibs.np_datetime, pandas._libs.tslibs.dtypes, pandas._libs.tslibs.base, pandas._libs.tslibs.nattype, pandas._libs.tslibs.timezones, pandas._libs.tslibs.fields, pandas._libs.tslibs.timedeltas, pandas._libs.tslibs.tzconversion, pandas._libs.tslibs.timestamps, pandas._libs.properties, pandas._libs.tslibs.offsets, pandas._libs.tslibs.strptime, pandas._libs.tslibs.parsing, pandas._libs.tslibs.conversion, pandas._libs.tslibs.period, pandas._libs.tslibs.vectorized, pandas._libs.ops_dispatch, pandas._libs.missing, pandas._libs.hashtable, pandas._libs.algos, pandas._libs.interval, pandas._libs.lib, pandas._libs.ops, pandas._libs.hashing, pandas._libs.arrays, pandas._libs.tslib, pandas._libs.sparse, pandas._libs.internals, pandas._libs.indexing, pandas._libs.index, pandas._libs.writers, pandas._libs.join, pandas._libs.window.aggregations, pandas._libs.window.indexers, pandas._libs.reshape, pandas._libs.groupby, pandas._libs.json, pandas._libs.parsers, pandas._libs.testing, _cffi_backend, scipy._lib._ccallback_c, scipy.sparse._sparsetools, _csparsetools, scipy.sparse._csparsetools, scipy.linalg._fblas, scipy.linalg._flapack, scipy.linalg.cython_lapack, scipy.linalg._cythonized_array_utils, scipy.linalg._solve_toeplitz, scipy.linalg._decomp_lu_cython, scipy.linalg._matfuncs_sqrtm_triu, scipy.linalg._matfuncs_expm, scipy.linalg._linalg_pythran, scipy.linalg.cython_blas, scipy.linalg._decomp_update, scipy.sparse.linalg._dsolve._superlu, scipy.sparse.linalg._eigen.arpack._arpack, scipy.sparse.linalg._propack._spropack, scipy.sparse.linalg._propack._dpropack, scipy.sparse.linalg._propack._cpropack, scipy.sparse.linalg._propack._zpropack, scipy.sparse.csgraph._tools, scipy.sparse.csgraph._shortest_path, scipy.sparse.csgraph._traversal, scipy.sparse.csgraph._min_spanning_tree, scipy.sparse.csgraph._flow, scipy.sparse.csgraph._matching, scipy.sparse.csgraph._reordering, scipy.spatial._ckdtree, scipy._lib.messagestream, scipy.spatial._qhull, scipy.spatial._voronoi, scipy.spatial._distance_wrap, scipy.spatial._hausdorff, scipy.special._ufuncs_cxx, scipy.special._ufuncs, scipy.special._specfun, scipy.special._comb, scipy.special._ellip_harm_2, scipy.spatial.transform._rotation, scipy.optimize._group_columns, scipy.optimize._trlib._trlib, scipy.optimize._lbfgsb, _moduleTNC, scipy.optimize._moduleTNC, scipy.optimize._cobyla, scipy.optimize._slsqp, scipy.optimize._minpack, scipy.optimize._lsq.givens_elimination, scipy.optimize._zeros, scipy.optimize._cython_nnls, scipy._lib._uarray._uarray, scipy.linalg._decomp_interpolative, scipy.optimize._bglu_dense, scipy.optimize._lsap, scipy.optimize._direct, scipy.integrate._odepack, scipy.integrate._quadpack, scipy.integrate._vode, scipy.integrate._dop, scipy.integrate._lsoda, scipy.interpolate._fitpack, scipy.interpolate._dfitpack, scipy.interpolate._dierckx, scipy.interpolate._ppoly, scipy.interpolate._interpnd, scipy.interpolate._rbfinterp_pythran, scipy.interpolate._rgi_cython, scipy.interpolate._bspl, scipy.special.cython_special, scipy.stats._stats, scipy.stats._sobol, scipy.stats._qmc_cy, scipy.stats._biasedurn, scipy.stats._stats_pythran, scipy.stats._levy_stable.levyst, scipy.stats._ansari_swilk_statistics, scipy.stats._mvn, scipy.stats._rcont.rcont, scipy.ndimage._nd_image, scipy.ndimage._rank_filter_1d, _ni_label, scipy.ndimage._ni_label, PIL._imaging, kiwisolver._cext, sklearn.__check_build._check_build, psutil._psutil_linux, psutil._psutil_posix, sklearn.utils._isfinite, sklearn.utils.sparsefuncs_fast, sklearn.utils.murmurhash, sklearn.utils._openmp_helpers, sklearn.metrics.cluster._expected_mutual_info_fast, sklearn.preprocessing._csr_polynomial_expansion, sklearn.preprocessing._target_encoder_fast, sklearn.metrics._dist_metrics, sklearn.metrics._pairwise_distances_reduction._datasets_pair, sklearn.utils._cython_blas, sklearn.metrics._pairwise_distances_reduction._base, sklearn.metrics._pairwise_distances_reduction._middle_term_computer, sklearn.utils._heap, sklearn.utils._sorting, sklearn.metrics._pairwise_distances_reduction._argkmin, sklearn.metrics._pairwise_distances_reduction._argkmin_classmode, sklearn.utils._vector_sentinel, sklearn.metrics._pairwise_distances_reduction._radius_neighbors, sklearn.metrics._pairwise_distances_reduction._radius_neighbors_classmode, sklearn.metrics._pairwise_fast, sklearn.neighbors._partition_nodes, sklearn.neighbors._ball_tree, sklearn.neighbors._kd_tree, sklearn.utils.arrayfuncs, sklearn.utils._random, sklearn.utils._seq_dataset, sklearn.linear_model._cd_fast, _loss, sklearn._loss._loss, sklearn.svm._liblinear, sklearn.svm._libsvm, sklearn.svm._libsvm_sparse, sklearn.linear_model._sag_fast, sklearn.utils._weight_vector, sklearn.linear_model._sgd_fast, sklearn.decomposition._online_lda_fast, sklearn.decomposition._cdnmf_fast, dtaidistance.dtw_cc, dtaidistance.dtw_cc_omp, dtaidistance.dtw_cc_numpy, dtaidistance.ed_cc, PIL._imagingmath (total: 182)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)
+shape (36,)

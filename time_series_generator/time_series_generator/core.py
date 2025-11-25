@@ -9,17 +9,11 @@ import os, sys
 sys.path.append(os.path.dirname(__file__))
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))  # Add the parent directory
 
-# try:
-from time_series_generator.preprocessing  import DataPrepare
-from time_series_generator.metrics import fast_dtw_distance  # 仍可用在後驗細修時的輔助
-from time_series_generator.density import compute_posterior_weights_from_partial_subseq
-import time_series_generator.config as cfg
-    
-# except ImportError:
-#     from time_series_generator.time_series_generator.preprocessing  import DataPrepare
-#     from time_series_generator.time_series_generator.metrics import fast_dtw_distance  # 仍可用在後驗細修時的輔助
-#     from time_series_generator.time_series_generator.density import compute_posterior_weights_from_partial_subseq
-#     import time_series_generator.time_series_generator.config as cfg
+from time_series_generator.time_series_generator.preprocessing  import DataPrepare
+from time_series_generator.time_series_generator.metrics import fast_dtw_distance  # 仍可用在後驗細修時的輔助
+from time_series_generator.time_series_generator.density import compute_posterior_weights_from_partial_subseq
+import config as cfg
+
 # ========= 規一化與相位對齊工具 =========
 
 def _norm(x, eps=1e-8):
@@ -143,7 +137,7 @@ class Generator:
         h = self.bandwidth
 
         # Dirichlet 溫度：越小→越尖銳（越接近少數 analog）
-        tau = 5000.0
+        tau = 50.0
         alpha = np.clip(w_global, 1e-8, None) * tau
 
         samples = []
@@ -390,7 +384,7 @@ class BayesianDistributionEstimator:
     def _prepare_data(self):
         # 你的 DataPrepare 應提供 generate_grouped_subsequences()
         self.grouped_samples = self.datapreparer.generate_grouped_subsequences(
-            remove_dates=['2024-03-15','2024-03-16', '2024-03-29', '2024-03-30'],  # drop specific bad days
+            remove_dates=['2024-03-15','2024-03-16', '2024-03-29', '2024-03-30'],  # drop specific test days
         )
 
     # ---------- seed 的 z-score ----------

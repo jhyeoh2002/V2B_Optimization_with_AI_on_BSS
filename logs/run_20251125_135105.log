@@ -1,0 +1,70 @@
+nohup: ignoring input
+==================================================
+PART 1: Starting data preprocess for 2023-01-01 00:00:00 to 2024-09-30 23:00:00...
+==================================================
+
+	1.1 Preprocessing radiation data...
+		[INFO] Radiation data already exists at './data/timeseries/radiation_data.csv'
+
+	1.2 Preprocessing temperature data...
+		[INFO] Temperature data already exists at './data/timeseries/temperature_data.csv'
+
+	1.3 Preprocessing building data...
+		[INFO] Building data already exists at './data/timeseries/building_data.csv'
+
+	1.4 Preprocessing electricity cost data...
+		[INFO] Electricity cost data already exists at './data/timeseries/electricitycostG2B_data.csv' and './data/timeseries/electricitycostG2V_data.csv'
+
+	1.5 Preprocessing battery demand series data...
+		[INFO] Found existing battery data at './data/battery_demand_tol26/resample_full.csv' and './data/battery_demand_tol26/resample_train.csv'
+
+		[INFO] Number of series for clean windows = (168, 37)
+		[INFO] Number of eligible series for Case 2 = (1378, 37)
+		[INFO] Number of seeds ready for Case 3  = (2000, 36)
+
+		[INFO] Case 1 exists — loaded battery demand with shape (168, 37).
+		[INFO] Case 2 exists — loaded battery demand with shape (1546, 37).
+		[INFO] Building Case 3 (extended random-seed generation)
+		[INFO] Case 3 will generate 2000 new series from random seeds
+		[INFO] Resuming Case 3 from checkpoint: './data/battery_demand_tol26/case3_extended_generated/battery_demand_ckpt.npz'
+		[INFO] Case 3 resume index = 455, current series shape = (2001, 37)
+		[INFO] Case 3 generating from random seeds:   0%|          | 0/1545 [00:00<?, ?it/s]		[INFO] Case 3 generating from random seeds:   0%|          | 1/1545 [00:14<6:17:24, 14.67s/it]		[INFO] Case 3 generating from random seeds:   0%|          | 2/1545 [00:29<6:14:32, 14.56s/it]		[INFO] Case 3 generating from random seeds:   0%|          | 3/1545 [00:44<6:21:54, 14.86s/it]		[INFO] Case 3 generating from random seeds:   0%|          | 4/1545 [01:07<7:45:21, 18.12s/it]		[INFO] Case 3 generating from random seeds:   0%|          | 5/1545 [01:22<7:12:02, 16.83s/it]		[INFO] Case 3 generating from random seeds:   0%|          | 6/1545 [01:36<6:50:23, 16.00s/it]		[INFO] Case 3 generating from random seeds:   0%|          | 7/1545 [01:50<6:37:22, 15.50s/it]		[INFO] Case 3 generating from random seeds:   1%|          | 8/1545 [02:05<6:29:38, 15.21s/it]		[INFO] Case 3 generating from random seeds:   1%|          | 9/1545 [02:41<9:13:18, 21.61s/it]		[INFO] Case 3 generating from random seeds:   1%|          | 10/1545 [02:57<8:34:24, 20.11s/it]		[INFO] Case 3 generating from random seeds:   1%|          | 11/1545 [03:12<7:50:41, 18.41s/it]		[INFO] Case 3 generating from random seeds:   1%|          | 12/1545 [03:28<7:35:12, 17.82s/it]		[INFO] Case 3 generating from random seeds:   1%|          | 13/1545 [03:43<7:12:03, 16.92s/it]		[INFO] Case 3 generating from random seeds:   1%|          | 14/1545 [04:04<7:37:48, 17.94s/it]		[INFO] Case 3 generating from random seeds:   1%|          | 15/1545 [04:21<7:32:51, 17.76s/it]		[INFO] Case 3 generating from random seeds:   1%|          | 16/1545 [04:44<8:11:28, 19.29s/it]		[INFO] Case 3 generating from random seeds:   1%|          | 17/1545 [04:59<7:38:56, 18.02s/it]		[INFO] Case 3 generating from random seeds:   1%|          | 18/1545 [05:17<7:36:19, 17.93s/it]		[INFO] Case 3 generating from random seeds:   1%|          | 19/1545 [05:34<7:31:44, 17.76s/it]		[INFO] Case 3 generating from random seeds:   1%|          | 19/1545 [05:36<7:30:39, 17.72s/it]
+Traceback (most recent call last):
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/main.py", line 12, in <module>
+    main()
+    ~~~~^^
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/main.py", line 8, in main
+    data = preprocessor.preprocess()
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/preprocess/preprocessor.py", line 231, in preprocess
+    battery_series = gen.generate_battery_series(rerun=False)
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/preprocess/batterygenerator.py", line 251, in generate_battery_series
+    sample = self.generate_artificial_battery_data(seed, n_samples)
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/preprocess/batterygenerator.py", line 289, in generate_artificial_battery_data
+    return generator.generate()
+           ~~~~~~~~~~~~~~~~~~^^
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/core.py", line 131, in generate
+    self._estimator.estimate_and_correct_distribution_phase_locked(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        seed=self.seed, bandwidth=self.bandwidth
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/core.py", line 223, in estimate_and_correct_distribution_phase_locked
+    self._prepare_data()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/core.py", line 386, in _prepare_data
+    self.grouped_samples = self.datapreparer.generate_grouped_subsequences(
+                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        remove_dates=['2024-03-15','2024-03-16', '2024-03-29', '2024-03-30'],  # drop specific test days
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/preprocessing.py", line 54, in generate_grouped_subsequences
+    all_subseqs = self._expand_all_sequences(subseqs)
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/preprocessing.py", line 113, in _expand_all_sequences
+    expanded = self._expand_to_all_right_shifts(seq)
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/preprocessing.py", line 105, in _expand_to_all_right_shifts
+    right = np.full(self.window_size - L - shift, np.nan)
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/site-packages/numpy/_core/numeric.py", line 350, in full
+    fill_value = asarray(fill_value)
+SystemError: error return without exception set

@@ -1,0 +1,31 @@
+nohup: ignoring input
+==================================================
+PART 1: Starting data preprocess for 2023-01-01 00:00:00 to 2024-09-30 23:00:00...
+==================================================
+
+	1.1 Preprocessing radiation data...
+		[INFO] Radiation data already exists at './data/timeseries/radiation_data.csv'
+
+	1.2 Preprocessing temperature data...
+		[INFO] Temperature data already exists at './data/timeseries/temperature_data.csv'
+
+	1.3 Preprocessing building data...
+		[INFO] Building data already exists at './data/timeseries/building_data.csv'
+
+	1.4 Preprocessing electricity cost data...
+		[INFO] Electricity cost data already exists at './data/timeseries/electricitycostG2B_data.csv' and './data/timeseries/electricitycostG2V_data.csv'
+
+	1.5 Preprocessing battery demand series data...
+		[INFO] Found existing battery data at './data/battery_demand_tol26/resample_full.csv' and './data/battery_demand_tol26/resample_train.csv'
+
+		[INFO] Number of series for clean windows = (168, 37)
+		[INFO] Number of eligible series for Case 2 = (1378, 37)
+		[INFO] Number of seeds ready for Case 3  = (2000, 36)
+
+		[INFO] Case 1 exists — loaded battery demand with shape (168, 37).
+		[INFO] Case 2 exists — loaded battery demand with shape (1546, 37).
+		[INFO] Building Case 3 (extended random-seed generation)
+		[INFO] Case 3 will generate 2000 new series from random seeds
+		[INFO] Resuming Case 3 from checkpoint: './data/battery_demand_tol26/case3_extended_generated/battery_demand_ckpt.npz'
+		[INFO] Case 3 resume index = 474, current series shape = (2020, 37)
+		[INFO] Case 3 generating from random seeds:   0%|          | 0/1526 [00:00<?, ?it/s]		[INFO] Case 3 generating from random seeds:   0%|          | 1/1526 [00:14<6:15:44, 14.78s/it]		[INFO] Case 3 generating from random seeds:   0%|          | 2/1526 [00:29<6:11:15, 14.62s/it]		[INFO] Case 3 generating from random seeds:   0%|          | 3/1526 [00:43<6:08:07, 14.50s/it]		[INFO] Case 3 generating from random seeds:   0%|          | 4/1526 [00:58<6:07:22, 14.48s/it]		[INFO] Case 3 generating from random seeds:   0%|          | 5/1526 [01:12<6:06:54, 14.47s/it]		[INFO] Case 3 generating from random seeds:   0%|          | 6/1526 [01:26<6:05:25, 14.42s/it]		[INFO] Case 3 generating from random seeds:   0%|          | 7/1526 [01:41<6:06:55, 14.49s/it]		[INFO] Case 3 generating from random seeds:   1%|          | 8/1526 [01:56<6:07:18, 14.52s/it]		[INFO] Case 3 generating from random seeds:   1%|          | 9/1526 [02:10<6:08:25, 14.57s/it]		[INFO] Case 3 generating from random seeds:   1%|          | 10/1526 [02:25<6:08:40, 14.59s/it]		[INFO] Case 3 generating from random seeds:   1%|          | 11/1526 [02:40<6:10:42, 14.68s/it]		[INFO] Case 3 generating from random seeds:   1%|          | 12/1526 [02:55<6:12:48, 14.77s/it]		[INFO] Case 3 generating from random seeds:   1%|          | 13/1526 [03:10<6:15:35, 14.89s/it]		[INFO] Case 3 generating from random seeds:   1%|          | 14/1526 [03:25<6:16:05, 14.92s/it]		[INFO] Case 3 generating from random seeds:   1%|          | 15/1526 [03:40<6:17:16, 14.98s/it]		[INFO] Case 3 generating from random seeds:   1%|          | 16/1526 [03:55<6:17:24, 15.00s/it]		[INFO] Case 3 generating from random seeds:   1%|          | 17/1526 [04:10<6:18:14, 15.04s/it]
