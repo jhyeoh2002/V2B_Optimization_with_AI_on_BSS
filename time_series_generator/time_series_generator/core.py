@@ -101,6 +101,7 @@ class Generator:
                  bootstrap_size: int = cfg.BOOTSTRAP_SIZE if hasattr(cfg, "BOOTSTRAP_SIZE") else 20,
                  alpha_prior: float = getattr(cfg, "ALPHA_PRIOR", 2.0),
                  beta_lik: float = getattr(cfg, "BETA_LIK", 2.0),
+                 tolerance=None 
                  ):
         
         self.window_size = window_size
@@ -115,6 +116,7 @@ class Generator:
         self.bootstrap_size = bootstrap_size
         self.alpha_prior = alpha_prior
         self.beta_lik = beta_lik
+        self.tolerance = tolerance
 
         self._estimator = BayesianDistributionEstimator(
             window_size=self.window_size,
@@ -123,7 +125,8 @@ class Generator:
             top_k=self.top_k,
             align_mode=self.align_mode,
             alpha_prior=self.alpha_prior,
-            beta_lik=self.beta_lik
+            beta_lik=self.beta_lik,
+            tolerance=self.tolerance
         )
 
     def generate(self):
@@ -187,7 +190,7 @@ class BayesianDistributionEstimator:
 
     def __init__(self, window_size=cfg.WINDOW_SIZE, resolution=cfg.RESOLUTION,
                  max_shift=6, top_k=200, align_mode="roll",
-                 alpha_prior: float = 2.0, beta_lik: float = 2.0):
+                 alpha_prior: float = 2.0, beta_lik: float = 2.0, tolerance=None):
         """
         alpha_prior: 放大相似樣本（先驗）的權重程度（越大越重視相似者）
         beta_lik:   放大不相似樣本（似然）的權重程度（越大越重視不相似者）
@@ -199,8 +202,9 @@ class BayesianDistributionEstimator:
         self.align_mode = align_mode
         self.alpha_prior = alpha_prior
         self.beta_lik = beta_lik
+        self.tolerance = tolerance
 
-        self.datapreparer = DataPrepare(window_size, resolution)
+        self.datapreparer = DataPrepare(window_size, resolution, tolerance=self.tolerance)
         self.grouped_samples = None
 
     def estimate_and_correct_distribution_phase_locked(self, seed: np.ndarray, bandwidth=cfg.BANDWIDTH):

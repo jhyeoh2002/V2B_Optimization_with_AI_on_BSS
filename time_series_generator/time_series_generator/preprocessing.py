@@ -9,9 +9,10 @@ sys.path.append(os.path.dirname(__file__))
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))  # Add the parent directory
 
 class DataPrepare:
-    def __init__(self, window_size: int = 24, resolution: str = '1h'):
+    def __init__(self, window_size: int = 24, resolution: str = '1h', tolerance: int = None):
         self.window_size = window_size
         self.resolution = resolution
+        self.tolerance = tolerance
 
     def generate_grouped_subsequences(
         self,
@@ -43,7 +44,7 @@ class DataPrepare:
             
         # print(tdf_filled)
         
-        save_path = f"./data/battery_demand_tol{cfg.TOLERANCE}/resample_train.csv"
+        save_path = f"./data/battery_demand/tol{self.tolerance}/resample_train.csv"
         tdf_filled = pd.read_csv(save_path, index_col=0, parse_dates=True)
         tdf_filled = tdf_filled["raw_data"]
     

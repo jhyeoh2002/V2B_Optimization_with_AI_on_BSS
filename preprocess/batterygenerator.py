@@ -27,12 +27,11 @@ class BatterySeriesGenerator:
     """
 
     def __init__(self, 
-                 train_path = f'./data/battery_demand_tol{cfg.TOLERANCE}/resample_train.csv', 
-                 full_path = f'./data/battery_demand_tol{cfg.TOLERANCE}/resample_full.csv',
-                 battery_dir: str = f"./data/battery_demand_tol{cfg.TOLERANCE}/"):
-        self.train_path = train_path
-        self.full_path = full_path
-        self.battery_dir = battery_dir
+                 tolerance: int = None):
+        self.tolerance = tolerance
+        self.train_path = f'./data/battery_demand/tol{self.tolerance}/resample_train.csv'
+        self.full_path = f'./data/battery_demand/tol{self.tolerance}/resample_full.csv'
+        self.battery_dir = f"./data/battery_demand/tol{self.tolerance}/"
         self.resolution = cfg.RESOLUTION
         if not os.path.exists(self.full_path) or not os.path.exists(self.train_path):
             os.makedirs(os.path.dirname(self.battery_dir), exist_ok=True)
@@ -89,7 +88,6 @@ class BatterySeriesGenerator:
     def generate_battery_series(
         self,
         window_size: int = cfg.WINDOW_SIZE,
-        tolerance: int = cfg.TOLERANCE,
         n_samples: int = cfg.NSAMPLE,
         rerun: bool = False,
     ):
@@ -127,7 +125,7 @@ class BatterySeriesGenerator:
             nan_count = np.count_nonzero(np.isnan(chunk))
             if nan_count == 0:
                 clean_series.append([i] + chunk)
-            elif (nan_count <= tolerance) and (not np.isnan(chunk[0])) and (not np.isnan(chunk[-1])):
+            elif (nan_count <= self.tolerance) and (not np.isnan(chunk[0])) and (not np.isnan(chunk[-1])):
                 eligible_chunks.append([i] + chunk)
         
         np.random.seed(cfg.RANDOM_STATE)
@@ -282,14 +280,15 @@ class BatterySeriesGenerator:
         generator = tsg.Generator(
             window_size=len(seq),
             seed=seq,
-            n_sample=n_samples
+            n_sample=n_samples,
+            tolerance=self.tolerance
         )
         return generator.generate()
 
     # -------------------------------------------------------------------------
     # 3. Generate battery scheduling arrays
     # -------------------------------------------------------------------------
-    def generate_battery_schedule(self, n_station=38 * 2, SOC_thr=0.9, window_size=48, tolerance=6):
+    def generate_battery_schedule(self, n_station=38 * 2, SOC_thr=0.9, window_size=48):
         """
         Schedule battery usage based on generated series.
         """
@@ -308,7 +307,9 @@ class BatterySeriesGenerator:
             details_path = os.path.join(dir, f"battery_details.npy")
             
             if os.path.exists(availability_path) and os.path.exists(details_path):
-                print(f"\t\t[INFO] Case {key} exists — loaded from '{availability_path}' and '{details_path}'")
+                availability = np.load(availability_path)
+                details = np.load(details_path)
+                print(f"\t\t[INFO] Case {key} exists — loaded from '{availability_path}' and '{details_path}' shape {availability.shape} and {details.shape}")
                 continue
 
             try:
@@ -363,111 +364,6 @@ class BatterySeriesGenerator:
         
         return 
 
-    def generate_battery_schedule_from_custom_series(
-    self,
-    custom_series,
-    n_station=38 * 2,
-    SOC_thr=0.9,
-    window_size=48,
-    tolerance=6,
-    save_prefix="custom",
-    ):
-        """
-        Schedule battery usage directly from a custom input series.
-
-        Parameters
-        ----------
-        custom_series : np.ndarray
-            Custom battery demand time series, shape (n_series, window_size).
-            Each row represents one scenario or run.
-        n_station : int, default=76
-            Number of battery stations or slots for scheduling.
-        SOC_thr : float, default=0.9
-            SOC threshold at which a battery is considered full/ready to depart.
-        window_size : int, default=48
-            Number of time steps in the input window.
-        tolerance : int, default=6
-            Tolerance parameter for naming consistency with existing outputs.
-        save_prefix : str, default="custom"
-            Prefix for saving output .npy files to avoid overwriting original datasets.
-
-        Returns
-        -------
-        a_vt_list_arr : np.ndarray
-            Array of availability schedules (n_series, n_veh, window_size).
-        details : np.ndarray
-            Array of details: [SOC_a_v, SOC_d_v, t_a_v, t_d_v].
-        """
-        assert isinstance(custom_series, np.ndarray), "custom_series must be a NumPy array."
-        assert custom_series.ndim == 2, f"Expected 2D array (n_series, window_size), got {custom_series.shape}"
-        assert custom_series.shape[1] == window_size+1, f"Window size mismatch ({custom_series.shape[1]} vs {window_size})"
-
-        print(f"[INFO] Running battery scheduling for custom series: {custom_series.shape}")
-        
-        path_clean = os.path.join(self.processed_dir, f"{save_prefix}_battery_series_window{window_size}.npy")
-        np.save(path_clean, custom_series)
-
-        # === Initialize containers ===
-        a_vt_list, SOC_a_v_list, SOC_d_v_list, t_a_v_list, t_d_v_list = [], [], [], [], []
-        tnum = window_size
-
-        for idx, series in enumerate(custom_series):
-            a_vt, SOC_a_v, SOC_d_v, t_a_v, t_d_v = schedule_batteries(
-                series, n_station, tnum, SOC_thr=SOC_thr
-            )
-
-            a_vt_list.append(np.array(a_vt, dtype=float))
-            SOC_a_v_list.append(np.round(np.array(SOC_a_v, dtype=float), 2))
-            SOC_d_v_list.append(np.round(np.array(SOC_d_v, dtype=float), 2))
-            t_a_v_list.append(np.array(t_a_v, dtype=float))
-            t_d_v_list.append(np.array(t_d_v, dtype=float))
-
-            print(f"  → Series {idx+1}/{len(custom_series)} processed "
-                f"(batteries: {len(SOC_a_v)} | avg SOC_a: {np.nanmean(SOC_a_v):.2f})")
-
-        # === Padding ===
-        max_batt = max(arr.shape[0] for arr in a_vt_list)
-        print(f"[INFO] Max vehicle count across series: {max_batt}")
-
-        a_vt_list_arr = np.array([
-            np.pad(arr, ((0, max_batt - arr.shape[0]), (0, 0)), mode='constant', constant_values=np.nan)
-            for arr in a_vt_list
-        ])
-        SOC_a_v_list_arr = np.array([
-            np.pad(arr, (0, max_batt - arr.shape[0]), mode='constant', constant_values=np.nan)
-            for arr in SOC_a_v_list
-        ])
-        SOC_d_v_list_arr = np.array([
-            np.pad(arr, (0, max_batt - arr.shape[0]), mode='constant', constant_values=np.nan)
-            for arr in SOC_d_v_list
-        ])
-        t_a_v_list_arr = np.array([
-            np.pad(arr, (0, max_batt - arr.shape[0]), mode='constant', constant_values=np.nan)
-            for arr in t_a_v_list
-        ])
-        t_d_v_list_arr = np.array([
-            np.pad(arr, (0, max_batt - arr.shape[0]), mode='constant', constant_values=np.nan)
-            for arr in t_d_v_list
-        ])
-
-        # === Combine details ===
-        details = np.array([SOC_a_v_list_arr, SOC_d_v_list_arr, t_a_v_list_arr, t_d_v_list_arr])
-
-        # === Save outputs ===
-        schedule_path = os.path.join(
-            self.processed_dir, f"{save_prefix}_battery_schedule_window{window_size}.npy"
-        )
-        details_path = os.path.join(
-            self.processed_dir, f"{save_prefix}_battery_details_window{window_size}.npy"
-        )
-        np.save(schedule_path, a_vt_list_arr)
-        np.save(details_path, details)
-
-        print(f"[INFO] Saved custom schedule → {schedule_path}")
-        print(f"[INFO] Saved custom details  → {details_path}")
-        print(f"[INFO] Schedule shape: {a_vt_list_arr.shape}, Details shape: {details.shape}")
-
-        return a_vt_list_arr, details
         
     def plot_series_generator(self, sample, seed, idx, case_id=2):
 

@@ -18,10 +18,11 @@ class DataPreprocessor:
     
     # Add the project root directory to the Python module search path
 
-    def __init__(self, start_date, end_date):
+    def __init__(self, start_date, end_date, tolerance):
         self.start_date = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
         self.end_date = datetime.strptime(end_date, "%Y-%m-%d %H:%M:%S")
         self.date_range = pd.date_range(start=self.start_date, end=self.end_date, freq='h')
+        self.tolerance = tolerance
         
     def clean_weather_data(self, filepath):
         
@@ -186,7 +187,6 @@ class DataPreprocessor:
     
     def preprocess(self):
         
-        print("="*50,f"PART 1: Starting data preprocess for {cfg.START_DATE} to {cfg.END_DATE}...", "="*50, sep="\n")
         
         # Initialize the DataPreprocessor with the specified date range
         
@@ -227,11 +227,11 @@ class DataPreprocessor:
 
         print(f"\n\t1.5 Preprocessing battery demand series data...")
 
-        gen = BatterySeriesGenerator()
+        gen = BatterySeriesGenerator(self.tolerance)
         gen.generate_battery_series(rerun=False)
 
 
         print(f"\n\t1.6 Generating battery schedule...")
-        gen.generate_battery_schedule(n_station=38 * 2, SOC_thr=cfg.SOC_THR, window_size=cfg.WINDOW_SIZE, tolerance=cfg.TOLERANCE)
+        gen.generate_battery_schedule(n_station=38 * 2, SOC_thr=cfg.SOC_THR, window_size=cfg.WINDOW_SIZE)
 
     

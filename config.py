@@ -8,7 +8,7 @@ START_DATE = "2023-01-01 00:00:00"
 END_DATE = "2024-09-30 23:00:00"
 RESOLUTION = '1h'
 
-TEST_MODE = True
+TEST_MODE = False
 TEST_DATE = ['2024-03-15', '2024-03-16', '2024-03-29', '2024-03-30']
 
 # ==============================================================================
@@ -72,7 +72,7 @@ SEED_48 = np.array([
 # ==============================================================================
 # 5. Optimization & Sampling Parameters
 # ==============================================================================
-WINDOW_LENGTH = 48  # hours
+WINDOW_LENGTH = 36  # hours
 BANDWIDTH = 0.1
 TOP_K = 1000
 
@@ -82,8 +82,7 @@ NSAMPLE = 200
 N_EXTENDED = 2000
 
 # --- Tolerances ---
-TOLERANCE = 25      # General tolerance (up to 1/3 of window)
-TOLERANCE_NAN = 7   # Number of NaNs tolerated in battery series
+TOLERANCE_DEFAULT = 25      # General tolerance (up to 1/3 of window)
 
 # ==============================================================================
 # 6. Output Naming Configuration
