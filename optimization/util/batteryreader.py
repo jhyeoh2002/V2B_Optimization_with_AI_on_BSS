@@ -15,17 +15,17 @@ def get_battery_details(window_length: int, tolerance: int, Test: bool = False):
         t_d_v: list of 1D‐arrays (int) of departure times
     """
     # Construct paths
-    base_dir = "../data/processed"
+    battery_dir = "./data/processed"
     
     if not Test:
-        schedule_path = os.path.join(base_dir, f"battery_schedule_{tolerance}nan_window{window_length}.npy")
-        details_path  = os.path.join(base_dir, f"battery_details_{tolerance}nan_window{window_length}.npy")
-        series_normal_path   = os.path.join(base_dir, f"battery_series_window{window_length}.npy")
-        series_withnan_path  = os.path.join(base_dir, f"battery_series_with_{tolerance}nan_window{window_length}.npy")
+        schedule_path = os.path.join(battery_dir, f"battery_schedule_{tolerance}nan_window{window_length}.npy")
+        details_path  = os.path.join(battery_dir, f"battery_details_{tolerance}nan_window{window_length}.npy")
+        series_normal_path   = os.path.join(battery_dir, f"battery_series_window{window_length}.npy")
+        series_withnan_path  = os.path.join(battery_dir, f"battery_series_with_{tolerance}nan_window{window_length}.npy")
     else:
-        schedule_path = os.path.join(base_dir, f"testdata_battery_schedule_window{window_length}.npy")
-        details_path  = os.path.join(base_dir, f"testdata_battery_details_window{window_length}.npy")
-        series_normal_path   = os.path.join(base_dir, f"testdata_battery_series_window{window_length}.npy")
+        schedule_path = os.path.join(battery_dir, f"testdata_battery_schedule_window{window_length}.npy")
+        details_path  = os.path.join(battery_dir, f"testdata_battery_details_window{window_length}.npy")
+        series_normal_path   = os.path.join(battery_dir, f"testdata_battery_series_window{window_length}.npy")
         series_withnan_path  = None
     
     # Load schedule (2D/3D array) and filter out NaN rows

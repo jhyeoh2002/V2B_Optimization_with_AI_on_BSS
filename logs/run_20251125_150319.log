@@ -1,29 +1,0 @@
-nohup: ignoring input
-==================================================
-PART 1: Starting data preprocess for 2023-01-01 00:00:00 to 2024-09-30 23:00:00...
-==================================================
-
-	1.1 Preprocessing radiation data...
-		[INFO] Radiation data already exists at './data/timeseries/radiation_data.csv'
-
-	1.2 Preprocessing temperature data...
-		[INFO] Temperature data already exists at './data/timeseries/temperature_data.csv'
-
-	1.3 Preprocessing building data...
-		[INFO] Building data already exists at './data/timeseries/building_data.csv'
-
-	1.4 Preprocessing electricity cost data...
-		[INFO] Electricity cost data already exists at './data/timeseries/electricitycostG2B_data.csv' and './data/timeseries/electricitycostG2V_data.csv'
-
-	1.5 Preprocessing battery demand series data...
-		[INFO] Found existing battery data at './data/battery_demand_tol29/resample_full.csv' and './data/battery_demand_tol29/resample_train.csv'
-
-		[INFO] Number of series for clean windows = (168, 37)
-		[INFO] Number of eligible series for Case 2 = (1388, 37)
-		[INFO] Number of seeds ready for Case 3  = (2000, 36)
-
-		[INFO] Case 1 exists — loaded battery demand with shape (168, 37).
-		[INFO] Building Case 2 (fill NaN)
-		[INFO] Resuming Case 2 from checkpoint: './data/battery_demand_tol29/case2_nan_filled/battery_demand_ckpt.npz'
-		[INFO] Case 2 resume index = 1309, current series shape = (1477, 37)
-		[INFO] Case 2 generating:   0%|          | 0/79 [00:00<?, ?it/s]		[INFO] Case 2 generating:   1%|▏         | 1/79 [00:14<18:47, 14.45s/it]		[INFO] Case 2 generating:   3%|▎         | 2/79 [00:28<18:24, 14.34s/it]		[INFO] Case 2 generating:   4%|▍         | 3/79 [00:43<18:09, 14.34s/it]		[INFO] Case 2 generating:   5%|▌         | 4/79 [00:57<17:56, 14.35s/it]		[INFO] Case 2 generating:   6%|▋         | 5/79 [01:11<17:42, 14.36s/it]		[INFO] Case 2 generating:   8%|▊         | 6/79 [01:26<17:37, 14.48s/it]		[INFO] Case 2 generating:   9%|▉         | 7/79 [01:41<17:28, 14.56s/it]		[INFO] Case 2 generating:  10%|█         | 8/79 [01:55<17:17, 14.61s/it]		[INFO] Case 2 generating:  11%|█▏        | 9/79 [02:10<17:07, 14.68s/it]		[INFO] Case 2 generating:  13%|█▎        | 10/79 [02:25<16:56, 14.73s/it]		[INFO] Case 2 generating:  14%|█▍        | 11/79 [02:56<22:26, 19.80s/it]		[INFO] Case 2 generating:  15%|█▌        | 12/79 [03:11<20:24, 18.28s/it]		[INFO] Case 2 generating:  16%|█▋        | 13/79 [03:26<18:58, 17.26s/it]		[INFO] Case 2 generating:  18%|█▊        | 14/79 [03:41<17:55, 16.55s/it]		[INFO] Case 2 generating:  19%|█▉        | 15/79 [03:56<17:11, 16.11s/it]

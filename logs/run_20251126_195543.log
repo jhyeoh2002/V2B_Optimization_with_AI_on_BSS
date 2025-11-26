@@ -1,0 +1,40 @@
+nohup: ignoring input
+==================================================
+PART 1: Starting data preprocess for 2023-01-01 00:00:00 to 2024-09-30 23:00:00...
+==================================================
+
+	1.1 Preprocessing radiation data...
+		[INFO] Radiation data already exists at './data/timeseries/radiation_data.csv'
+
+	1.2 Preprocessing temperature data...
+		[INFO] Temperature data already exists at './data/timeseries/temperature_data.csv'
+
+	1.3 Preprocessing building data...
+		[INFO] Building data already exists at './data/timeseries/building_data.csv'
+
+	1.4 Preprocessing electricity cost data...
+		[INFO] Electricity cost data already exists at './data/timeseries/electricitycostG2B_data.csv' and './data/timeseries/electricitycostG2V_data.csv'
+
+	1.5 Preprocessing battery demand series data...
+		[INFO] Found existing battery data at './data/battery_demand_tol25/resample_full.csv' and './data/battery_demand_tol25/resample_train.csv'
+
+		[INFO] Number of series for clean windows = (168, 37)
+		[INFO] Number of eligible series for Case 2 = (1377, 37)
+		[INFO] Number of seeds ready for Case 3  = (2000, 36)
+
+		[INFO] Case 1 exists — loaded battery demand from './data/battery_demand_tol25/case1_real_only/battery_demand.npy' with shape (168, 37).
+		[INFO] Case 2 exists — loaded battery demand from './data/battery_demand_tol25/case2_nan_filled/battery_demand.npy' with shape (1545, 37).
+		[INFO] Case 3 exists — loaded battery demand from './data/battery_demand_tol25/case3_extended_generated/battery_demand.npy' with shape (3545, 37).
+
+	1.6 Generating battery schedule...
+		[INFO] Case 1 exists — loaded from './data/battery_demand_tol25/case1_real_only/battery_availability.npy' and './data/battery_demand_tol25/case1_real_only/battery_details.npy'
+		[INFO] Case 2 exists — loaded from './data/battery_demand_tol25/case2_nan_filled/battery_availability.npy' and './data/battery_demand_tol25/case2_nan_filled/battery_details.npy'
+		[INFO] Case 3 exists — loaded from './data/battery_demand_tol25/case3_extended_generated/battery_availability.npy' and './data/battery_demand_tol25/case3_extended_generated/battery_details.npy'
+Traceback (most recent call last):
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/main.py", line 17, in <module>
+    main()
+    ~~~~^^
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/main.py", line 11, in main
+    energy_allocator = EnergyAllocator()
+                       ^^^^^^^^^^^^^^^
+NameError: name 'EnergyAllocator' is not defined

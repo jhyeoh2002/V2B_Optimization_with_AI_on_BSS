@@ -152,7 +152,7 @@ class BatterySeriesGenerator:
         case1_file = os.path.join(case_dirs[1], "battery_demand.npy")
         if (not rerun) and os.path.exists(case1_file):
             case1_series = np.load(case1_file)
-            print(f"\t\t[INFO] Case 1 exists — loaded battery demand with shape {case1_series.shape}.")
+            print(f"\t\t[INFO] Case 1 exists — loaded battery demand from '{case1_file}' with shape {case1_series.shape}.")
         else:
             case1_series = _save_case(1, clean_series)
 
@@ -166,7 +166,7 @@ class BatterySeriesGenerator:
 
         if (not rerun) and os.path.exists(case2_file):
             case2_series = np.load(case2_file)
-            print(f"\t\t[INFO] Case 2 exists — loaded battery demand with shape {case2_series.shape}.")
+            print(f"\t\t[INFO] Case 2 exists — loaded battery demand from '{case2_file}' with shape {case2_series.shape}.")
 
         else:
             print(f"\t\t[INFO] Building Case 2 (fill NaN)")
@@ -215,7 +215,7 @@ class BatterySeriesGenerator:
 
         if (not rerun) and os.path.exists(case3_file):
             case3_series = np.load(case3_file)
-            print(f"\t\t[INFO] Case 3 exists — loaded battery demand with shape {case3_series.shape}.")
+            print(f"\t\t[INFO] Case 3 exists — loaded battery demand from '{case3_file}' with shape {case3_series.shape}.")
 
         else:
             print(f"\t\t[INFO] Building Case 3 (extended random-seed generation)")
@@ -293,62 +293,75 @@ class BatterySeriesGenerator:
         """
         Schedule battery usage based on generated series.
         """
-        path_clean = os.path.join(self.processed_dir, f"battery_series_window{window_size}.npy")
-        path_nan = os.path.join(self.processed_dir, f"battery_series_with_{tolerance}nan_window{window_size}.npy")
+        
+        base_dir = self.battery_dir
+        case_dirs = {
+            1: os.path.join(base_dir, "case1_real_only"),
+            2: os.path.join(base_dir, "case2_nan_filled"),
+            3: os.path.join(base_dir, "case3_extended_generated"),
+        }
+        
+        for key, dir in case_dirs.items():
+                
+            demand_path = os.path.join(dir, f"battery_demand.npy")
+            availability_path = os.path.join(dir, f"battery_availability.npy")
+            details_path = os.path.join(dir, f"battery_details.npy")
+            
+            if os.path.exists(availability_path) and os.path.exists(details_path):
+                print(f"\t\t[INFO] Case {key} exists — loaded from '{availability_path}' and '{details_path}'")
+                continue
 
-        if os.path.isfile(path_clean):
-            battery_series = np.load(path_clean)
-            series_with_nan = np.load(path_nan)
-        else:
-            battery_series, series_with_nan = self.generate_battery_series(
-                window_size=window_size, tolerance=int(window_size / 3)
-            )
+            try:
+                battery_demand = np.load(demand_path)
+            except Exception as e:
+                print(f"[ERROR] Could not load battery demand from '{demand_path}': {e}")
+                continue
+    
+            tnum = cfg.WINDOW_SIZE  # subtract index column
 
-        battery_series_all = np.concatenate((battery_series, series_with_nan), axis=0)
-        tnum = battery_series_all.shape[1] - 1  # subtract index column
+            a_vt_list, SOC_a_v_list, SOC_d_v_list, t_a_v_list, t_d_v_list = [], [], [], [], []
 
-        a_vt_list, SOC_a_v_list, SOC_d_v_list, t_a_v_list, t_d_v_list = [], [], [], [], []
+            for series in battery_demand:
+                a_vt, SOC_a_v, SOC_d_v, t_a_v, t_d_v = schedule_batteries(
+                    series, n_station, tnum, SOC_thr=SOC_thr
+                )
+                a_vt_list.append(np.array(a_vt, dtype=float))
+                SOC_a_v_list.append(np.round(np.array(SOC_a_v, dtype=float), 2))
+                SOC_d_v_list.append(np.round(np.array(SOC_d_v, dtype=float), 2))
+                t_a_v_list.append(np.array(t_a_v, dtype=float))
+                t_d_v_list.append(np.array(t_d_v, dtype=float))
 
-        for series in battery_series_all:
-            a_vt, SOC_a_v, SOC_d_v, t_a_v, t_d_v = schedule_batteries(
-                series, n_station, tnum, SOC_thr=SOC_thr
-            )
-            a_vt_list.append(np.array(a_vt, dtype=float))
-            SOC_a_v_list.append(np.round(np.array(SOC_a_v, dtype=float), 2))
-            SOC_d_v_list.append(np.round(np.array(SOC_d_v, dtype=float), 2))
-            t_a_v_list.append(np.array(t_a_v, dtype=float))
-            t_d_v_list.append(np.array(t_d_v, dtype=float))
+            max_batt = max(arr.shape[0] for arr in a_vt_list)
 
-        max_batt = max(arr.shape[0] for arr in a_vt_list)
+            a_vt_list_arr = np.array([
+                np.pad(arr, ((0, max_batt - arr.shape[0]), (0, 0)), mode='constant', constant_values=np.nan)
+                for arr in a_vt_list
+            ])
+            SOC_a_v_list_arr = np.array([
+                np.pad(arr, (0, max_batt - arr.shape[0]), mode='constant', constant_values=np.nan)
+                for arr in SOC_a_v_list
+            ])
+            SOC_d_v_list_arr = np.array([
+                np.pad(arr, (0, max_batt - arr.shape[0]), mode='constant', constant_values=np.nan)
+                for arr in SOC_d_v_list
+            ])
+            t_a_v_list_arr = np.array([
+                np.pad(arr, (0, max_batt - arr.shape[0]), mode='constant', constant_values=np.nan)
+                for arr in t_a_v_list
+            ])
+            t_d_v_list_arr = np.array([
+                np.pad(arr, (0, max_batt - arr.shape[0]), mode='constant', constant_values=np.nan)
+                for arr in t_d_v_list
+            ])
 
-        a_vt_list_arr = np.array([
-            np.pad(arr, ((0, max_batt - arr.shape[0]), (0, 0)), mode='constant', constant_values=np.nan)
-            for arr in a_vt_list
-        ])
-        SOC_a_v_list_arr = np.array([
-            np.pad(arr, (0, max_batt - arr.shape[0]), mode='constant', constant_values=np.nan)
-            for arr in SOC_a_v_list
-        ])
-        SOC_d_v_list_arr = np.array([
-            np.pad(arr, (0, max_batt - arr.shape[0]), mode='constant', constant_values=np.nan)
-            for arr in SOC_d_v_list
-        ])
-        t_a_v_list_arr = np.array([
-            np.pad(arr, (0, max_batt - arr.shape[0]), mode='constant', constant_values=np.nan)
-            for arr in t_a_v_list
-        ])
-        t_d_v_list_arr = np.array([
-            np.pad(arr, (0, max_batt - arr.shape[0]), mode='constant', constant_values=np.nan)
-            for arr in t_d_v_list
-        ])
+            details = np.array([SOC_a_v_list_arr, SOC_d_v_list_arr, t_a_v_list_arr, t_d_v_list_arr])
 
-        details = np.array([SOC_a_v_list_arr, SOC_d_v_list_arr, t_a_v_list_arr, t_d_v_list_arr])
+            np.save(availability_path, a_vt_list_arr)
+            np.save(details_path, details)
 
-        np.save(os.path.join(self.processed_dir, f"battery_schedule_{tolerance}nan_window{window_size}.npy"), a_vt_list_arr)
-        np.save(os.path.join(self.processed_dir, f"battery_details_{tolerance}nan_window{window_size}.npy"), details)
-
-        print(f"[INFO] Saved schedule and details for window={window_size}")
-        return a_vt_list_arr, details
+            print(f"\t\t[INFO] Saved availability and details for Case {key} at '{dir}'")
+        
+        return 
 
     def generate_battery_schedule_from_custom_series(
     self,
@@ -474,18 +487,6 @@ class BatterySeriesGenerator:
             linewidth=0,
             zorder=1
         )
-
-        # --- Generated samples (faint black lines, lowest)
-        # for lines, i in enumerate(sample):
-        #     plt.plot(
-        #         range(len(i)),
-        #         i,
-        #         color='black',
-        #         alpha=0.15,
-        #         linewidth=0.8,
-        #         label="Generated Samples" if lines == 0 else "",
-        #         zorder=0
-        #     )
 
         # --- Sample mean (blue line, middle)
         plt.plot(

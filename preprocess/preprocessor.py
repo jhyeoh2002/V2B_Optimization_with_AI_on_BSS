@@ -228,13 +228,10 @@ class DataPreprocessor:
         print(f"\n\t1.5 Preprocessing battery demand series data...")
 
         gen = BatterySeriesGenerator()
-        battery_series = gen.generate_battery_series(rerun=False)
+        gen.generate_battery_series(rerun=False)
 
-        # Define parameters for generating battery schedules
-        n_station = 38 * 2  # Total number of stations
 
-        # print(f"Generating battery schedule for window size {cfg.WINDOW_SIZE}...")
-        # battery_schedule, battery_details = gen.generate_battery_schedule(n_station=n_station, SOC_thr=cfg.SOC_THR, window_size=cfg.WINDOW_SIZE, tolerance=cfg.TOLERANCE)
-        # print(f"Battery schedule for window size {cfg.WINDOW_SIZE} generated successfully.")
+        print(f"\n\t1.6 Generating battery schedule...")
+        gen.generate_battery_schedule(n_station=38 * 2, SOC_thr=cfg.SOC_THR, window_size=cfg.WINDOW_SIZE, tolerance=cfg.TOLERANCE)
 
     

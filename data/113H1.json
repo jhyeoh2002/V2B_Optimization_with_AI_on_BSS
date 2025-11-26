@@ -1,0 +1,151 @@
+{
+  "version": "113H1",
+  "period": {
+    "start": "2024-04-01",
+    "end": "2024-10-15"
+  },
+  "tariffs": {
+    "building_low_voltage": {
+      "metadata": {
+        "summer_rule": "6/1-9/30"
+      },
+      "energy_charge": {
+        "summer": 3.44,
+        "nonsummer": 3.26
+      }
+    },
+
+    "building_high_voltage_2stage": {
+      "metadata": {
+        "summer_rule": "5/16-10/15"
+      },
+      "energy_charge": {
+        "summer": {
+          "weekday": {
+            "peak": ["09:00-24:00", 5.78],
+            "offpeak": ["00:00-09:00", 2.32]
+          },
+          "saturday": {
+            "half_peak": ["09:00-24:00", 2.42],
+            "offpeak": ["00:00-09:00", 2.32]
+          },
+          "holiday": {
+            "offpeak": ["00:00-24:00", 2.32]
+          }
+        },
+        "nonsummer": {
+          "weekday": {
+            "peak": ["06:00-11:00,14:00-24:00", 5.46],
+            "offpeak": ["00:00-06:00,11:00-14:00", 2.11]
+          },
+          "saturday": {
+            "half_peak": ["06:00-11:00,14:00-24:00", 2.22],
+            "offpeak": ["00:00-06:00,11:00-14:00", 2.11]
+          },
+          "holiday": {
+            "offpeak": ["00:00-24:00", 2.11]
+          }
+        }
+      }
+    },
+
+    "building_high_voltage_3stage_fixed_peak": {
+      "metadata": {
+        "summer_rule": "5/16-10/15"
+      },
+      "energy_charge": {
+        "summer": {
+          "weekday": {
+            "peak": ["16:00-22:00", 8.05],
+            "half_peak": ["09:00-16:00,22:00-24:00", 5.02],
+            "offpeak": ["00:00-09:00", 2.18]
+          },
+          "saturday": {
+            "half_peak": ["09:00-24:00", 2.27],
+            "offpeak": ["00:00-09:00", 2.18]
+          },
+          "holiday": {
+            "offpeak": ["00:00-24:00", 2.18]
+          }
+        },
+        "nonsummer": {
+          "weekday": {
+            "half_peak": ["06:00-11:00,14:00-24:00", 4.70],
+            "offpeak": ["00:00-06:00,11:00-14:00", 2.00]
+          },
+          "saturday": {
+            "half_peak": ["06:00-11:00,14:00-24:00", 2.10],
+            "offpeak": ["00:00-06:00,11:00-14:00", 2.00]
+          },
+          "holiday": {
+            "offpeak": ["00:00-24:00", 2.00]
+          }
+        }
+      }
+    },
+    
+    "ev_low_contract": {
+      "metadata": {
+        "summer_rule": "6/1-9/30"
+      },
+      "energy_charge": {
+        "summer": {
+          "weekday": {
+            "peak": ["16:00-22:00", 10.70],
+            "offpeak": ["00:00-16:00,22:00-24:00", 2.62]
+          },
+          "saturday": {
+            "offpeak": ["00:00-24:00", 2.62]
+          },
+          "holiday": {
+            "offpeak": ["00:00-24:00", 2.62]
+          }
+        },
+        "nonsummer": {
+          "weekday": {
+            "peak": ["15:00-21:00", 10.42],
+            "offpeak": ["00:00-15:00,21:00-24:00", 2.49]
+          },
+          "saturday": {
+            "offpeak": ["00:00-24:00", 2.49]
+          },
+          "holiday": {
+            "offpeak": ["00:00-24:00", 2.49]
+          }
+        }
+      }
+    },
+
+    "ev_high_contract": {
+      "metadata": {
+        "summer_rule": "6/1-9/30"
+      },
+      "energy_charge": {
+        "summer": {
+          "weekday": {
+            "peak": ["16:00-22:00", 10.70],
+            "offpeak": ["00:00-16:00,22:00-24:00", 2.62]
+          },
+          "saturday": {
+            "offpeak": ["00:00-24:00", 2.62]
+          },
+          "holiday": {
+            "offpeak": ["00:00-24:00", 2.62]
+          }
+        },
+        "nonsummer": {
+          "weekday": {
+            "peak": ["15:00-21:00", 10.42],
+            "offpeak": ["00:00-15:00,21:00-24:00", 2.49]
+          },
+          "saturday": {
+            "offpeak": ["00:00-24:00", 2.49]
+          },
+          "holiday": {
+            "offpeak": ["00:00-24:00", 2.49]
+          }
+        }
+      }
+    }
+  }
+}

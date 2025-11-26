@@ -1,0 +1,10 @@
+nohup: ignoring input
+Crash diagnostics ON
+Traceback (most recent call last):
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/main.py", line 2, in <module>
+    from optimization.util.EnergyAllocator import EnergyAllocator
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/optimization/util/EnergyAllocator.py", line 9, in <module>
+    from GurobiOptimizer import GurobiOptimizer
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/optimization/util/GurobiOptimizer.py", line 8, in <module>
+    from util.batteryreader import get_battery_details
+ModuleNotFoundError: No module named 'util'

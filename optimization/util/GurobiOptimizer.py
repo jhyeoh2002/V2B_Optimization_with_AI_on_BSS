@@ -5,7 +5,7 @@ from logstatus import log_status
 import sys
 import os
 import numpy as np
-from util.batteryreader import get_battery_details
+from optimization.util.batteryreader import get_battery_details
 
 sys.path.append(os.path.abspath(".."))
 
