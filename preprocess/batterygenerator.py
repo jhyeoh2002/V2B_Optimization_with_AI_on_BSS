@@ -1,13 +1,11 @@
-from math import e
 import os
-from sys import prefix
 from turtle import shape
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from preprocess.battscheduler import schedule_batteries
 import config as cfg
-from typing import List, Optional, Dict
+from typing import List
 
 import matplotlib.pyplot as plt
 

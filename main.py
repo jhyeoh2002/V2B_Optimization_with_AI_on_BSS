@@ -1,6 +1,7 @@
 import argparse  # <--- 1. Import argparse
 from preprocess.preprocessor import DataPreprocessor
 from MILP.EnergyAllocator import EnergyAllocator
+from supervised_learning.training import train
 import config as cfg
 
 def main():
@@ -13,7 +14,7 @@ def main():
     print("\n", "="*50,f"PART 2: MILP Optimization...", "="*50, sep="\n")
 
     # Define which cases you want to run
-    cases_to_run = [1, 2, 3] 
+    cases_to_run = [1,2,3] 
     
     # Use the tolerance from the command line arguments
     target_tolerance = args.tolerance 
@@ -30,6 +31,17 @@ def main():
         # 3. (Optional) Run Immediate Charging Baseline
         allocator.run_iterations(mode="immediate_charging", rerun=False)
 
+        print(f"\t\t[INFO] Case {case_num} completed.")
+        
+    print("\n", "="*50,"PART 3: Supervised Learning...","="*50, sep="\n")
+    
+    
+    for case_num in cases_to_run:
+        print(f"\n\t3.{case_num} Training Case {case_num}...")
+
+        train(case_id=case_num, tolerance=target_tolerance)
+    
+    
         print(f"\t\t[INFO] Case {case_num} completed.")
 
 if __name__ == "__main__":

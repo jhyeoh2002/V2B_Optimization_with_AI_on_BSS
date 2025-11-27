@@ -4,31 +4,34 @@ import numpy as np
 import pandas as pd
 import json
 from itertools import chain
-
+from util.case_dir import case_dir
 # ==== Path setup ====
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, "../.."))
-DATA_PROCESSED_DIR = os.path.join(PROJECT_ROOT, "data", "processed")
-OUTPUT_OPT_DIR = os.path.join(PROJECT_ROOT, "optimization", "output")
+# BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, "../.."))
+# DATA_PROCESSED_DIR = os.path.join(PROJECT_ROOT, "data", "processed")
+# OUTPUT_OPT_DIR = os.path.join(PROJECT_ROOT, "optimization", "output")
 
 sys.path.append(os.path.abspath(".."))
 
 
-def merge_and_process(sequence_length=24, save_feature_info=True, tolerance=4, window_size=48, optimization_folder="WL48_PV500_48H_with_2nan", dataset_name="merged_windowed_datasetV3.csv", feature_info_name="feature_infoV3.json"):
+def merge_and_process(sequence_length=24, save_feature_info=True, tolerance=4, window_size=48, optimization_folder="WL48_PV500_48H_with_2nan", dataset_name="merged_windowed_datasetV3.csv", feature_info_name="feature_infoV3.json", case_id=1):
     """Merge npy + CSV time-series into one supervised learning dataset."""
-
+    
+    demand_dir = f"./data/battery_demand/tol{tolerance}"
+    case_demand_dir = case_dir(demand_dir, case_id)
+    
     # === Load npy arrays ===
-    battery_demand = np.concatenate((np.load(os.path.join(DATA_PROCESSED_DIR, f"battery_series_window{window_size}.npy")), np.load(os.path.join(DATA_PROCESSED_DIR, f"battery_series_with_{tolerance}nan_window{window_size}.npy"))), axis=0)
-    battery_details = np.load(os.path.join(DATA_PROCESSED_DIR, f"battery_details_{tolerance}nan_window{window_size}.npy"))
-    battery_schedule = np.load(os.path.join(DATA_PROCESSED_DIR, f"battery_schedule_{tolerance}nan_window{window_size}.npy"))  # availability schedule
+    battery_demand = np.load( f"{case_demand_dir}/battery_demand.npy")
+    battery_details = np.load(f"{case_demand_dir}/battery_details.npy")
+    battery_schedule = np.load(f"{case_demand_dir}/battery_availability.npy")  # availability schedule
 
     arrival_soc = battery_details[0]
     departure_soc = battery_details[1]
     arrival_times = battery_details[2]
     departure_times = battery_details[3]
 
-    ground_truth = np.load(os.path.join(OUTPUT_OPT_DIR, f"{optimization_folder}/optimization/charging_demand.npy"))
-    SOC = np.load(os.path.join(OUTPUT_OPT_DIR, f"{optimization_folder}/optimization/SOC.npy"))
+    ground_truth = np.load(f"{optimization_folder}/optimization/charging_demand.npy")
+    SOC = np.load(f"{optimization_folder}/optimization/SOC.npy")
 
     # === Load CSV data ===
     def read_clean_csv(path):
@@ -38,10 +41,10 @@ def merge_and_process(sequence_length=24, save_feature_info=True, tolerance=4, w
         df = df.fillna(method="ffill").fillna(method="bfill")
         return df
 
-    building_demand = read_clean_csv(os.path.join(DATA_PROCESSED_DIR, "building_data.csv"))
-    electricity_price = read_clean_csv(os.path.join(DATA_PROCESSED_DIR, "electricitycostG2B_data.csv"))
-    radiation = read_clean_csv(os.path.join(DATA_PROCESSED_DIR, "radiation_data.csv"))
-    temperature = read_clean_csv(os.path.join(DATA_PROCESSED_DIR, "temperature_data.csv"))
+    building_demand = read_clean_csv("./data/timeseries/building_data.csv")
+    electricity_price = read_clean_csv("./data/timeseries/electricitycostG2B_data.csv")
+    radiation = read_clean_csv("./data/timeseries/radiation_data.csv")
+    temperature = read_clean_csv("./data/timeseries/temperature_data.csv")
 
     # === Static features ===
     building_demand.index = pd.to_datetime(building_demand.index)
@@ -76,9 +79,11 @@ def merge_and_process(sequence_length=24, save_feature_info=True, tolerance=4, w
     rows = []
     valid_count = 0
     
+    extended_index = np.random.uniform(low=0, high=15287, size=(battery_demand.shape[0])).astype(int)
+    
     for i in range(battery_demand.shape[0]):
         
-        start_idx = int(battery_demand[i, 0])
+        start_idx = int(battery_demand[i, 0]) if battery_demand[i, 0] >= 0 else extended_index[i]
         end_idx = start_idx + sequence_length
         if end_idx > len(building_demand):
             continue
@@ -162,9 +167,9 @@ def merge_and_process(sequence_length=24, save_feature_info=True, tolerance=4, w
     df_processed = pd.DataFrame(rows, columns=cols)
 
     # === Save outputs ===
-    output_path = os.path.join(BASE_DIR, dataset_name)
-    df_processed.to_csv(output_path, index=False)
-    print(f"✅ Saved merged dataset: {output_path}  (shape: {df_processed.shape})")
+    # output_path = os.path.join(BASE_DIRdataset_name)
+    df_processed.to_csv(dataset_name, index=False)
+    print(f"✅ Saved merged dataset: {dataset_name}  (shape: {df_processed.shape})")
 
     if save_feature_info:
         feature_info = {
@@ -174,10 +179,10 @@ def merge_and_process(sequence_length=24, save_feature_info=True, tolerance=4, w
             "target_col": "target",
             "num_embeddings": suggested_num_embeddings
         }
-        json_path = os.path.join(BASE_DIR, feature_info_name)
-        with open(json_path, "w") as f:
+        # json_path = os.path.join(BASE_DIR, feature_info_name)
+        with open(feature_info_name, "w") as f:
             json.dump(feature_info, f, indent=4)
-        print(f"✅ Saved feature metadata: {json_path}")
+        print(f"✅ Saved feature metadata: {feature_info_name}")
 
     return df_processed
 

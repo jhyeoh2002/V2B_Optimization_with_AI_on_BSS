@@ -109,7 +109,7 @@ def get_loaders_from_files(
     target_col = feature_info["target_col"]
 
     # --- Split data ---
-    train_df, val_df = train_test_split(df, test_size=0.3, random_state=random_seed, shuffle=True)
+    train_df, val_df = train_test_split(df, test_size=0.2, random_state=random_seed, shuffle=True)
 
     print(f"✅ Dataset split: {len(train_df)} train, {len(val_df)} val")
 

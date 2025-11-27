@@ -3,8 +3,8 @@
 # ==========================================
 # CONFIGURATION
 # ==========================================
-START_TOL=16
-END_TOL=30
+START_TOL=25
+END_TOL=26
 LOG_DIR="logs"
 MODE="parallel"  # Set to "parallel" to run all at once, "sequential" to run one by one
 
