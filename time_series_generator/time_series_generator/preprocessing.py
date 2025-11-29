@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from collections import defaultdict
 from typing import List, Optional, Dict
-import config as cfg
+from . import config as cfg
 import os, sys
 
 sys.path.append(os.path.dirname(__file__))
@@ -44,7 +44,8 @@ class DataPrepare:
             
         # print(tdf_filled)
         
-        save_path = f"./data/battery_demand/tol{self.tolerance}/resample_train.csv"
+        # save_path = f"./data/battery_demand/tol{self.tolerance}/resample_train.csv"
+        save_path = f'/home/gary/git_repo/jhern/V2B_Optimization_with_AI_on_BSS/data/battery_demand/tol1/resample_train.csv'
         tdf_filled = pd.read_csv(save_path, index_col=0, parse_dates=True)
         tdf_filled = tdf_filled["raw_data"]
     
