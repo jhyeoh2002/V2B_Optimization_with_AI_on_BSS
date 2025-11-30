@@ -67,8 +67,8 @@ def merge_and_process(sequence_length=24, save_feature_info=True, tolerance=4, w
     indices = np.clip(indices, 0, None).astype(int)
     num_unique = len(np.unique(indices))
     suggested_num_embeddings = int(num_unique * 1.2)
-    print(f"🔢 Unique quantized indices: {num_unique}")
-    print(f"✅ Suggested num_embeddings: {suggested_num_embeddings}")
+    print(f"\t\t[INFO] Unique quantized indices: {num_unique}")
+    print(f"\t\t[INFO] Suggested num_embeddings: {suggested_num_embeddings}")
 
     # === Determine n_veh from existing data ===
     n_veh = SOC.shape[2] if SOC.ndim == 3 else SOC.shape[1]
@@ -153,7 +153,7 @@ def merge_and_process(sequence_length=24, save_feature_info=True, tolerance=4, w
         valid_count += 1
     
 
-    print(f"✅ Processed {valid_count} valid samples.")
+    print(f"\t\t[INFO] Processed {valid_count} valid samples.")
 
     # === Column naming ===
     static_names = ["sin_hour", "cos_hour", "sin_day", "cos_day"]
@@ -169,7 +169,7 @@ def merge_and_process(sequence_length=24, save_feature_info=True, tolerance=4, w
     # === Save outputs ===
     # output_path = os.path.join(BASE_DIRdataset_name)
     df_processed.to_csv(dataset_name, index=False)
-    print(f"✅ Saved merged dataset: {dataset_name}  (shape: {df_processed.shape})")
+    print(f"\t\t[INFO] Saved merged dataset: {dataset_name}  (shape: {df_processed.shape})")
 
     if save_feature_info:
         feature_info = {
@@ -182,7 +182,7 @@ def merge_and_process(sequence_length=24, save_feature_info=True, tolerance=4, w
         # json_path = os.path.join(BASE_DIR, feature_info_name)
         with open(feature_info_name, "w") as f:
             json.dump(feature_info, f, indent=4)
-        print(f"✅ Saved feature metadata: {feature_info_name}")
+        print(f"\t\t[INFO] Saved feature metadata: {feature_info_name}")
 
     return df_processed
 

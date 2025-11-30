@@ -111,19 +111,19 @@ def get_loaders_from_files(
     # --- Split data ---
     train_df, val_df = train_test_split(df, test_size=0.2, random_state=random_seed, shuffle=True)
 
-    print(f"✅ Dataset split: {len(train_df)} train, {len(val_df)} val")
+    print(f"\t\t[INFO] Dataset split: {len(train_df)} train, {len(val_df)} val")
 
     # --- Fit or load scalers ---
     if fit_scaler:
         static_scaler, series_scaler, battery_scaler = fit_and_transform_scalers(
             train_df, static_cols, series_cols_list, battery_cols_list, save_dir=scaler_dir
         )
-        print("✅ Scalers fitted and saved.")
+        print("\t\t[INFO] Scalers fitted and saved.")
     else:
         static_scaler = joblib.load(os.path.join(scaler_dir, "scaler_static.pkl"))
         series_scaler = joblib.load(os.path.join(scaler_dir, "scaler_series.pkl"))
         battery_scaler = joblib.load(os.path.join(scaler_dir, "scaler_battery.pkl"))
-        print("✅ Scalers loaded from disk.")
+        print("\t\t[INFO] Scalers loaded from disk.")
 
     # --- Datasets ---
     train_ds = TimeSeriesDataset(train_df, static_cols, series_cols_list, battery_cols_list, target_col,

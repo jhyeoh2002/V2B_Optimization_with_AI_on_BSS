@@ -59,7 +59,7 @@ class BatterySeriesGenerator:
         b_path_template: str = cfg.B_PATH_TEMPLATE,
         a_range: range = range(40),
         b_range: range = range(37),
-        remove_dates: List[str] = cfg.TEST_DATE     # <–– new parameter
+        remove_dates: List[str] = cfg.TEST_DATE1 + cfg.TEST_DATE2     # <–– new parameter
         )  -> pd.Series:
         
         # 1. Load data
@@ -106,10 +106,15 @@ class BatterySeriesGenerator:
             2: os.path.join(base_dir, "case2_nan_filled"),
             3: os.path.join(base_dir, "case3_extended_generated"),
         }
+        
         for d in case_dirs.values():
             os.makedirs(d, exist_ok=True)
 
         # === Load raw data once ===
+        full_df = pd.read_csv(self.full_path, index_col=0)
+        full_df.index = pd.to_datetime(full_df.index)
+        full_values = full_df.values.flatten().tolist()
+        
         df = pd.read_csv(self.train_path, index_col=0)
         df.index = pd.to_datetime(df.index)
         flat_values = df.values.flatten().tolist()
@@ -266,7 +271,59 @@ class BatterySeriesGenerator:
             if os.path.exists(ckpt3_path):
                 os.remove(ckpt3_path)
                 
+        # -------------------------------------------------------------------------
+        # Case 0 — Test Case
+        # -------------------------------------------------------------------------
+        
+        full_df = pd.read_csv(self.full_path, index_col=0)
+        full_df.index = pd.to_datetime(full_df.index)
+        
+        # 1. Define your test cases in a list to iterate easily
+        test_cases = [cfg.TEST_DATE1, cfg.TEST_DATE2]
+        
+        # Initialize list if not already done
+        test_series = [] 
+
+        for i, (day1, day2) in enumerate(test_cases):
+            
+            # 2. Check if both days exist in the dataframe index
+            # Using partial string indexing (e.g., .loc['2024-03-15'])
+            try:
+                # Extract data for the specific days
+                df_d1 = full_df.loc[day1]
+                df_d2 = full_df.loc[day2]
                 
+                # 3. Ensure both days are valid and not empty
+                if not df_d1.empty and not df_d2.empty:
+                    
+                    # Concatenate the two days (vertical stack)
+                    combined_df = pd.concat([df_d1, df_d2])
+                    
+                    # 4. Check length (Optional: Strict check for 48 points)
+                    if len(combined_df) == 48:
+                        # 2. Find the integer index (row number) of the FIRST timestamp
+                        # Get the actual Timestamp object of the first row of day 1
+                        first_timestamp = df_d1.index[0]
+                        
+                        # Find where that timestamp sits in the main dataframe (0 to len-1)
+                        start_row_idx = full_df.index.get_loc(first_timestamp)
+                        
+                        flat_values = combined_df.values.flatten().astype(int).tolist()
+                        
+                        # 5. Append to your series
+                        # Note: formatting as [ID, data...] to match your Case 2 structure
+                        # Using 'i' as the ID (0, 1, etc.)
+                        test_series.append([start_row_idx] + flat_values)
+                        
+                        print(f"\t\t[INFO] Case 0: Successfully added test pair {day1} & {day2}")
+                        print(f"\t\tData: {test_series[-1]}")
+                    else:
+                        print(f"[WARNING] Date pair {day1}-{day2} found but length is {len(combined_df)}, expected 48.")
+                        
+            except KeyError:
+                # This catches if one of the dates is completely missing from the index
+                print(f"[WARNING] Skipping {day1} or {day2}: Date not found in index.")        
+        
         return {1: case1_series, 2: case2_series, 3: case3_series}
     # -------------------------------------------------------------------------
     # 2. Artificial data generation

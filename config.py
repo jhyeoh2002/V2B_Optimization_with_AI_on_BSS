@@ -1,3 +1,4 @@
+from encodings.punycode import T
 import numpy as np
 import os
 
@@ -9,7 +10,8 @@ END_DATE = "2024-09-30 23:00:00"
 RESOLUTION = '1h'
 
 TEST_MODE = False
-TEST_DATE = ['2024-03-15', '2024-03-16', '2024-03-29', '2024-03-30']
+TEST_DATE1 = ['2024-03-15', '2024-03-16']
+TEST_DATE2 = ['2024-03-29', '2024-03-30']
 
 CASE1 = "case1_real_only"
 CASE2 = "case2_nan_filled"

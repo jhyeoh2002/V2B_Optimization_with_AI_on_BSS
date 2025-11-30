@@ -4,14 +4,14 @@ import math
 
 class TemporalAttentiveFusionNet(nn.Module):
     def __init__(self,
-                 num_embeddings=8000,
+                 num_embeddings=10000,
                  embedding_dim=64,
                  n_heads=4,
-                 fc_hidden_dim1=512,
-                 fc_hidden_dim2=64,
+                 fc_hidden_dim1=128,
+                 fc_hidden_dim2=16,
                 #  fc_hidden_dim3=32,
-                 attention_dropout=0.5,
-                 dropout=0.5):
+                 attention_dropout=0.2,
+                 dropout=0.2):
         """
         Multihead attention-based fusion of static + temporal inputs.
         Each 24-hour series passes through interpretable attention, then all summaries are fused.
@@ -69,8 +69,9 @@ class TemporalAttentiveFusionNet(nn.Module):
         out = self.relu(out)
 
         out = self.fc2(out)
-        # out = self.bn2(out)
-        # out = self.dropout(out)
+        out = self.bn2(out)
+        out = self.dropout(out)
+        out = self.relu(out)
 
         # out = self.fc3(out)
         # out = self.bn3(out)
