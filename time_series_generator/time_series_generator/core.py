@@ -116,7 +116,7 @@ class BayesianEstimator:
         self.top_k = top_k 
 
     def get_resampled_pool(self, seed: np.ndarray, n_draws: int = 100, 
-                           selection_mode: str = 'softmax', top_k_limit: Union[int, None] = None) \
+                           selection_mode: str = 'topk', top_k_limit: Union[int, None] = None) \
                            -> Tuple[np.ndarray, np.ndarray]:
         """
         核心方法：計算所有歷史片段的機率，並重抽樣出 n_draws 條樣本。
@@ -247,11 +247,9 @@ class BayesianJointImputer:
     利用多元高斯分佈 (MVN) 的條件機率，對 Raw Samples 中的缺失值進行單次隨機採樣補值，
     以保留最大變異數結構。
     """
-    def __init__(self, raw_samples: np.ndarray, max_iter: int = 20, tol: float = 1e-4, random_state: int = 0):
+    def __init__(self, raw_samples: np.ndarray, random_state: int = 0):
         self.raw_samples = np.asarray(raw_samples)
         self.N, self.T = self.raw_samples.shape
-        self.max_iter = max_iter
-        self.tol = tol
         self.rng = np.random.RandomState(random_state)
         
         # --- 1. 初始化全域參數 (Mu & Sigma) ---
