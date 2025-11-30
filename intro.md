@@ -33,8 +33,7 @@ To mitigate the aforementioned academic limitations, this study proposes a **non
 2.  **Traceable Probabilistic Generation:** Our core innovation utilizes **inverse distance weighting** $w \propto 1 / D_E^2$ to transform the standardized Euclidean distance $D_E$ into a **conditional probability** of sampling, $P(x_{cand}^{(i)} | x_{seed})$. This is a **non-parametric, scenario-driven sampling mechanism** that ensures the **traceability** of the generated samples. Concurrently, we inject **weighted noise inversely proportional** to the sampling probability to optimize the trade-off between the ensemble's **fidelity** and **diversity**.
 3.  **One-Shot Stochastic Joint Imputation:** Finally, we utilize **Conditional Probability Sampling from a Multivariate Gaussian Distribution (MVN)** to perform One-Shot stochastic imputation for all missing values in the mixed Raw Samples. This is crucial because it guarantees that the generated ensemble **faithfully preserves the Joint Covariance Structure**, thereby achieving the **accurate quantification of uncertainty** for the system.
 
----
-*The following sections will elaborate on the mathematical principles and implementation details of this framework and provide experimental evidence demonstrating its superior performance in handling incomplete time series data.*
+
 
 ---
 
