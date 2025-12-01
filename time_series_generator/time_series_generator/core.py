@@ -303,13 +303,22 @@ class BayesianMixtureGenerator:
 
             if overlap.sum() > 0:
                 diff = self.seed[overlap] - sample[overlap]
-                bias = np.mean(diff)
-                sample = sample + bias
-            
-            # 2. 種子覆蓋 - 確保已知點精確保留
-            # sample[seed_mask] = self.seed[seed_mask]
-            
-            # 3. 加權雜訊 (Stochasticity Injection)
+                bias = float(np.nanmean(diff))
+                if np.isfinite(bias):
+                    sample = sample + bias
+
+            # 2. Data-driven 軟條件：在 overlap 區域往 seed 靠，
+            #    但「強度由資料決定」
+            if overlap.sum() > 1:
+                alpha_i = self._compute_alpha(sample, overlap)
+                # alpha_i 越接近 1 → 越信 sample
+                # alpha_i 越接近 0 → 越信 seed
+                sample[overlap] = (
+                    alpha_i * sample[overlap]
+                    + (1.0 - alpha_i) * self.seed[overlap]
+                )
+
+            # 3. 加權雜訊（與採樣機率成反比）
             valid_mask = np.isfinite(sample)
             raw_weight = float(weights[i])
 
