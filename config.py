@@ -61,29 +61,20 @@ RANDOM_STATE = 42
 
 # --- Active Seed Configuration ---
 SEED = None
-WINDOW_SIZE = 18 # Used for general windowing
-
-# Seed 48 Configuration
-WINDOW_SIZE_48 = 48
-SEED_48 = np.array([
-    28.0, 26.0, 22.0, np.nan, np.nan, 21.0, 28.0, 17.0, 32.0, 36.0, 30.0, 19.0, 
-    20.0, np.nan, np.nan, 33.0, 37.0, 42.0, 42.0, 42.0, 38.67, 33.33, 30.8, 
-    27.33, 29.2, 30.0, 29.6, 26.0, np.nan, 26.67, 16.0, 21.0, 20.67, 25.5, 
-    26.0, 22.0, 16.33, 22.0, 32.0, 35.0, 40.0, 40.0, 40.0, 38.0, np.nan, 
-    6.0, 13.0, 19.33
-])
+WINDOW_SIZE = 36 # Used for general windowing
 
 # ==============================================================================
 # 5. Optimization & Sampling Parameters
 # ==============================================================================
 WINDOW_LENGTH = WINDOW_SIZE  # hours
-BANDWIDTH = 0.1
-TOP_K = 1000
+BANDWIDTH = 0.001
+TOP_K = 200
 
 # --- Sampling ---
 BOOTSTRAP_SIZE = 1
-NSAMPLE = 200
-N_EXTENDED = 2000
+NSAMPLE = 100
+# N_EXTENDED = 2000
+MAX_SHIFT = 24
 
 # --- Tolerances ---
 TOLERANCE_DEFAULT = 15      # General tolerance (up to 1/3 of window)

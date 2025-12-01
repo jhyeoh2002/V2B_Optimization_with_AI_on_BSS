@@ -1,57 +1,0 @@
-Crash diagnostics ON
-
-
-==================================================
-PART 1: Data preprocess for 2023-01-01 00:00:00 to 2024-09-30 23:00:00...
-==================================================
-
-	1.1 Preprocessing radiation data...
-		[INFO] Radiation data already exists at './data/timeseries/radiation_data.csv'
-
-	1.2 Preprocessing temperature data...
-		[INFO] Temperature data already exists at './data/timeseries/temperature_data.csv'
-
-	1.3 Preprocessing building data...
-		[INFO] Building data already exists at './data/timeseries/building_data.csv'
-
-	1.4 Preprocessing electricity cost data...
-		[INFO] Electricity cost data already exists at './data/timeseries/electricitycostG2B_data.csv' and './data/timeseries/electricitycostG2V_data.csv'
-
-	1.5 Preprocessing battery demand series data...
-		[INFO] Found existing battery data at './data/battery_demand/tol30/resample_full.csv' and './data/battery_demand/tol30/resample_train.csv'
-
-		[INFO] Number of series for clean windows = (168, 37)
-		[INFO] Number of eligible series for Case 2 = (1391, 37)
-		[INFO] Number of seeds ready for Case 3  = (2000, 36)
-
-		[INFO] Case 1 exists — loaded battery demand from './data/battery_demand/tol30/case1_real_only/battery_demand.npy' with shape (168, 37).
-		[INFO] Case 2 exists — loaded battery demand from './data/battery_demand/tol30/case2_nan_filled/battery_demand.npy' with shape (1559, 37).
-		[INFO] Case 3 exists — loaded battery demand from './data/battery_demand/tol30/case3_extended_generated/battery_demand.npy' with shape (3559, 37).
-
-	1.6 Generating battery schedule...
-		[INFO] Case 1 exists — loaded from './data/battery_demand/tol30/case1_real_only/battery_availability.npy' and './data/battery_demand/tol30/case1_real_only/battery_details.npy' shape (168, 263, 36) and (4, 168, 263)
-		[INFO] Case 2 exists — loaded from './data/battery_demand/tol30/case2_nan_filled/battery_availability.npy' and './data/battery_demand/tol30/case2_nan_filled/battery_details.npy' shape (1559, 429, 36) and (4, 1559, 429)
-		[INFO] Case 3 exists — loaded from './data/battery_demand/tol30/case3_extended_generated/battery_availability.npy' and './data/battery_demand/tol30/case3_extended_generated/battery_details.npy' shape (3559, 429, 36) and (4, 3559, 429)
-
-
-==================================================
-PART 2: MILP Optimization...
-==================================================
-
-	2.1 Optimizing Case 1...
-		[INFO] Loaded 168 samples from './data/battery_demand/tol30/case1_real_only'
-		[INFO] Results already exist at './data/optimization_results/tol30/case1_real_only/optimization/V2B.npy'. Skipping optimization run.
-		[INFO] Results already exist at './data/optimization_results/tol30/case1_real_only/immediate_charging/V2B.npy'. Skipping immediate_charging run.
-		[INFO] Case 1 completed.
-
-	2.2 Optimizing Case 2...
-		[INFO] Loaded 1559 samples from './data/battery_demand/tol30/case2_nan_filled'
-		[INFO] Results already exist at './data/optimization_results/tol30/case2_nan_filled/optimization/V2B.npy'. Skipping optimization run.
-		[INFO] Results already exist at './data/optimization_results/tol30/case2_nan_filled/immediate_charging/V2B.npy'. Skipping immediate_charging run.
-		[INFO] Case 2 completed.
-
-	2.3 Optimizing Case 3...
-		[INFO] Loaded 3559 samples from './data/battery_demand/tol30/case3_extended_generated'
-		[INFO] Found checkpoint: './data/optimization_results/tol30/case3_extended_generated/optimization_checkpoint.npz'
-		[INFO] Resuming from iteration 3030
-		[INFO] Processing optimization series:   0%|                          | 0/529 [00:00<?, ?series/s]		[INFO] Processing optimization series:   0%|                  | 1/529 [00:02<19:25,  2.21s/series]		[INFO] Processing optimization series:   0%|                  | 2/529 [00:02<11:41,  1.33s/series]		[INFO] Processing optimization series:   1%|                  | 3/529 [00:06<19:11,  2.19s/series]		[INFO] Processing optimization series:   1%|▏                 | 4/529 [00:07<16:30,  1.89s/series]		[INFO] Processing optimization series:   1%|▏                 | 5/529 [00:08<13:53,  1.59s/series]		[INFO] Processing optimization series:   1%|▏                 | 6/529 [00:09<12:31,  1.44s/series]		[INFO] Processing optimization series:   1%|▏                 | 7/529 [00:11<12:46,  1.47s/series]		[INFO] Processing optimization series:   2%|▎                 | 8/529 [00:11<09:59,  1.15s/series]		[INFO] Processing optimization series:   2%|▎                 | 9/529 [00:12<09:47,  1.13s/series]		[INFO] Processing optimization series:   2%|▎                | 10/529 [00:22<32:33,  3.76s/series]		[INFO] Processing optimization series:   2%|▎                | 11/529 [00:23<26:11,  3.03s/series]		[INFO] Processing optimization series:   2%|▍                | 12/529 [00:24<19:17,  2.24s/series]		[INFO] Processing optimization series:   2%|▍                | 13/529 [00:24<14:49,  1.72s/series]		[INFO] Processing optimization series:   3%|▍                | 14/529 [00:26<13:46,  1.60s/series]		[INFO] Processing optimization series:   3%|▍                | 15/529 [00:26<10:59,  1.28s/series]		[INFO] Processing optimization series:   3%|▌                | 16/529 [00:27<09:03,  1.06s/series]		[INFO] Processing optimization series:   3%|▌                | 17/529 [00:27<07:35,  1.12series/s]		[INFO] Processing optimization series:   3%|▌                | 18/529 [00:29<09:33,  1.12s/series]		[INFO] Processing optimization series:   4%|▌                | 19/529 [00:29<08:09,  1.04series/s]		[INFO] Processing optimization series:   4%|▋                | 20/529 [00:38<28:27,  3.36s/series]		[INFO] Processing optimization series:   4%|▋                | 21/529 [00:40<24:38,  2.91s/series]		[INFO] Processing optimization series:   4%|▋                | 22/529 [00:41<18:12,  2.16s/series]		[INFO] Processing optimization series:   4%|▋                | 23/529 [00:41<13:50,  1.64s/series]		[INFO] Processing optimization series:   5%|▊                | 24/529 [00:42<10:51,  1.29s/series]		[INFO] Processing optimization series:   5%|▊                | 25/529 [00:44<12:41,  1.51s/series]		[INFO] Processing optimization series:   5%|▊                | 26/529 [00:44<10:24,  1.24s/series]		[INFO] Processing optimization series:   5%|▊                | 27/529 [00:45<08:28,  1.01s/series]		[INFO] Processing optimization series:   5%|▉                | 28/529 [00:47<10:28,  1.25s/series]		[INFO] Processing optimization series:   5%|▉                | 29/529 [00:47<08:34,  1.03s/series]		[INFO] Processing optimization series:   6%|▉                | 30/529 [00:55<26:59,  3.25s/series]		[INFO] Processing optimization series:   6%|▉                | 31/529 [00:56<21:03,  2.54s/series]		[INFO] Processing optimization series:   6%|█                | 32/529 [01:00<22:52,  2.76s/series]		[INFO] Processing optimization series:   6%|█                | 33/529 [01:01<18:49,  2.28s/series]		[INFO] Processing optimization series:   6%|█                | 34/529 [01:02<16:02,  1.94s/series]		[INFO] Processing optimization series:   7%|█                | 35/529 [01:03<13:55,  1.69s/series]		[INFO] Processing optimization series:   7%|█▏               | 36/529 [01:06<17:40,  2.15s/series]		[INFO] Processing optimization series:   7%|█▏               | 37/529 [01:07<13:27,  1.64s/series]		[INFO] Processing optimization series:   7%|█▏               | 38/529 [01:07<10:22,  1.27s/series]		[INFO] Processing optimization series:   7%|█▎               | 39/529 [01:08<08:15,  1.01s/series]		[INFO] Processing optimization series:   8%|█▎               | 40/529 [01:16<27:21,  3.36s/series]		[INFO] Processing optimization series:   8%|█▎               | 41/529 [01:17<20:23,  2.51s/series]		[INFO] Processing optimization series:   8%|█▎               | 42/529 [01:18<16:23,  2.02s/series]		[INFO] Processing optimization series:   8%|█▍               | 43/529 [01:20<17:10,  2.12s/series]		[INFO] Processing optimization series:   8%|█▍               | 44/529 [01:21<13:05,  1.62s/series]		[INFO] Processing optimization series:   9%|█▍               | 45/529 [01:21<10:22,  1.29s/series]		[INFO] Processing optimization series:   9%|█▍               | 46/529 [01:21<08:10,  1.02s/series]		[INFO] Processing optimization series:   9%|█▌               | 47/529 [01:23<10:07,  1.26s/series]		[INFO] Processing optimization series:   9%|█▌               | 48/529 [01:24<08:23,  1.05s/series]		[INFO] Processing optimization series:   9%|█▌               | 49/529 [01:24<06:58,  1.15series/s]		[INFO] Processing optimization series:   9%|█▌               | 50/529 [01:34<27:39,  3.46s/series]		[INFO] Processing optimization series:  10%|█▋               | 51/529 [01:35<22:08,  2.78s/series]		[INFO] Processing optimization series:  10%|█▋               | 52/529 [01:36<17:17,  2.18s/series]

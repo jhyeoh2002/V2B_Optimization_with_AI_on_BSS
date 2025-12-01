@@ -1,0 +1,61 @@
+nohup: ignoring input
+Crash diagnostics ON
+
+
+==================================================
+PART 1: Data preprocess for 2023-01-01 00:00:00 to 2024-09-30 23:00:00...
+==================================================
+
+	1.1 Preprocessing radiation data...
+		[INFO] Radiation data already exists at './data/timeseries/radiation_data.csv'
+
+	1.2 Preprocessing temperature data...
+		[INFO] Temperature data already exists at './data/timeseries/temperature_data.csv'
+
+	1.3 Preprocessing building data...
+		[INFO] Building data already exists at './data/timeseries/building_data.csv'
+
+	1.4 Preprocessing electricity cost data...
+		[INFO] Electricity cost data already exists at './data/timeseries/electricitycostG2B_data.csv' and './data/timeseries/electricitycostG2V_data.csv'
+
+	1.5 Preprocessing battery demand series data...
+		[INFO] Found existing battery data at './data/battery_demandV2/tol15/resample_full.csv' and './data/battery_demandV2/tol15/resample_train.csv'
+
+		[INFO] Number of series for clean windows = (455, 19)
+		[INFO] Number of eligible series for Case 2 = (1233, 19)
+		[INFO] Case 1 exists — loaded battery demand from './data/battery_demandV2/tol15/case1_real_only/battery_demand.npy' with shape (455, 19).
+		[INFO] Building Case 2 (fill NaN)
+		[INFO] Resuming Case 2 from checkpoint: './data/battery_demandV2/tol15/case2_nan_filled/battery_demand_ckpt.npz'
+		[INFO] Case 2 resume index = 13, current series shape = (468, 19)
+		[INFO] Case 2 generating:   0%|          | 0/1220 [00:00<?, ?it/s]		[INFO] Case 2 generating:   0%|          | 0/1220 [00:01<?, ?it/s]
+(array([[37.01058168, 32.97680518, 36.96140275, ..., 32.97705323,
+        29.49732865, 35.52015778],
+       [29.80731583, 28.06807446, 42.43267333, ..., 30.44134097,
+        37.36607916, 26.95244083],
+       [35.35265996, 24.55951395, 27.48311714, ..., 34.22479488,
+        31.18773397, 37.35752444],
+       ...,
+       [38.49007258, 36.61274655, 34.62816997, ..., 38.6227806 ,
+        33.19178126, 24.98779987],
+       [32.00058757, 30.19957002, 45.20168185, ..., 31.97511072,
+        27.39707447, 31.83559642],
+       [26.96940433, 38.00737168, 34.44741018, ..., 32.74495369,
+        40.98507543, 36.97351105]], shape=(100, 18)), {'step1_resample': 0.003191196999978274, 'step2_mixture': 0.0008651390089653432, 'step3_impute': 0.002885500027332455, 'total': 0.006941836036276072})
+Traceback (most recent call last):
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/main.py", line 65, in <module>
+    main()
+    ~~~~^^
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/main.py", line 12, in main
+    data = preprocessor.preprocess()
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/preprocess/preprocessor.py", line 231, in preprocess
+    gen.generate_battery_series(rerun=False)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/preprocess/batterygenerator.py", line 194, in generate_battery_series
+    series_case2.append([i] + np.nanmean(sample, axis=0).tolist())
+                              ~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/site-packages/numpy/lib/_nanfunctions_impl.py", line 1033, in nanmean
+    arr, mask = _replace_nan(a, 0)
+                ~~~~~~~~~~~~^^^^^^
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/site-packages/numpy/lib/_nanfunctions_impl.py", line 98, in _replace_nan
+    a = np.asanyarray(a)
+ValueError: setting an array element with a sequence. The requested array has an inhomogeneous shape after 1 dimensions. The detected shape was (2,) + inhomogeneous part.

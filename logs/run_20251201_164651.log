@@ -1,0 +1,9 @@
+nohup: ignoring input
+Traceback (most recent call last):
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/main.py", line 3, in <module>
+    from MILP.EnergyAllocator import EnergyAllocator
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/MILP/EnergyAllocator.py", line 10, in <module>
+    from GurobiOptimizer import GurobiOptimizer
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/MILP/GurobiOptimizer.py", line 1, in <module>
+    import gurobipy as gp
+ModuleNotFoundError: No module named 'gurobipy'

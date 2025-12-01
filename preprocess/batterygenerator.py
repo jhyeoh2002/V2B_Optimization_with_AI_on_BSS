@@ -185,9 +185,12 @@ class BatterySeriesGenerator:
             # ---- Generation loop ----
             for idx in tqdm(range(start_idx, len(eligible_chunks)),
                             desc="\t\t[INFO] Case 2 generating"):
-                i, chunk = eligible_chunks[idx][0], eligible_chunks[idx][1:]
+                # i, chunk = eligible_chunks[idx][0], eligible_chunks[idx][1:]
+                i, chunk = eligible_chunks[idx][0], [35.0, np.nan, 35.0, np.nan, 35.0, 24.6, 27.0, 28.0, 23.0, 23.0, 23.666666666666668, 19.0, 27.0, 27.0, 37.0, 30.0, 27.0, 23.0, 25.666666666666668, 30.0, np.nan, 33.0, 34.0, np.nan, np.nan, np.nan, 22.5, 17.5, np.nan, 19.0, 25.0, np.nan, 25.0, 25.0, 25.5, 27.0]
+
+                sample = self._generate_artificial_battery_data(chunk, n_samples)[0]
                 
-                sample = self.generate_artificial_battery_data(chunk, n_samples)
+                print(sample)
                 
                 series_case2.append([i] + np.nanmean(sample, axis=0).tolist())
                     
@@ -328,7 +331,7 @@ class BatterySeriesGenerator:
     # -------------------------------------------------------------------------
     # 2. Artificial data generation
     # -------------------------------------------------------------------------
-    def generate_artificial_battery_data(self, seq, n_samples=25):
+    def _generate_artificial_battery_data(self, seq, n_samples=25):
         """
         Generate artificial battery data using the time series generator module.
         """
@@ -350,7 +353,7 @@ class BatterySeriesGenerator:
             seed=seq,          
             datapreparer=dataprep,     
             window_size=cfg.WINDOW_SIZE,
-            max_shift=cfg.WINDOW_SIZE,
+            max_shift=cfg.MAX_SHIFT,
             top_k=cfg.TOP_K,
             random_state=cfg.RANDOM_STATE,
         )
