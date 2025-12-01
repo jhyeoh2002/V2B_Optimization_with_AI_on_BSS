@@ -1,33 +1,35 @@
 import numpy as np
 import pandas as pd
 from typing import List, Tuple, Union
+import time
+
 
 # =============================================================================
 # 0. 基礎工具 (Base Utilities)
 # =============================================================================
 
-def _norm(x: np.ndarray, eps: float = 1e-8) -> np.ndarray:
-    """
-    計算 Z-Score 標準化 (Standardization)。
+# def _norm(x: np.ndarray, eps: float = 1e-8) -> np.ndarray:
+#     """
+#     計算 Z-Score 標準化 (Standardization)。
     
-    將序列轉換為零均值、單位標準差。
+#     將序列轉換為零均值、單位標準差。
     
-    Args:
-        x: 待標準化的 NumPy 數組。
-        eps: 用於數值穩定的極小值，防止標準差為零。
+#     Args:
+#         x: 待標準化的 NumPy 數組。
+#         eps: 用於數值穩定的極小值，防止標準差為零。
         
-    Returns:
-        標準化後的數組。
-    """
-    x = np.asarray(x, float)
-    m = np.nanmean(x)
-    s = np.nanstd(x)
+#     Returns:
+#         標準化後的數組。
+#     """
+#     x = np.asarray(x, float)
+#     m = np.nanmean(x)
+#     s = np.nanstd(x)
     
-    # 數值穩定性檢查
-    if not np.isfinite(s) or s < eps: 
-        s = eps
+#     # 數值穩定性檢查
+#     if not np.isfinite(s) or s < eps: 
+#         s = eps
         
-    return (x - m) / s
+#     return (x - m) / s
 
 def _best_lag_xcorr(seed: np.ndarray, cand: np.ndarray, max_shift: int) -> np.ndarray:
     """
@@ -115,69 +117,115 @@ class BayesianEstimator:
         self.max_shift = max_shift
         self.top_k = top_k 
 
-    def get_resampled_pool(self, seed: np.ndarray, n_draws: int = 100, 
-                           selection_mode: str = 'topk', top_k_limit: Union[int, None] = None) \
-                           -> Tuple[np.ndarray, np.ndarray]:
+    def get_resampled_pool(
+        self,
+        seed: np.ndarray,
+        n_draws: int = 100,
+        selection_mode: str = "topk",
+        top_k_limit: Union[int, None] = None,
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """
         核心方法：計算所有歷史片段的機率，並重抽樣出 n_draws 條樣本。
-        
+        向量化版本：把對齊 + 距離計算改成批次運算，加速迴圈瓶頸。
+
         Args:
-            seed: 用於匹配的時序片段。
+            seed: 用於匹配的時序片段，shape (T,)
             n_draws: 要抽樣出的樣本數量。
             selection_mode: 'softmax' (機率抽樣) 或 'topk' (硬性選取最佳 K 個)。
             top_k_limit: 在 'topk' 模式下，實際要選取的數量 (None 時使用 self.top_k)。
             
         Returns:
-            (resampled_pool, resampled_weights): 重抽樣的對齊後樣本池和它們的原始採樣機率。
+            (resampled_pool, resampled_weights): 
+                - resampled_pool: (n_draws, T) 對齊後樣本池（原始尺度）
+                - resampled_weights: (n_draws,) 被選中樣本對應的原始採樣機率。
         """
-        seed = np.asarray(seed, float)
-        seed_norm = _norm(seed)
-        N = len(self.samples)
-        
-        aligned_candidates = []
-        distances = []
-        
-        # 1. 對齊並計算所有歷史資料的距離
-        for i in range(N):
-            cand = self.samples[i]
-            # 對齊
-            aligned_cand = _best_lag_xcorr(seed, cand, self.max_shift)
-            # 計算歐式距離
-            dist = _euclidean_distance(seed_norm, _norm(aligned_cand))
-            
-            aligned_candidates.append(aligned_cand)
-            distances.append(dist)
-            
-        distances = np.array(distances)
-        
-        # 2. 根據模式計算機率 (Probabilities Calculation)
-        
-        if selection_mode == 'topk':
+        # ---- 0. 準備資料形狀 ----
+        seed = np.asarray(seed, float)          # (T,)
+        seed_norm = _norm(seed)                # (T,)
+
+        # self.samples 假設是 (N, T) 或 list of (T,)
+        samples_arr = np.asarray(self.samples, float)  # (N, T)
+        if samples_arr.ndim != 2:
+            raise ValueError("self.samples 必須是形狀為 (N, T) 的 2D 陣列")
+
+        N, T = samples_arr.shape
+        if seed.shape[0] != T:
+            raise ValueError(f"seed 長度 {seed.shape[0]} 與 samples 長度 {T} 不一致")
+
+        max_shift = self.max_shift
+
+        # ---- 1. 一次性把所有樣本做 normalize（模仿 _norm 的行為） ----
+        # _norm 是對每一條 series 各自 z-score，因此這裡做 batch 版
+        eps = 1e-8
+        mean = np.nanmean(samples_arr, axis=1, keepdims=True)   # (N, 1)
+        std = np.nanstd(samples_arr, axis=1, keepdims=True)     # (N, 1)
+        std = np.where((~np.isfinite(std)) | (std < eps), 1.0, std)
+        samples_norm = (samples_arr - mean) / std               # (N, T)
+
+        # ---- 2. 在 [-max_shift, max_shift] 內找每條樣本的最佳 lag（向量化） ----
+        # best_d2: 每條樣本目前最佳的「距離平方」
+        best_d2 = np.full(N, np.inf, dtype=float)
+        best_lag = np.zeros(N, dtype=int)
+
+        # 把 seed_norm broadcast 成 (1, T) 好跟 (N, T) 做減法
+        seed_norm_2d = seed_norm[None, :]   # (1, T)
+
+        # 遍歷所有 lag，但每個 lag 都對全體 samples 一次處理
+        for lag in range(-max_shift, max_shift + 1):
+            # (N, T) 所有樣本同時平移（roll 不會改變 mean/std，所以 normalize 後再 roll 是 OK 的）
+            shifted_norm = np.roll(samples_norm, shift=lag, axis=1)  # (N, T)
+
+            # 與 seed_norm 的差異，計算 L2 distance^2
+            diff = shifted_norm - seed_norm_2d        # broadcasting -> (N, T)
+            # 如果你原本的 _euclidean_distance 有特別處理 NaN，可以在這裡改成對 NaN 忽略的版本
+            d2 = np.nansum(diff * diff, axis=1)       # (N,)
+
+            # 找到在這個 lag 下更好的樣本
+            mask = d2 < best_d2
+            best_d2[mask] = d2[mask]
+            best_lag[mask] = lag
+
+        # 距離 = sqrt(distance^2)
+        distances = np.sqrt(best_d2)  # (N,)
+
+        # ---- 3. 依據 best_lag 對「原始 samples」做對齊，得到 aligned_candidates ----
+        aligned_candidates = np.empty_like(samples_arr)  # (N, T)
+        unique_lags = np.unique(best_lag)
+
+        for lag in unique_lags:
+            idx = (best_lag == lag)
+            # 對該 lag 的所有 sample 一次 roll
+            aligned_candidates[idx] = np.roll(samples_arr[idx], shift=lag, axis=1)
+
+        # ---- 4. 根據模式計算機率 (Probabilities Calculation) ----
+        if selection_mode == "topk":
             # A. Top-K 模式：硬性選取最佳 K 個，並給予均等機率
             K = min(top_k_limit if top_k_limit is not None else self.top_k, N)
             best_indices = np.argsort(distances)[:K]
-            
-            probs = np.zeros(N)
-            if K > 0:
-                probs[best_indices] = 1.0 / K 
-                probs /= np.sum(probs) # 確保總和為 1
 
-        else: # Softmax (default)
+            probs = np.zeros(N, dtype=float)
+            if K > 0:
+                probs[best_indices] = 1.0 / K
+                probs /= np.sum(probs)  # 保險起見再 normalize 一次
+        else:
             # B. Softmax 模式：機率與距離平方成反比 (距離越近，機率越高)
             epsilon = 1e-6
-            # 權重 = 1 / (距離^2 + epsilon)
-            weights = 1.0 / (distances**2 + epsilon) 
+            weights = 1.0 / (distances**2 + epsilon)  # (N,)
             probs = weights / np.sum(weights)
-        
-        # 3. 重抽樣 (Resampling)
-        
-        # 根據機率分佈 (p=probs) 進行 n_draws 次帶放回的抽樣
-        indices = np.random.choice(N, size=n_draws, p=probs, replace=True)
-        
-        resampled_pool = np.stack([aligned_candidates[i] for i in indices])
-        resampled_weights = probs[indices] # 記錄它們被選中的原始機率
-        
+
+        # ---- 5. 重抽樣 (Resampling) ----
+        # 建議用 self.random_state（如果你有）避免全域 np.random 造成 side-effect
+        rng = getattr(self, "random_state", None)
+        if rng is None:
+            rng = np.random.default_rng()
+        # n_draws 次帶放回抽樣
+        indices = rng.choice(N, size=n_draws, p=probs, replace=True)
+
+        resampled_pool = aligned_candidates[indices]  # (n_draws, T)
+        resampled_weights = probs[indices]            # (n_draws,)
+
         return resampled_pool, resampled_weights
+
 
 # =============================================================================
 # 2. 混合生成器 (Mixture Generator) - 結合與加噪
@@ -220,7 +268,7 @@ class BayesianMixtureGenerator:
                 sample = sample + bias
             
             # 2. 種子覆蓋 - 確保已知點精確保留
-            sample[seed_mask] = self.seed[seed_mask]
+            # sample[seed_mask] = self.seed[seed_mask]
             
             # 3. 加權雜訊 (Stochasticity Injection)
             valid_mask = np.isfinite(sample)
@@ -338,6 +386,14 @@ class BayesianJointImputer:
         return X_filled
 
 
+
+
+
+
+
+
+
+
 # =============================================================================
 # 4. 總流程 Wrapper (Generator) - 對外接口
 # =============================================================================
@@ -364,6 +420,7 @@ class Generator:
                     all_subseq.append(np.asarray(arr, float))
         
         # 自動計算 base_noise：根據歷史樣本的平均標準差設定雜訊基礎，以保持數據尺度一致
+        all_subseq = all_subseq[:1000]
         N = len(all_subseq)
         if N > 0:
             sample_size = min(N, 100)
@@ -381,27 +438,53 @@ class Generator:
 
     def generate(self, n_sample: int = 100) -> np.ndarray:
         """
-        執行完整的時序樣本生成流程。
+        執行完整的時序樣本生成流程，並記錄每個步驟的耗時。
         
         Args:
             n_sample: 要生成的時序樣本數量。
             
         Returns:
-            (n_sample, T) 維度的完整時序樣本矩陣。
+            complete_samples: (n_sample, T) 維度的完整時序樣本矩陣。
+            timings: dict，包含每個流程的耗時（秒）
         """
+
+        timings = {}
+
+        # ---------------------------------------------------------
         # 1. 機率重抽樣
+        # ---------------------------------------------------------
+        t0 = time.perf_counter()
         resampled_pool, weights = self.estimator.get_resampled_pool(
             self.seed, n_draws=n_sample
         )
+        timings["step1_resample"] = time.perf_counter() - t0
 
+        # ---------------------------------------------------------
         # 2. 混合與加權雜訊
+        # ---------------------------------------------------------
+        t0 = time.perf_counter()
         mixture_gen = BayesianMixtureGenerator(
-            seed=self.seed, base_noise=self.base_noise, random_state=self.random_state
+            seed=self.seed, 
+            base_noise=self.base_noise, 
+            random_state=self.random_state
         )
-        raw_samples = mixture_gen.generate_raw_ensemble(pool=resampled_pool, weights=weights)
+        raw_samples = mixture_gen.generate_raw_ensemble(
+            pool=resampled_pool, 
+            weights=weights
+        )
+        timings["step2_mixture"] = time.perf_counter() - t0
 
-        # 3. 單次隨機聯合補值
+        # ---------------------------------------------------------
+        # 3. 單次隨機聯合補值（Joint MVN）
+        # ---------------------------------------------------------
+        t0 = time.perf_counter()
         imputer = BayesianJointImputer(raw_samples, random_state=self.random_state)
         complete_samples = imputer.impute()
+        timings["step3_impute"] = time.perf_counter() - t0
 
-        return complete_samples
+        # ---------------------------------------------------------
+        # 全流程耗時
+        # ---------------------------------------------------------
+        timings["total"] = sum(timings.values())
+
+        return complete_samples, timings
