@@ -17,6 +17,8 @@ CASE1 = "case1_real_only"
 CASE2 = "case2_nan_filled"
 CASE3 = "case3_extended_generated"
 
+BATTERYDEMAND_PATH = "battery_demandV2"
+
 # ==============================================================================
 # 2. File Paths
 # ==============================================================================
@@ -57,13 +59,9 @@ MEAN = 27.91
 STD = 10.34
 RANDOM_STATE = 42
 
-# --- Random Generation Window ---
-RG_WINDOW_SIZE = 30
-RG_SEED = np.random.normal(loc=MEAN, scale=STD, size=RG_WINDOW_SIZE)
-
 # --- Active Seed Configuration ---
 SEED = None
-WINDOW_SIZE = 36 # Used for general windowing
+WINDOW_SIZE = 18 # Used for general windowing
 
 # Seed 48 Configuration
 WINDOW_SIZE_48 = 48
@@ -78,7 +76,7 @@ SEED_48 = np.array([
 # ==============================================================================
 # 5. Optimization & Sampling Parameters
 # ==============================================================================
-WINDOW_LENGTH = 36  # hours
+WINDOW_LENGTH = WINDOW_SIZE  # hours
 BANDWIDTH = 0.1
 TOP_K = 1000
 
@@ -88,7 +86,7 @@ NSAMPLE = 200
 N_EXTENDED = 2000
 
 # --- Tolerances ---
-TOLERANCE_DEFAULT = 25      # General tolerance (up to 1/3 of window)
+TOLERANCE_DEFAULT = 15      # General tolerance (up to 1/3 of window)
 
 # ==============================================================================
 # 6. Output Naming Configuration

@@ -9,8 +9,8 @@ from typing import List
 
 import matplotlib.pyplot as plt
 
-import time_series_generator.time_series_generator.core as tsg
-
+from time_series_generator.time_series_generator.core import Generator as BlockGenerator
+from time_series_generator.time_series_generator.preprocessing import DataPrepare
 
 class BatterySeriesGenerator:
     """
@@ -27,9 +27,9 @@ class BatterySeriesGenerator:
     def __init__(self, 
                  tolerance: int = None):
         self.tolerance = tolerance
-        self.train_path = f'./data/battery_demand/tol{self.tolerance}/resample_train.csv'
-        self.full_path = f'./data/battery_demand/tol{self.tolerance}/resample_full.csv'
-        self.battery_dir = f"./data/battery_demand/tol{self.tolerance}/"
+        self.train_path = f'./data/{cfg.BATTERYDEMAND_PATH}/tol{self.tolerance}/resample_train.csv'
+        self.full_path = f'./data/{cfg.BATTERYDEMAND_PATH}/tol{self.tolerance}/resample_full.csv'
+        self.battery_dir = f"./data/{cfg.BATTERYDEMAND_PATH}/tol{self.tolerance}/"
         self.resolution = cfg.RESOLUTION
         if not os.path.exists(self.full_path) or not os.path.exists(self.train_path):
             os.makedirs(os.path.dirname(self.battery_dir), exist_ok=True)
@@ -137,7 +137,7 @@ class BatterySeriesGenerator:
         
         print(f"\n\t\t[INFO] Number of series for clean windows = {np.array(clean_series).shape}")
         print(f"\t\t[INFO] Number of eligible series for Case 2 = {np.array(eligible_chunks).shape}")
-        print(f"\t\t[INFO] Number of seeds ready for Case 3  = {np.array(generation_seed).shape}\n")
+        # print(f"\t\t[INFO] Number of seeds ready for Case 3  = {np.array(generation_seed).shape}\n")
 
         # Helper for saving
         def _save_case(case_id, series_list):
@@ -206,70 +206,70 @@ class BatterySeriesGenerator:
             if os.path.exists(ckpt2_path):
                 os.remove(ckpt2_path)
 
-        # -------------------------------------------------------------------------
-        # Case 3 — extended (with checkpoint, using random seed)
-        # -------------------------------------------------------------------------
-        case3_dir = case_dirs[3]
-        case3_file = os.path.join(case3_dir, "battery_demand.npy")
-        ckpt3_path = os.path.join(case3_dir, "battery_demand_ckpt.npz")
-        tmp3_path  = os.path.join(case3_dir, "battery_demand_ckpt.tmp.npz")
+        # # -------------------------------------------------------------------------
+        # # Case 3 — extended (with checkpoint, using random seed)
+        # # -------------------------------------------------------------------------
+        # case3_dir = case_dirs[3]
+        # case3_file = os.path.join(case3_dir, "battery_demand.npy")
+        # ckpt3_path = os.path.join(case3_dir, "battery_demand_ckpt.npz")
+        # tmp3_path  = os.path.join(case3_dir, "battery_demand_ckpt.tmp.npz")
 
-        if (not rerun) and os.path.exists(case3_file):
-            case3_series = np.load(case3_file)
-            print(f"\t\t[INFO] Case 3 exists — loaded battery demand from '{case3_file}' with shape {case3_series.shape}.")
+        # if (not rerun) and os.path.exists(case3_file):
+        #     case3_series = np.load(case3_file)
+        #     print(f"\t\t[INFO] Case 3 exists — loaded battery demand from '{case3_file}' with shape {case3_series.shape}.")
 
-        else:
-            print(f"\t\t[INFO] Building Case 3 (extended random-seed generation)")
+        # else:
+        #     print(f"\t\t[INFO] Building Case 3 (extended random-seed generation)")
 
-            # Start from Case 2
-            series_case3 = case2_series.tolist()
+        #     # Start from Case 2
+        #     series_case3 = case2_series.tolist()
 
-            # ---- Create random seeds for Case 3 ----
-            generation_seed = np.random.normal(
-                loc=28, scale=10,
-                size=(cfg.N_EXTENDED, window_size)
-            )
+        #     # ---- Create random seeds for Case 3 ----
+        #     generation_seed = np.random.normal(
+        #         loc=28, scale=10,
+        #         size=(cfg.N_EXTENDED, window_size)
+        #     )
 
-            print(f"\t\t[INFO] Case 3 will generate {generation_seed.shape[0]} new series from random seeds")
+        #     print(f"\t\t[INFO] Case 3 will generate {generation_seed.shape[0]} new series from random seeds")
 
-            # ---- Checkpoint restore for case 3 ----
-            start_idx = 0
-            if (not rerun) and os.path.exists(ckpt3_path):
-                print(f"\t\t[INFO] Resuming Case 3 from checkpoint: '{ckpt3_path}'")
-                ckpt = np.load(ckpt3_path, allow_pickle=True)
-                series_case3 = ckpt["series"].tolist()
-                start_idx    = int(ckpt["last_index"])
-                print(f"\t\t[INFO] Case 3 resume index = {start_idx}, current series shape = {np.array(series_case3).shape}")
+        #     # ---- Checkpoint restore for case 3 ----
+        #     start_idx = 0
+        #     if (not rerun) and os.path.exists(ckpt3_path):
+        #         print(f"\t\t[INFO] Resuming Case 3 from checkpoint: '{ckpt3_path}'")
+        #         ckpt = np.load(ckpt3_path, allow_pickle=True)
+        #         series_case3 = ckpt["series"].tolist()
+        #         start_idx    = int(ckpt["last_index"])
+        #         print(f"\t\t[INFO] Case 3 resume index = {start_idx}, current series shape = {np.array(series_case3).shape}")
 
 
-            # ---- Extended generation using random seeds ----
-            for idx in tqdm(range(start_idx, len(generation_seed)),
-                            desc="\t\t[INFO] Case 3 generating from random seeds"):
+        #     # ---- Extended generation using random seeds ----
+        #     for idx in tqdm(range(start_idx, len(generation_seed)),
+        #                     desc="\t\t[INFO] Case 3 generating from random seeds"):
 
-                seed = generation_seed[idx]
+        #         seed = generation_seed[idx]
 
-                sample = self.generate_artificial_battery_data(seed, n_samples)
+        #         sample = self.generate_artificial_battery_data(seed, n_samples)
                 
-                self.plot_series_generator(sample, seed, idx, case_id=3)
+        #         self.plot_series_generator(sample, seed, idx, case_id=3)
 
-                # Append mean sample (consistent with Case 2)
-                series_case3.append([-1] + np.nanmean(sample, axis=0).tolist())
+        #         # Append mean sample (consistent with Case 2)
+        #         series_case3.append([-1] + np.nanmean(sample, axis=0).tolist())
 
-                # Diagnostic plot
-                self.plot_series_generator(sample, seed, idx)
+        #         # Diagnostic plot
+        #         self.plot_series_generator(sample, seed, idx)
 
-                # ---- Save checkpoint ----
-                np.savez_compressed(
-                    tmp3_path,
-                    series=np.array(series_case3, dtype=object),
-                    last_index=idx + 1,
-                )
-                os.replace(tmp3_path, ckpt3_path)
+        #         # ---- Save checkpoint ----
+        #         np.savez_compressed(
+        #             tmp3_path,
+        #             series=np.array(series_case3, dtype=object),
+        #             last_index=idx + 1,
+        #         )
+        #         os.replace(tmp3_path, ckpt3_path)
 
-            # ---- Final save ----
-            case3_series = _save_case(3, series_case3)
-            if os.path.exists(ckpt3_path):
-                os.remove(ckpt3_path)
+        #     # ---- Final save ----
+        #     case3_series = _save_case(3, series_case3)
+        #     if os.path.exists(ckpt3_path):
+        #         os.remove(ckpt3_path)
                 
         # -------------------------------------------------------------------------
         # Case 0 — Test Case
@@ -324,7 +324,7 @@ class BatterySeriesGenerator:
                 # This catches if one of the dates is completely missing from the index
                 print(f"[WARNING] Skipping {day1} or {day2}: Date not found in index.")        
         
-        return {1: case1_series, 2: case2_series, 3: case3_series}
+        return {1: case1_series, 2: case2_series}
     # -------------------------------------------------------------------------
     # 2. Artificial data generation
     # -------------------------------------------------------------------------
@@ -332,12 +332,29 @@ class BatterySeriesGenerator:
         """
         Generate artificial battery data using the time series generator module.
         """
-        generator = tsg.Generator(
-            window_size=len(seq),
-            seed=seq,
-            n_sample=n_samples,
-            tolerance=self.tolerance
+        # generator = tsg.Generator(
+        #     window_size=len(seq),
+        #     seed=seq,
+        #     n_sample=n_samples,
+        #     tolerance=self.tolerance
+        # )
+        
+        dataprep = DataPrepare(
+            window_size=cfg.WINDOW_SIZE,
+            resolution=cfg.RESOLUTION,
+            tolerance=cfg.TOLERANCE_DEFAULT
         )
+
+        # 新的呼叫方式
+        generator = BlockGenerator(
+            seed=seq,          
+            datapreparer=dataprep,     
+            window_size=cfg.WINDOW_SIZE,
+            max_shift=cfg.WINDOW_SIZE,
+            top_k=cfg.TOP_K,
+            random_state=cfg.RANDOM_STATE,
+        )
+        
         return generator.generate()
 
     # -------------------------------------------------------------------------
@@ -463,15 +480,15 @@ class BatterySeriesGenerator:
 
         plt.xlabel("Time Step")
         plt.ylabel("Number of Fully Charged Batteries")
-        plt.xticks(np.arange(0, cfg.WINDOW_SIZE + 1, step=6))
+        plt.xticks(np.arange(0, cfg.WINDOW_SIZE + 1, step=3))
         plt.xlim(0, cfg.WINDOW_SIZE)
         plt.legend()
         plt.tight_layout()
 
         # Save BEFORE showing
         if case_id == 2:
-            plt.savefig(f'./figures/series_generation_case2/{idx}.png', dpi=300)
+            plt.savefig(f'./figures/series_generationV2_case2/{idx}.png', dpi=300)
         elif case_id == 3:
-            plt.savefig(f'./figures/series_generation_case3/{idx}.png', dpi=300)
+            plt.savefig(f'./figures/series_generationV2_case3/{idx}.png', dpi=300)
             
         plt.close()

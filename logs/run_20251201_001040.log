@@ -1,0 +1,73 @@
+nohup: ignoring input
+Crash diagnostics ON
+
+
+==================================================
+PART 1: Data preprocess for 2023-01-01 00:00:00 to 2024-09-30 23:00:00...
+==================================================
+
+	1.1 Preprocessing radiation data...
+		[INFO] Radiation data already exists at './data/timeseries/radiation_data.csv'
+
+	1.2 Preprocessing temperature data...
+		[INFO] Temperature data already exists at './data/timeseries/temperature_data.csv'
+
+	1.3 Preprocessing building data...
+		[INFO] Building data already exists at './data/timeseries/building_data.csv'
+
+	1.4 Preprocessing electricity cost data...
+		[INFO] Electricity cost data already exists at './data/timeseries/electricitycostG2B_data.csv' and './data/timeseries/electricitycostG2V_data.csv'
+
+	1.5 Preprocessing battery demand series data...
+		[INFO] Found existing battery data at './data/battery_demandV2/tol15/resample_full.csv' and './data/battery_demandV2/tol15/resample_train.csv'
+
+		[INFO] Number of series for clean windows = (455, 19)
+		[INFO] Number of eligible series for Case 2 = (1233, 19)
+		[INFO] Case 1 exists — loaded battery demand from './data/battery_demandV2/tol15/case1_real_only/battery_demand.npy' with shape (455, 19).
+		[INFO] Building Case 2 (fill NaN)
+		[INFO] Resuming Case 2 from checkpoint: './data/battery_demandV2/tol15/case2_nan_filled/battery_demand_ckpt.npz'
+		[INFO] Case 2 resume index = 4, current series shape = (459, 19)
+		[INFO] Case 2 generating:   0%|          | 0/1229 [00:00<?, ?it/s]/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/core.py:330: RuntimeWarning: covariance is not symmetric positive-semidefinite.
+  noise = self.rng.multivariate_normal(np.zeros(len(idx_u)), cond_sigma)
+		[INFO] Case 2 generating:   0%|          | 1/1229 [02:52<58:45:08, 172.24s/it]/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/core.py:330: RuntimeWarning: covariance is not symmetric positive-semidefinite.
+  noise = self.rng.multivariate_normal(np.zeros(len(idx_u)), cond_sigma)
+		[INFO] Case 2 generating:   0%|          | 2/1229 [05:48<59:28:45, 174.51s/it]/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/core.py:330: RuntimeWarning: covariance is not symmetric positive-semidefinite.
+  noise = self.rng.multivariate_normal(np.zeros(len(idx_u)), cond_sigma)
+		[INFO] Case 2 generating:   0%|          | 3/1229 [08:45<59:47:32, 175.57s/it]		[INFO] Case 2 generating:   0%|          | 3/1229 [08:51<60:17:57, 177.06s/it]
+Traceback (most recent call last):
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/main.py", line 65, in <module>
+    main()
+    ~~~~^^
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/main.py", line 12, in main
+    data = preprocessor.preprocess()
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/preprocess/preprocessor.py", line 231, in preprocess
+    gen.generate_battery_series(rerun=False)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/preprocess/batterygenerator.py", line 190, in generate_battery_series
+    sample = self.generate_artificial_battery_data(chunk, n_samples)
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/preprocess/batterygenerator.py", line 358, in generate_artificial_battery_data
+    return generator.generate()
+           ~~~~~~~~~~~~~~~~~~^^
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/core.py", line 393, in generate
+    resampled_pool, weights = self.estimator.get_resampled_pool(
+                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self.seed, n_draws=n_sample
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/core.py", line 144, in get_resampled_pool
+    aligned_cand = _best_lag_xcorr(seed, cand, self.max_shift)
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/core.py", line 69, in _best_lag_xcorr
+    if np.std(a) < std_eps or np.std(b) < std_eps:
+       ~~~~~~^^^
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/site-packages/numpy/_core/fromnumeric.py", line 4064, in std
+    return _methods._std(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                         **kwargs)
+                         ^^^^^^^^^
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/site-packages/numpy/_core/_methods.py", line 223, in _std
+    ret = _var(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+               keepdims=keepdims, where=where, mean=mean)
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/site-packages/numpy/_core/_methods.py", line 171, in _var
+    arrmean = umr_sum(arr, axis, dtype, keepdims=True, where=where)
+ValueError: PyCapsule_GetPointer called with invalid PyCapsule object

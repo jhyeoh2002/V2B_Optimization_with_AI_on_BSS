@@ -220,7 +220,7 @@ class BayesianMixtureGenerator:
                 sample = sample + bias
             
             # 2. 種子覆蓋 - 確保已知點精確保留
-            sample[seed_mask] = self.seed[seed_mask]
+            # sample[seed_mask] = self.seed[seed_mask]
             
             # 3. 加權雜訊 (Stochasticity Injection)
             valid_mask = np.isfinite(sample)

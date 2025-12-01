@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from collections import defaultdict
 from typing import List, Optional, Dict
-from . import config as cfg
+import config as cfg
 import os, sys
 
 sys.path.append(os.path.dirname(__file__))
@@ -23,34 +23,11 @@ class DataPrepare:
         remove_dates: List[str] = None     # <–– new parameter
         )  -> pd.Series:
         
-        # # 1. Load data
-        # a_tdf = self._load_series_from_range(a_path_template, a_range)
-        # b_tdf = self._load_series_from_range(b_path_template, b_range)
-        # tdf = pd.concat([a_tdf, b_tdf], axis=1).dropna().sum(axis=1)
-
-        # # 2. Ensure minute-level continuity
-        # full_index = pd.date_range(start=tdf.index.min(), end=tdf.index.max(), freq='1min')
-        # tdf_filled = tdf.reindex(full_index).resample(self.resolution).mean()
-        # tdf_filled.name = 'raw_data'
-
-        # # save_path = "./data/battery_demand/resample_full.csv"
-        # # tdf_filled.to_csv(save_path, index_label='timestamp')
-
-
-        # # 3. Optional filtering before saving
-        # if remove_dates:
-        #     remove_dates = pd.to_datetime(remove_dates)
-        #     tdf_filled = tdf_filled[~tdf_filled.index.normalize().isin(remove_dates)]
-            
-        # print(tdf_filled)
-        
-        # save_path = f"./data/battery_demand/tol{self.tolerance}/resample_train.csv"
-        save_path = f'/home/gary/git_repo/jhern/V2B_Optimization_with_AI_on_BSS/data/battery_demand/tol1/resample_train.csv'
+        save_path = f"./data/{cfg.BATTERYDEMAND_PATH}/tol{self.tolerance}/resample_train.csv"
+        # save_path = f'/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/data/battery_demand/tol1/resample_train.csv'
         tdf_filled = pd.read_csv(save_path, index_col=0, parse_dates=True)
         tdf_filled = tdf_filled["raw_data"]
-    
-        # print(tdf_filled)
-                
+                    
         # 產生子序列並展開為固定長度
         subseqs = self._generate_valid_subsequences(tdf_filled.values)
         all_subseqs = self._expand_all_sequences(subseqs)

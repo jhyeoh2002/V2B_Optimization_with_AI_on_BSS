@@ -1,0 +1,32 @@
+nohup: ignoring input
+Crash diagnostics ON
+
+
+==================================================
+PART 1: Data preprocess for 2023-01-01 00:00:00 to 2024-09-30 23:00:00...
+==================================================
+
+	1.1 Preprocessing radiation data...
+		[INFO] Radiation data already exists at './data/timeseries/radiation_data.csv'
+
+	1.2 Preprocessing temperature data...
+		[INFO] Temperature data already exists at './data/timeseries/temperature_data.csv'
+
+	1.3 Preprocessing building data...
+		[INFO] Building data already exists at './data/timeseries/building_data.csv'
+
+	1.4 Preprocessing electricity cost data...
+		[INFO] Electricity cost data already exists at './data/timeseries/electricitycostG2B_data.csv' and './data/timeseries/electricitycostG2V_data.csv'
+
+	1.5 Preprocessing battery demand series data...
+		[INFO] Found existing battery data at './data/battery_demandV2/tol15/resample_full.csv' and './data/battery_demandV2/tol15/resample_train.csv'
+
+		[INFO] Number of series for clean windows = (455, 19)
+		[INFO] Number of eligible series for Case 2 = (1233, 19)
+		[INFO] Number of seeds ready for Case 3  = (2000, 18)
+
+		[INFO] Case 1 exists — loaded battery demand from './data/battery_demandV2/tol15/case1_real_only/battery_demand.npy' with shape (455, 19).
+		[INFO] Building Case 2 (fill NaN)
+		[INFO] Case 2 generating:   0%|          | 0/1233 [00:00<?, ?it/s]/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/core.py:330: RuntimeWarning: covariance is not symmetric positive-semidefinite.
+  noise = self.rng.multivariate_normal(np.zeros(len(idx_u)), cond_sigma)
+		[INFO] Case 2 generating:   0%|          | 1/1233 [02:40<54:52:17, 160.34s/it]		[INFO] Case 2 generating:   0%|          | 2/1233 [05:35<57:49:49, 169.12s/it]		[INFO] Case 2 generating:   0%|          | 3/1233 [08:33<59:09:03, 173.13s/it]

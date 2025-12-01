@@ -14,7 +14,7 @@ def main():
     print("\n", "="*50,f"PART 2: MILP Optimization...", "="*50, sep="\n")
 
     # Define which cases you want to run
-    cases_to_run = [1,2,3] 
+    cases_to_run = [1,2] 
     
     # Use the tolerance from the command line arguments
     target_tolerance = args.tolerance 
