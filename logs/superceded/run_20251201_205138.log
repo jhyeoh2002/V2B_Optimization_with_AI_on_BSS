@@ -1,0 +1,57 @@
+nohup: ignoring input
+Crash diagnostics ON
+
+
+==================================================
+PART 1: Data preprocess for 2023-01-01 00:00:00 to 2024-09-30 23:00:00...
+==================================================
+
+	1.1 Preprocessing radiation data...
+		[INFO] Radiation data already exists at './data/timeseries/radiation_data.csv'
+
+	1.2 Preprocessing temperature data...
+		[INFO] Temperature data already exists at './data/timeseries/temperature_data.csv'
+
+	1.3 Preprocessing building data...
+		[INFO] Building data already exists at './data/timeseries/building_data.csv'
+
+	1.4 Preprocessing electricity cost data...
+		[INFO] Electricity cost data already exists at './data/timeseries/electricitycostG2B_data.csv' and './data/timeseries/electricitycostG2V_data.csv'
+
+	1.5 Preprocessing battery demand series data...
+		[INFO] Found existing battery data at './data/battery_demand/resample_full.csv' and './data/battery_demand/resample_train.csv'
+
+		[INFO] Number of series for clean windows = (168, 37)
+		[INFO] Number of eligible series for Case 2 = (1395, 37)
+		[INFO] Saved case 1: './data/battery_demand/case1_real_only/battery_demand.npy', shape=(168, 37)
+		[INFO] Building Case 2 (fill NaN)
+		[INFO] Case 2 generating:   0%|          | 0/1395 [00:00<?, ?it/s]		[INFO] Case 2 generating:   0%|          | 1/1395 [00:05<2:12:50,  5.72s/it]		[INFO] Case 2 generating:   0%|          | 2/1395 [00:11<2:09:38,  5.58s/it]		[INFO] Case 2 generating:   0%|          | 3/1395 [00:16<2:07:42,  5.50s/it]		[INFO] Case 2 generating:   0%|          | 4/1395 [00:22<2:06:41,  5.46s/it]		[INFO] Case 2 generating:   0%|          | 5/1395 [00:27<2:06:27,  5.46s/it]		[INFO] Case 2 generating:   0%|          | 6/1395 [00:32<2:06:12,  5.45s/it]		[INFO] Case 2 generating:   1%|          | 7/1395 [00:38<2:05:37,  5.43s/it]		[INFO] Case 2 generating:   1%|          | 8/1395 [00:43<2:05:07,  5.41s/it]		[INFO] Case 2 generating:   1%|          | 9/1395 [00:49<2:04:54,  5.41s/it]		[INFO] Case 2 generating:   1%|          | 10/1395 [00:54<2:04:13,  5.38s/it]		[INFO] Case 2 generating:   1%|          | 11/1395 [00:59<2:04:04,  5.38s/it]		[INFO] Case 2 generating:   1%|          | 12/1395 [01:05<2:04:22,  5.40s/it]		[INFO] Case 2 generating:   1%|          | 13/1395 [01:10<2:04:24,  5.40s/it]		[INFO] Case 2 generating:   1%|          | 14/1395 [01:15<2:03:40,  5.37s/it]		[INFO] Case 2 generating:   1%|          | 15/1395 [01:21<2:03:39,  5.38s/it]		[INFO] Case 2 generating:   1%|          | 16/1395 [01:26<2:03:45,  5.38s/it]		[INFO] Case 2 generating:   1%|          | 17/1395 [01:32<2:03:50,  5.39s/it]		[INFO] Case 2 generating:   1%|▏         | 18/1395 [01:37<2:03:24,  5.38s/it]		[INFO] Case 2 generating:   1%|▏         | 19/1395 [01:42<2:03:14,  5.37s/it]		[INFO] Case 2 generating:   1%|▏         | 20/1395 [01:48<2:03:26,  5.39s/it]		[INFO] Case 2 generating:   2%|▏         | 21/1395 [01:53<2:03:32,  5.39s/it]		[INFO] Case 2 generating:   2%|▏         | 22/1395 [01:58<2:03:01,  5.38s/it]		[INFO] Case 2 generating:   2%|▏         | 23/1395 [02:04<2:03:48,  5.41s/it]		[INFO] Case 2 generating:   2%|▏         | 24/1395 [02:09<2:03:43,  5.41s/it]		[INFO] Case 2 generating:   2%|▏         | 25/1395 [02:15<2:03:02,  5.39s/it]		[INFO] Case 2 generating:   2%|▏         | 26/1395 [02:20<2:02:53,  5.39s/it]		[INFO] Case 2 generating:   2%|▏         | 27/1395 [02:26<2:02:49,  5.39s/it]		[INFO] Case 2 generating:   2%|▏         | 28/1395 [02:31<2:02:47,  5.39s/it]		[INFO] Case 2 generating:   2%|▏         | 29/1395 [02:36<2:02:10,  5.37s/it]		[INFO] Case 2 generating:   2%|▏         | 30/1395 [02:42<2:02:09,  5.37s/it]		[INFO] Case 2 generating:   2%|▏         | 31/1395 [02:47<2:02:12,  5.38s/it]		[INFO] Case 2 generating:   2%|▏         | 32/1395 [02:52<2:02:04,  5.37s/it]		[INFO] Case 2 generating:   2%|▏         | 33/1395 [02:58<2:02:19,  5.39s/it]		[INFO] Case 2 generating:   2%|▏         | 34/1395 [03:03<2:02:07,  5.38s/it]		[INFO] Case 2 generating:   3%|▎         | 35/1395 [03:09<2:02:01,  5.38s/it]		[INFO] Case 2 generating:   3%|▎         | 36/1395 [03:14<2:02:22,  5.40s/it]		[INFO] Case 2 generating:   3%|▎         | 37/1395 [03:19<2:02:07,  5.40s/it]		[INFO] Case 2 generating:   3%|▎         | 38/1395 [03:25<2:02:04,  5.40s/it]		[INFO] Case 2 generating:   3%|▎         | 39/1395 [03:30<2:01:30,  5.38s/it]		[INFO] Case 2 generating:   3%|▎         | 40/1395 [03:35<2:01:19,  5.37s/it]		[INFO] Case 2 generating:   3%|▎         | 41/1395 [03:41<2:01:16,  5.37s/it]		[INFO] Case 2 generating:   3%|▎         | 42/1395 [03:46<2:01:09,  5.37s/it]		[INFO] Case 2 generating:   3%|▎         | 43/1395 [03:52<2:00:45,  5.36s/it]		[INFO] Case 2 generating:   3%|▎         | 44/1395 [03:57<2:00:41,  5.36s/it]		[INFO] Case 2 generating:   3%|▎         | 45/1395 [04:02<2:00:24,  5.35s/it]		[INFO] Case 2 generating:   3%|▎         | 46/1395 [04:08<2:00:29,  5.36s/it]		[INFO] Case 2 generating:   3%|▎         | 47/1395 [04:13<2:00:11,  5.35s/it]		[INFO] Case 2 generating:   3%|▎         | 48/1395 [04:18<2:00:16,  5.36s/it]		[INFO] Case 2 generating:   4%|▎         | 49/1395 [04:24<2:00:26,  5.37s/it]		[INFO] Case 2 generating:   4%|▎         | 50/1395 [04:29<2:00:02,  5.36s/it]		[INFO] Case 2 generating:   4%|▎         | 51/1395 [04:34<1:59:52,  5.35s/it]		[INFO] Case 2 generating:   4%|▎         | 52/1395 [04:40<2:00:05,  5.36s/it]		[INFO] Case 2 generating:   4%|▍         | 53/1395 [04:45<2:00:03,  5.37s/it]		[INFO] Case 2 generating:   4%|▍         | 54/1395 [04:50<1:59:30,  5.35s/it]		[INFO] Case 2 generating:   4%|▍         | 55/1395 [04:56<1:59:23,  5.35s/it]		[INFO] Case 2 generating:   4%|▍         | 56/1395 [05:01<1:59:19,  5.35s/it]		[INFO] Case 2 generating:   4%|▍         | 57/1395 [05:07<1:59:29,  5.36s/it]		[INFO] Case 2 generating:   4%|▍         | 58/1395 [05:12<1:59:12,  5.35s/it]		[INFO] Case 2 generating:   4%|▍         | 59/1395 [05:17<1:59:20,  5.36s/it]		[INFO] Case 2 generating:   4%|▍         | 60/1395 [05:23<1:59:25,  5.37s/it]		[INFO] Case 2 generating:   4%|▍         | 61/1395 [05:28<1:59:02,  5.35s/it]		[INFO] Case 2 generating:   4%|▍         | 62/1395 [05:33<1:59:35,  5.38s/it]		[INFO] Case 2 generating:   5%|▍         | 63/1395 [05:39<1:59:32,  5.38s/it]		[INFO] Case 2 generating:   5%|▍         | 64/1395 [05:44<1:59:36,  5.39s/it]		[INFO] Case 2 generating:   5%|▍         | 65/1395 [05:50<1:59:22,  5.39s/it]		[INFO] Case 2 generating:   5%|▍         | 66/1395 [05:55<1:59:44,  5.41s/it]		[INFO] Case 2 generating:   5%|▍         | 67/1395 [06:00<1:59:33,  5.40s/it]		[INFO] Case 2 generating:   5%|▍         | 68/1395 [06:06<1:58:52,  5.38s/it]		[INFO] Case 2 generating:   5%|▍         | 69/1395 [06:11<1:58:49,  5.38s/it]		[INFO] Case 2 generating:   5%|▌         | 70/1395 [06:16<1:58:45,  5.38s/it]		[INFO] Case 2 generating:   5%|▌         | 71/1395 [06:22<1:58:51,  5.39s/it]		[INFO] Case 2 generating:   5%|▌         | 72/1395 [06:27<1:58:22,  5.37s/it]		[INFO] Case 2 generating:   5%|▌         | 73/1395 [06:33<1:58:18,  5.37s/it]		[INFO] Case 2 generating:   5%|▌         | 74/1395 [06:38<1:58:55,  5.40s/it]		[INFO] Case 2 generating:   5%|▌         | 75/1395 [06:43<1:58:33,  5.39s/it]		[INFO] Case 2 generating:   5%|▌         | 76/1395 [06:49<1:58:46,  5.40s/it]		[INFO] Case 2 generating:   6%|▌         | 77/1395 [06:54<1:58:38,  5.40s/it]		[INFO] Case 2 generating:   6%|▌         | 78/1395 [07:00<1:58:31,  5.40s/it]		[INFO] Case 2 generating:   6%|▌         | 79/1395 [07:05<1:57:58,  5.38s/it]		[INFO] Case 2 generating:   6%|▌         | 80/1395 [07:10<1:58:07,  5.39s/it]		[INFO] Case 2 generating:   6%|▌         | 81/1395 [07:16<1:57:57,  5.39s/it]		[INFO] Case 2 generating:   6%|▌         | 82/1395 [07:21<1:57:21,  5.36s/it]		[INFO] Case 2 generating:   6%|▌         | 83/1395 [07:26<1:57:32,  5.38s/it]		[INFO] Case 2 generating:   6%|▌         | 84/1395 [07:32<1:57:34,  5.38s/it]		[INFO] Case 2 generating:   6%|▌         | 85/1395 [07:37<1:57:35,  5.39s/it]		[INFO] Case 2 generating:   6%|▌         | 86/1395 [07:43<1:57:03,  5.37s/it]		[INFO] Case 2 generating:   6%|▌         | 87/1395 [07:48<1:56:48,  5.36s/it]		[INFO] Case 2 generating:   6%|▋         | 88/1395 [07:53<1:56:56,  5.37s/it]		[INFO] Case 2 generating:   6%|▋         | 88/1395 [07:55<1:57:42,  5.40s/it]
+Traceback (most recent call last):
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/main.py", line 65, in <module>
+    main()
+    ~~~~^^
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/main.py", line 12, in main
+    data = preprocessor.preprocess()
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/preprocess/preprocessor.py", line 231, in preprocess
+    gen.generate_battery_series(rerun=True)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/preprocess/batterygenerator.py", line 190, in generate_battery_series
+    sample = self._generate_artificial_battery_data(chunk, n_samples)[0]
+             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/preprocess/batterygenerator.py", line 349, in _generate_artificial_battery_data
+    generator = BlockGenerator(
+        seed=seq,
+    ...<4 lines>...
+        random_state=cfg.RANDOM_STATE,
+    )
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/core.py", line 577, in __init__
+    grouped = datapreparer.generate_grouped_subsequences()
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/preprocessing.py", line 33, in generate_grouped_subsequences
+    all_subseqs = self._expand_all_sequences(subseqs)
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/preprocessing.py", line 92, in _expand_all_sequences
+    expanded = self._expand_to_all_right_shifts(seq)
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/preprocessing.py", line 83, in _expand_to_all_right_shifts
+    left = np.full(shift, np.nan)
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/site-packages/numpy/_core/numeric.py", line 352, in full
+    a = empty(shape, dtype, order, device=device)
+TypeError: expected a sequence of integers or a single integer, got '<code object full at 0x75582bfcbcb0, file "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/site'

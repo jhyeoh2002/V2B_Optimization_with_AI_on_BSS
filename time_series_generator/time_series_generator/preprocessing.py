@@ -23,7 +23,7 @@ class DataPrepare:
         remove_dates: List[str] = None     # <–– new parameter
         )  -> pd.Series:
         
-        save_path = f"./data/{cfg.BATTERYDEMAND_PATH}/tol{self.tolerance}/resample_train.csv"
+        save_path = f"./data/{cfg.BATTERYDEMAND_PATH}/resample_train.csv"
         # save_path = f'/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/data/battery_demand/tol1/resample_train.csv'
         tdf_filled = pd.read_csv(save_path, index_col=0, parse_dates=True)
         tdf_filled = tdf_filled["raw_data"]

@@ -167,6 +167,9 @@ class BayesianEstimator:
             aligned_candidates[idx] = np.roll(samples_arr[idx], shift=lag, axis=1)
 
         # ---- 4. 根據模式計算機率 ----
+        # selection_mode = selection_mode.lower()
+        
+        # ---- 4. 根據模式計算機率 (Modified for Weighted Top-K) ----
         selection_mode = selection_mode.lower()
 
         if selection_mode == "topk":
@@ -175,18 +178,50 @@ class BayesianEstimator:
 
             probs = np.zeros(N, dtype=float)
             if K > 0:
-                probs[best_indices] = 1.0 / K
-                probs /= np.sum(probs)
-            else:
-                # 萬一 K == 0 就 fallback 成 soft weighting
+                # [修改重點]：原本是均等權重 (1.0/K)，現在改為距離倒數權重
+                # 取出前 K 名的距離
+                top_dists = distances[best_indices]
+                
+                # 避免除以零
                 epsilon = 1e-6
-                weights = 1.0 / (distances ** 2 + epsilon)
+                
+                # 使用 Power Law (冪次律) 來放大差異
+                # power 越大，越極端地偏好第一名
+                # power = 5 是原本 fallback 的設定，已經很強了；若要更強可設 10
+                power = 10
+                
+                weights = 1.0 / (top_dists ** power + epsilon)
+                
+                # 正規化成機率
+                sub_probs = weights / np.sum(weights)
+                
+                # 填回總機率表
+                probs[best_indices] = sub_probs
+                
+            else:
+                # 萬一 K == 0 就 fallback
+                epsilon = 1e-6
+                weights = 1.0 / (distances ** power + epsilon)
                 probs = weights / np.sum(weights)
-        else:
-            # "soft" 模式：距離越小權重越大
-            epsilon = 1e-6
-            weights = 1.0 / (distances ** 2 + epsilon)
-            probs = weights / np.sum(weights)
+                
+        # if selection_mode == "topk":
+        #     K = min(top_k_limit if top_k_limit is not None else self.top_k, N)
+        #     best_indices = np.argsort(distances)[:K]
+
+        #     probs = np.zeros(N, dtype=float)
+        #     if K > 0:
+        #         probs[best_indices] = 1.0 / K
+        #         probs /= np.sum(probs)
+        #     else:
+        #         # 萬一 K == 0 就 fallback 成 soft weighting
+        #         epsilon = 1e-6
+        #         weights = 1.0 / (distances ** 2 + epsilon)
+        #         probs = weights / np.sum(weights)
+        # else:
+        #     # "soft" 模式：距離越小權重越大
+        #     epsilon = 1e-6
+        #     weights = 1.0 / (distances ** 2 + epsilon)
+        #     probs = weights / np.sum(weights)
 
         # ---- 5. 重抽樣 ----
         rng = self.random_state
@@ -422,9 +457,32 @@ class BayesianJointImputer:
                 if (self.Sigma[i, i] == 0.0) or (not np.isfinite(self.Sigma[i, i])):
                     self.Sigma[i, i] = fallback_var
 
-        # 對稱化 + jitter
-        self.Sigma = (self.Sigma + self.Sigma.T) / 2.0
-        self.Sigma += np.eye(self.T) * 1e-4
+        # 對稱化 + 預處理
+        self.Sigma = self._make_psd(self.Sigma, min_variance=1e-4)
+
+    def _make_psd(self, matrix: np.ndarray, min_variance: float = 1e-6) -> np.ndarray:
+        """
+        強制將矩陣轉換為對稱正定矩陣 (Symmetric Positive Definite)。
+        透過特徵值分解，將負的特徵值截斷為 min_variance。
+        """
+        # 1. 強制對稱
+        matrix = (matrix + matrix.T) / 2.0
+        
+        # 2. 特徵值分解 (使用 eigh 針對 Hermitian/Symmetric 矩陣更穩)
+        try:
+            vals, vecs = np.linalg.eigh(matrix)
+            
+            # 3. 修正特徵值：所有小於 min_variance 的值都設為 min_variance
+            vals = np.maximum(vals, min_variance)
+            
+            # 4. 重組矩陣
+            reconstructed = (vecs * vals) @ vecs.T
+            
+            # 5. 再次強制對稱 (消除浮點數誤差)
+            return (reconstructed + reconstructed.T) / 2.0
+        except np.linalg.LinAlgError:
+            # 萬一分解失敗，退回對角矩陣
+            return np.eye(matrix.shape[0]) * min_variance
 
     def impute(self) -> np.ndarray:
         """
@@ -446,32 +504,46 @@ class BayesianJointImputer:
 
             # 如果完全沒有觀測值，就直接整段從 N(mu, Sigma) 抽
             if len(idx_o) == 0:
-                X_filled[i] = self.rng.multivariate_normal(self.mu, self.Sigma)
+                try:
+                    X_filled[i] = self.rng.multivariate_normal(
+                        self.mu, self.Sigma, check_valid='warn'
+                    )
+                except:
+                    X_filled[i] = self.mu
                 continue
 
             mu_o = self.mu[idx_o]
             mu_u = self.mu[idx_u]
 
-            Sigma_oo = self.Sigma[np.ix_(idx_o, idx_o)] + np.eye(len(idx_o)) * 1e-5
+            # 加強穩定性：對角線加上微量噪音
+            Sigma_oo = self.Sigma[np.ix_(idx_o, idx_o)]
+            Sigma_oo = self._make_psd(Sigma_oo, min_variance=1e-5)
+            
             Sigma_uo = self.Sigma[np.ix_(idx_u, idx_o)]
             Sigma_uu = self.Sigma[np.ix_(idx_u, idx_u)]
 
             try:
+                # 使用 solve 求解 gain_T (Sigma_oo^-1 * Sigma_uo^T)
                 gain_T = np.linalg.solve(Sigma_oo, Sigma_uo.T)
+                
                 cond_mu = mu_u + gain_T.T @ (sample[idx_o] - mu_o)
+                
+                # 計算條件共變異數：Sigma_uu - Sigma_uo * Sigma_oo^-1 * Sigma_uo^T
                 cond_sigma = Sigma_uu - gain_T.T @ Sigma_uo.T
 
-                # 對稱 + jitter
-                cond_sigma = (cond_sigma + cond_sigma.T) / 2.0
-                cond_sigma += np.eye(len(idx_u)) * 1e-6
+                # [關鍵修復]：強制清洗 cond_sigma 確保正定
+                cond_sigma = self._make_psd(cond_sigma, min_variance=1e-8)
 
+                # 抽樣
                 noise = self.rng.multivariate_normal(
                     np.zeros(len(idx_u)),
                     cond_sigma,
+                    check_valid='warn' # 允許微小誤差，因為我們已經手動修復過
                 )
                 X_filled[i, idx_u] = cond_mu + noise
-            except np.linalg.LinAlgError:
-                # 失敗就退回 mu_u
+
+            except (np.linalg.LinAlgError, ValueError, RuntimeWarning):
+                # 如果還發生錯誤（極罕見），退回均值填補
                 X_filled[i, idx_u] = mu_u
 
         return X_filled
@@ -552,6 +624,7 @@ class Generator:
         resampled_pool, weights = self.estimator.get_resampled_pool(
             self.seed,
             n_draws=n_sample,
+            selection_mode="topk",
         )
         timings["step1_resample"] = time.perf_counter() - t0
 

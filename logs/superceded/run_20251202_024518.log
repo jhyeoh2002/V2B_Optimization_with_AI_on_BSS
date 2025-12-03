@@ -1,0 +1,51 @@
+nohup: ignoring input
+Crash diagnostics ON
+
+
+==================================================
+PART 1: Data preprocess for 2023-01-01 00:00:00 to 2024-09-30 23:00:00...
+==================================================
+
+	1.1 Preprocessing radiation data...
+		[INFO] Radiation data already exists at './data/timeseries/radiation_data.csv'
+
+	1.2 Preprocessing temperature data...
+		[INFO] Temperature data already exists at './data/timeseries/temperature_data.csv'
+
+	1.3 Preprocessing building data...
+		[INFO] Building data already exists at './data/timeseries/building_data.csv'
+
+	1.4 Preprocessing electricity cost data...
+		[INFO] Electricity cost data already exists at './data/timeseries/electricitycostG2B_data.csv' and './data/timeseries/electricitycostG2V_data.csv'
+
+	1.5 Preprocessing battery demand series data...
+		[INFO] Found existing battery data at './data/battery_demand/resample_full.csv' and './data/battery_demand/resample_train.csv'
+
+		[INFO] Number of series for clean windows = (168, 37)
+		[INFO] Number of eligible series for Case 2 = (1395, 37)
+		[INFO] Case 1 exists — loaded battery demand from './data/battery_demand/case1_real_only/battery_demand.npy' with shape (168, 37).
+		[INFO] Building Case 2 (fill NaN)
+		[INFO] Resuming Case 2 from checkpoint: './data/battery_demand/case2_nan_filled/battery_demand_ckpt.npz'
+		[INFO] Case 2 resume index = 750, current series shape = (918, 37)
+		[INFO] Case 2 generating:   0%|          | 0/645 [00:00<?, ?it/s]		[INFO] Case 2 generating:   0%|          | 1/645 [00:05<1:03:37,  5.93s/it]Fatal Python error: _PyEval_EvalFrameDefault: Executing a cache.
+Python runtime state: initialized
+
+Thread 0x000071389f2ff640 (most recent call first):
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/threading.py", line 363 in wait
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/threading.py", line 659 in wait
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/site-packages/tqdm/_monitor.py", line 60 in run
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/threading.py", line 1043 in _bootstrap_inner
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/threading.py", line 1014 in _bootstrap
+
+Current thread 0x0000713a0459d440 (most recent call first):
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/preprocessing.py", line 83 in _expand_to_all_right_shifts
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/preprocessing.py", line 92 in _expand_all_sequences
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/preprocessing.py", line 33 in generate_grouped_subsequences
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/core.py", line 577 in __init__
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/preprocess/batterygenerator.py", line 349 in _generate_artificial_battery_data
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/preprocess/batterygenerator.py", line 190 in generate_battery_series
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/preprocess/preprocessor.py", line 231 in preprocess
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/main.py", line 12 in main
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/main.py", line 65 in <module>
+
+Extension modules: numpy._core._multiarray_umath, numpy.linalg._umath_linalg, numpy.random._common, numpy.random.bit_generator, numpy.random._bounded_integers, numpy.random._mt19937, numpy.random.mtrand, numpy.random._philox, numpy.random._pcg64, numpy.random._sfc64, numpy.random._generator, pandas._libs.tslibs.ccalendar, pandas._libs.tslibs.np_datetime, pandas._libs.tslibs.dtypes, pandas._libs.tslibs.base, pandas._libs.tslibs.nattype, pandas._libs.tslibs.timezones, pandas._libs.tslibs.fields, pandas._libs.tslibs.timedeltas, pandas._libs.tslibs.tzconversion, pandas._libs.tslibs.timestamps, pandas._libs.properties, pandas._libs.tslibs.offsets, pandas._libs.tslibs.strptime, pandas._libs.tslibs.parsing, pandas._libs.tslibs.conversion, pandas._libs.tslibs.period, pandas._libs.tslibs.vectorized, pandas._libs.ops_dispatch, pandas._libs.missing, pandas._libs.hashtable, pandas._libs.algos, pandas._libs.interval, pandas._libs.lib, pandas._libs.ops, pandas._libs.hashing, pandas._libs.arrays, pandas._libs.tslib, pandas._libs.sparse, pandas._libs.internals, pandas._libs.indexing, pandas._libs.index, pandas._libs.writers, pandas._libs.join, pandas._libs.window.aggregations, pandas._libs.window.indexers, pandas._libs.reshape, pandas._libs.groupby, pandas._libs.json, pandas._libs.parsers, pandas._libs.testing, _cffi_backend, scipy._lib._ccallback_c, scipy.sparse._sparsetools, _csparsetools, scipy.sparse._csparsetools, scipy.linalg._fblas, scipy.linalg._flapack, scipy.linalg.cython_lapack, scipy.linalg._cythonized_array_utils, scipy.linalg._solve_toeplitz, scipy.linalg._decomp_lu_cython, scipy.linalg._matfuncs_sqrtm_triu, scipy.linalg._matfuncs_expm, scipy.linalg._linalg_pythran, scipy.linalg.cython_blas, scipy.linalg._decomp_update, scipy.sparse.linalg._dsolve._superlu, scipy.sparse.linalg._eigen.arpack._arpack, scipy.sparse.linalg._propack._spropack, scipy.sparse.linalg._propack._dpropack, scipy.sparse.linalg._propack._cpropack, scipy.sparse.linalg._propack._zpropack, scipy.sparse.csgraph._tools, scipy.sparse.csgraph._shortest_path, scipy.sparse.csgraph._traversal, scipy.sparse.csgraph._min_spanning_tree, scipy.sparse.csgraph._flow, scipy.sparse.csgraph._matching, scipy.sparse.csgraph._reordering, scipy.spatial._ckdtree, scipy._lib.messagestream, scipy.spatial._qhull, scipy.spatial._voronoi, scipy.spatial._distance_wrap, scipy.spatial._hausdorff, scipy.special._ufuncs_cxx, scipy.special._ufuncs, scipy.special._specfun, scipy.special._comb, scipy.special._ellip_harm_2, scipy.spatial.transform._rotation, scipy.optimize._group_columns, scipy.optimize._trlib._trlib, scipy.optimize._lbfgsb, _moduleTNC, scipy.optimize._moduleTNC, scipy.optimize._cobyla, scipy.optimize._slsqp, scipy.optimize._minpack, scipy.optimize._lsq.givens_elimination, scipy.optimize._zeros, scipy.optimize._cython_nnls, scipy._lib._uarray._uarray, scipy.linalg._decomp_interpolative, scipy.optimize._bglu_dense, scipy.optimize._lsap, scipy.optimize._direct, scipy.integrate._odepack, scipy.integrate._quadpack, scipy.integrate._vode, scipy.integrate._dop, scipy.integrate._lsoda, scipy.interpolate._fitpack, scipy.interpolate._dfitpack, scipy.interpolate._dierckx, scipy.interpolate._ppoly, scipy.interpolate._interpnd, scipy.interpolate._rbfinterp_pythran, scipy.interpolate._rgi_cython, scipy.interpolate._bspl, scipy.special.cython_special, scipy.stats._stats, scipy.stats._sobol, scipy.stats._qmc_cy, scipy.stats._biasedurn, scipy.stats._stats_pythran, scipy.stats._levy_stable.levyst, scipy.stats._ansari_swilk_statistics, scipy.stats._mvn, scipy.stats._rcont.rcont, scipy.ndimage._nd_image, scipy.ndimage._rank_filter_1d, _ni_label, scipy.ndimage._ni_label, PIL._imaging, kiwisolver._cext, gurobipy._util, gurobipy._exception, gurobipy._attrutil, gurobipy._core, gurobipy._batch, gurobipy._matrixapi, gurobipy._helpers, gurobipy._modelutil, gurobipy._model, psutil._psutil_linux, psutil._psutil_posix, torch._C, torch._C._dynamo.autograd_compiler, torch._C._dynamo.eval_frame, torch._C._dynamo.guards, torch._C._dynamo.utils, torch._C._fft, torch._C._linalg, torch._C._nested, torch._C._nn, torch._C._sparse, torch._C._special, sklearn.__check_build._check_build, sklearn.utils._isfinite, sklearn.utils.sparsefuncs_fast, sklearn.utils.murmurhash, sklearn.utils._openmp_helpers, sklearn.metrics.cluster._expected_mutual_info_fast, sklearn.preprocessing._csr_polynomial_expansion, sklearn.preprocessing._target_encoder_fast, sklearn.metrics._dist_metrics, sklearn.metrics._pairwise_distances_reduction._datasets_pair, sklearn.utils._cython_blas, sklearn.metrics._pairwise_distances_reduction._base, sklearn.metrics._pairwise_distances_reduction._middle_term_computer, sklearn.utils._heap, sklearn.utils._sorting, sklearn.metrics._pairwise_distances_reduction._argkmin, sklearn.metrics._pairwise_distances_reduction._argkmin_classmode, sklearn.utils._vector_sentinel, sklearn.metrics._pairwise_distances_reduction._radius_neighbors, sklearn.metrics._pairwise_distances_reduction._radius_neighbors_classmode, sklearn.metrics._pairwise_fast, sklearn.utils._random, PIL._imagingmath (total: 182)

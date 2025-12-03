@@ -1,0 +1,91 @@
+nohup: ignoring input
+Crash diagnostics ON
+
+
+==================================================
+PART 1: Data preprocess for 2023-01-01 00:00:00 to 2024-09-30 23:00:00...
+==================================================
+
+	1.1 Preprocessing radiation data...
+		[INFO] Radiation data already exists at './data/timeseries/radiation_data.csv'
+
+	1.2 Preprocessing temperature data...
+		[INFO] Temperature data already exists at './data/timeseries/temperature_data.csv'
+
+	1.3 Preprocessing building data...
+		[INFO] Building data already exists at './data/timeseries/building_data.csv'
+
+	1.4 Preprocessing electricity cost data...
+		[INFO] Electricity cost data already exists at './data/timeseries/electricitycostG2B_data.csv' and './data/timeseries/electricitycostG2V_data.csv'
+
+	1.5 Preprocessing battery demand series data...
+		[INFO] Found existing battery data at './data/battery_demand/resample_full.csv' and './data/battery_demand/resample_train.csv'
+
+		[INFO] Number of series for clean windows = (168, 37)
+		[INFO] Number of eligible series for Case 2 = (1395, 37)
+		[INFO] Saved case 1: './data/battery_demand/case1_real_only/battery_demand.npy', shape=(168, 37)
+		[INFO] Building Case 2 (fill NaN)
+		[INFO] Case 2 generating:   0%|          | 0/1395 [00:00<?, ?it/s]/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/core.py:503: RuntimeWarning: covariance is not symmetric positive-semidefinite.
+  noise = self.rng.multivariate_normal(
+		[INFO] Case 2 generating:   0%|          | 1/1395 [00:05<2:05:58,  5.42s/it]/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/core.py:503: RuntimeWarning: covariance is not symmetric positive-semidefinite.
+  noise = self.rng.multivariate_normal(
+		[INFO] Case 2 generating:   0%|          | 2/1395 [00:10<2:04:59,  5.38s/it]/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/core.py:503: RuntimeWarning: covariance is not symmetric positive-semidefinite.
+  noise = self.rng.multivariate_normal(
+		[INFO] Case 2 generating:   0%|          | 3/1395 [00:16<2:03:42,  5.33s/it]/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/core.py:503: RuntimeWarning: covariance is not symmetric positive-semidefinite.
+  noise = self.rng.multivariate_normal(
+		[INFO] Case 2 generating:   0%|          | 4/1395 [00:21<2:03:30,  5.33s/it]/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/core.py:503: RuntimeWarning: covariance is not symmetric positive-semidefinite.
+  noise = self.rng.multivariate_normal(
+		[INFO] Case 2 generating:   0%|          | 5/1395 [00:26<2:03:24,  5.33s/it]/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/core.py:503: RuntimeWarning: covariance is not symmetric positive-semidefinite.
+  noise = self.rng.multivariate_normal(
+		[INFO] Case 2 generating:   0%|          | 6/1395 [00:32<2:03:13,  5.32s/it]/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/core.py:503: RuntimeWarning: covariance is not symmetric positive-semidefinite.
+  noise = self.rng.multivariate_normal(
+		[INFO] Case 2 generating:   1%|          | 7/1395 [00:37<2:02:27,  5.29s/it]/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/core.py:503: RuntimeWarning: covariance is not symmetric positive-semidefinite.
+  noise = self.rng.multivariate_normal(
+		[INFO] Case 2 generating:   1%|          | 8/1395 [00:42<2:02:12,  5.29s/it]/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/core.py:503: RuntimeWarning: covariance is not symmetric positive-semidefinite.
+  noise = self.rng.multivariate_normal(
+		[INFO] Case 2 generating:   1%|          | 9/1395 [00:47<2:02:17,  5.29s/it]/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/core.py:503: RuntimeWarning: covariance is not symmetric positive-semidefinite.
+  noise = self.rng.multivariate_normal(
+		[INFO] Case 2 generating:   1%|          | 10/1395 [00:53<2:01:49,  5.28s/it]/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/core.py:503: RuntimeWarning: covariance is not symmetric positive-semidefinite.
+  noise = self.rng.multivariate_normal(
+		[INFO] Case 2 generating:   1%|          | 11/1395 [00:58<2:01:58,  5.29s/it]/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/core.py:503: RuntimeWarning: covariance is not symmetric positive-semidefinite.
+  noise = self.rng.multivariate_normal(
+		[INFO] Case 2 generating:   1%|          | 12/1395 [01:03<2:01:46,  5.28s/it]/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/core.py:503: RuntimeWarning: covariance is not symmetric positive-semidefinite.
+  noise = self.rng.multivariate_normal(
+		[INFO] Case 2 generating:   1%|          | 13/1395 [01:08<2:01:59,  5.30s/it]/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/core.py:503: RuntimeWarning: covariance is not symmetric positive-semidefinite.
+  noise = self.rng.multivariate_normal(
+		[INFO] Case 2 generating:   1%|          | 14/1395 [01:14<2:01:38,  5.28s/it]/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/core.py:503: RuntimeWarning: covariance is not symmetric positive-semidefinite.
+  noise = self.rng.multivariate_normal(
+		[INFO] Case 2 generating:   1%|          | 15/1395 [01:19<2:01:32,  5.28s/it]/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/core.py:503: RuntimeWarning: covariance is not symmetric positive-semidefinite.
+  noise = self.rng.multivariate_normal(
+		[INFO] Case 2 generating:   1%|          | 16/1395 [01:24<2:01:27,  5.28s/it]/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/core.py:503: RuntimeWarning: covariance is not symmetric positive-semidefinite.
+  noise = self.rng.multivariate_normal(
+		[INFO] Case 2 generating:   1%|          | 17/1395 [01:30<2:01:28,  5.29s/it]		[INFO] Case 2 generating:   1%|          | 17/1395 [01:31<2:03:10,  5.36s/it]
+Traceback (most recent call last):
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/main.py", line 65, in <module>
+    main()
+    ~~~~^^
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/main.py", line 12, in main
+    data = preprocessor.preprocess()
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/preprocess/preprocessor.py", line 231, in preprocess
+    gen.generate_battery_series(rerun=True)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/preprocess/batterygenerator.py", line 190, in generate_battery_series
+    sample = self._generate_artificial_battery_data(chunk, n_samples)[0]
+             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/preprocess/batterygenerator.py", line 349, in _generate_artificial_battery_data
+    generator = BlockGenerator(
+        seed=seq,
+    ...<4 lines>...
+        random_state=cfg.RANDOM_STATE,
+    )
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/core.py", line 540, in __init__
+    grouped = datapreparer.generate_grouped_subsequences()
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/preprocessing.py", line 33, in generate_grouped_subsequences
+    all_subseqs = self._expand_all_sequences(subseqs)
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/preprocessing.py", line 92, in _expand_all_sequences
+    expanded = self._expand_to_all_right_shifts(seq)
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/preprocessing.py", line 83, in _expand_to_all_right_shifts
+    left = np.full(shift, np.nan)
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/site-packages/numpy/_core/numeric.py", line 350, in full
+    fill_value = asarray(fill_value)
+SystemError: error return without exception set

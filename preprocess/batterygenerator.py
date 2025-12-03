@@ -27,9 +27,9 @@ class BatterySeriesGenerator:
     def __init__(self, 
                  tolerance: int = None):
         self.tolerance = tolerance
-        self.train_path = f'./data/{cfg.BATTERYDEMAND_PATH}/tol{self.tolerance}/resample_train.csv'
-        self.full_path = f'./data/{cfg.BATTERYDEMAND_PATH}/tol{self.tolerance}/resample_full.csv'
-        self.battery_dir = f"./data/{cfg.BATTERYDEMAND_PATH}/tol{self.tolerance}/"
+        self.train_path = f'{cfg.BATTERYDEMAND_DIR}/resample_train.csv'
+        self.full_path = f'{cfg.BATTERYDEMAND_DIR}/resample_full.csv'
+        self.battery_dir = f"{cfg.BATTERYDEMAND_DIR}/"
         self.resolution = cfg.RESOLUTION
         if not os.path.exists(self.full_path) or not os.path.exists(self.train_path):
             os.makedirs(os.path.dirname(self.battery_dir), exist_ok=True)
@@ -185,13 +185,10 @@ class BatterySeriesGenerator:
             # ---- Generation loop ----
             for idx in tqdm(range(start_idx, len(eligible_chunks)),
                             desc="\t\t[INFO] Case 2 generating"):
-                # i, chunk = eligible_chunks[idx][0], eligible_chunks[idx][1:]
-                i, chunk = eligible_chunks[idx][0], [35.0, np.nan, 35.0, np.nan, 35.0, 24.6, 27.0, 28.0, 23.0, 23.0, 23.666666666666668, 19.0, 27.0, 27.0, 37.0, 30.0, 27.0, 23.0, 25.666666666666668, 30.0, np.nan, 33.0, 34.0, np.nan, np.nan, np.nan, 22.5, 17.5, np.nan, 19.0, 25.0, np.nan, 25.0, 25.0, 25.5, 27.0]
+                i, chunk = eligible_chunks[idx][0], eligible_chunks[idx][1:]
 
                 sample = self._generate_artificial_battery_data(chunk, n_samples)[0]
-                
-                print(sample)
-                
+                                
                 series_case2.append([i] + np.nanmean(sample, axis=0).tolist())
                     
                 self.plot_series_generator(sample, chunk, i, case_id=2)
@@ -480,18 +477,17 @@ class BatterySeriesGenerator:
             label="Generation Seed",
             zorder=10
         )
-
+        
         plt.xlabel("Time Step")
         plt.ylabel("Number of Fully Charged Batteries")
         plt.xticks(np.arange(0, cfg.WINDOW_SIZE + 1, step=3))
         plt.xlim(0, cfg.WINDOW_SIZE)
         plt.legend()
         plt.tight_layout()
+        
+        if not os.path.exists(f'./figures/series_generation/'):
+            os.makedirs(f'./figures/series_generation/')
 
-        # Save BEFORE showing
-        if case_id == 2:
-            plt.savefig(f'./figures/series_generationV2_case2/{idx}.png', dpi=300)
-        elif case_id == 3:
-            plt.savefig(f'./figures/series_generationV2_case3/{idx}.png', dpi=300)
+        plt.savefig(f'./figures/series_generation/{idx}.png', dpi=300)
             
         plt.close()

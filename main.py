@@ -25,12 +25,12 @@ def main():
         # 1. Initialize Allocator for this specific case
         allocator = EnergyAllocator(case_id=case_num, tolerance=target_tolerance)
         
+        # 3. (Optional) Run Immediate Charging Baseline
+        allocator.run_iterations(mode="immediate_charging", rerun=False)
+        
         # 2. Run Optimization
         allocator.run_iterations(mode="optimization", rerun=False)
         
-        # 3. (Optional) Run Immediate Charging Baseline
-        allocator.run_iterations(mode="immediate_charging", rerun=False)
-
         print(f"\t\t[INFO] Case {case_num} completed.")
         
     print("\n", "="*50,"PART 3: Supervised Learning...","="*50, sep="\n")

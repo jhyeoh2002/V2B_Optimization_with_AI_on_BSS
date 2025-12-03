@@ -1,0 +1,7 @@
+nohup: ignoring input
+Allocating 20000 MB of RAM...
+--- CPU Heater Started ---
+Workers: 10
+Target Load: 100%
+Memory Held: 20000 MB
+Press CTRL+C to stop.

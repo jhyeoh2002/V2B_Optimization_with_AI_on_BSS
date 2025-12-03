@@ -1,0 +1,59 @@
+nohup: ignoring input
+Crash diagnostics ON
+
+
+==================================================
+PART 1: Data preprocess for 2023-01-01 00:00:00 to 2024-09-30 23:00:00...
+==================================================
+
+	1.1 Preprocessing radiation data...
+		[INFO] Radiation data already exists at './data/timeseries/radiation_data.csv'
+
+	1.2 Preprocessing temperature data...
+		[INFO] Temperature data already exists at './data/timeseries/temperature_data.csv'
+
+	1.3 Preprocessing building data...
+		[INFO] Building data already exists at './data/timeseries/building_data.csv'
+
+	1.4 Preprocessing electricity cost data...
+		[INFO] Electricity cost data already exists at './data/timeseries/electricitycostG2B_data.csv' and './data/timeseries/electricitycostG2V_data.csv'
+
+	1.5 Preprocessing battery demand series data...
+		[INFO] Found existing battery data at './data/battery_demand/resample_full.csv' and './data/battery_demand/resample_train.csv'
+
+		[INFO] Number of series for clean windows = (168, 37)
+		[INFO] Number of eligible series for Case 2 = (1395, 37)
+		[INFO] Case 1 exists — loaded battery demand from './data/battery_demand/case1_real_only/battery_demand.npy' with shape (168, 37).
+		[INFO] Building Case 2 (fill NaN)
+		[INFO] Resuming Case 2 from checkpoint: './data/battery_demand/case2_nan_filled/battery_demand_ckpt.npz'
+		[INFO] Case 2 resume index = 1013, current series shape = (1181, 37)
+		[INFO] Case 2 generating:   0%|          | 0/382 [00:00<?, ?it/s]		[INFO] Case 2 generating:   0%|          | 1/382 [00:05<34:44,  5.47s/it]		[INFO] Case 2 generating:   1%|          | 2/382 [00:11<35:37,  5.63s/it]		[INFO] Case 2 generating:   1%|          | 3/382 [00:16<34:29,  5.46s/it]		[INFO] Case 2 generating:   1%|          | 4/382 [00:21<34:05,  5.41s/it]		[INFO] Case 2 generating:   1%|▏         | 5/382 [00:27<33:49,  5.38s/it]		[INFO] Case 2 generating:   2%|▏         | 6/382 [00:32<33:38,  5.37s/it]		[INFO] Case 2 generating:   2%|▏         | 7/382 [00:37<33:21,  5.34s/it]		[INFO] Case 2 generating:   2%|▏         | 8/382 [00:43<33:18,  5.34s/it]		[INFO] Case 2 generating:   2%|▏         | 9/382 [00:48<33:14,  5.35s/it]		[INFO] Case 2 generating:   3%|▎         | 10/382 [00:53<32:58,  5.32s/it]		[INFO] Case 2 generating:   3%|▎         | 11/382 [00:58<32:49,  5.31s/it]		[INFO] Case 2 generating:   3%|▎         | 12/382 [01:04<32:51,  5.33s/it]		[INFO] Case 2 generating:   3%|▎         | 13/382 [01:09<32:49,  5.34s/it]		[INFO] Case 2 generating:   4%|▎         | 14/382 [01:14<32:36,  5.32s/it]		[INFO] Case 2 generating:   4%|▍         | 15/382 [01:20<32:30,  5.31s/it]		[INFO] Case 2 generating:   4%|▍         | 16/382 [01:25<32:25,  5.32s/it]		[INFO] Case 2 generating:   4%|▍         | 17/382 [01:30<32:20,  5.32s/it]		[INFO] Case 2 generating:   5%|▍         | 18/382 [01:36<32:09,  5.30s/it]		[INFO] Case 2 generating:   5%|▍         | 19/382 [01:41<32:07,  5.31s/it]		[INFO] Case 2 generating:   5%|▌         | 20/382 [01:46<32:05,  5.32s/it]		[INFO] Case 2 generating:   5%|▌         | 21/382 [01:52<32:02,  5.33s/it]		[INFO] Case 2 generating:   6%|▌         | 22/382 [01:57<31:57,  5.33s/it]		[INFO] Case 2 generating:   6%|▌         | 23/382 [02:02<31:53,  5.33s/it]		[INFO] Case 2 generating:   6%|▋         | 24/382 [02:08<31:40,  5.31s/it]		[INFO] Case 2 generating:   7%|▋         | 25/382 [02:13<31:41,  5.33s/it]		[INFO] Case 2 generating:   7%|▋         | 26/382 [02:18<31:37,  5.33s/it]		[INFO] Case 2 generating:   7%|▋         | 26/382 [02:20<32:01,  5.40s/it]
+Traceback (most recent call last):
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/main.py", line 65, in <module>
+    main()
+    ~~~~^^
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/main.py", line 12, in main
+    data = preprocessor.preprocess()
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/preprocess/preprocessor.py", line 231, in preprocess
+    gen.generate_battery_series(rerun=False)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/preprocess/batterygenerator.py", line 190, in generate_battery_series
+    sample = self._generate_artificial_battery_data(chunk, n_samples)[0]
+             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/preprocess/batterygenerator.py", line 349, in _generate_artificial_battery_data
+    generator = BlockGenerator(
+        seed=seq,
+    ...<4 lines>...
+        random_state=cfg.RANDOM_STATE,
+    )
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/core.py", line 577, in __init__
+    grouped = datapreparer.generate_grouped_subsequences()
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/preprocessing.py", line 33, in generate_grouped_subsequences
+    all_subseqs = self._expand_all_sequences(subseqs)
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/preprocessing.py", line 92, in _expand_all_sequences
+    expanded = self._expand_to_all_right_shifts(seq)
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/time_series_generator/time_series_generator/preprocessing.py", line 83, in _expand_to_all_right_shifts
+    left = np.full(shift, np.nan)
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/site-packages/numpy/_core/numeric.py", line 350, in full
+    fill_value = asarray(fill_value)
+SystemError: error return without exception set

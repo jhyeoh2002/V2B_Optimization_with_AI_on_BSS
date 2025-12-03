@@ -1,0 +1,59 @@
+nohup: ignoring input
+Crash diagnostics ON
+
+
+==================================================
+PART 1: Data preprocess for 2023-01-01 00:00:00 to 2024-09-30 23:00:00...
+==================================================
+
+	1.1 Preprocessing radiation data...
+		[INFO] Radiation data already exists at './data/timeseries/radiation_data.csv'
+
+	1.2 Preprocessing temperature data...
+		[INFO] Temperature data already exists at './data/timeseries/temperature_data.csv'
+
+	1.3 Preprocessing building data...
+		[INFO] Building data already exists at './data/timeseries/building_data.csv'
+
+	1.4 Preprocessing electricity cost data...
+		[INFO] Electricity cost data already exists at './data/timeseries/electricitycostG2B_data.csv' and './data/timeseries/electricitycostG2V_data.csv'
+
+	1.5 Preprocessing battery demand series data...
+		[INFO] Found existing battery data at './data/battery_demand/resample_full.csv' and './data/battery_demand/resample_train.csv'
+
+		[INFO] Number of series for clean windows = (168, 37)
+		[INFO] Number of eligible series for Case 2 = (1395, 37)
+		[INFO] Case 1 exists — loaded battery demand from './data/battery_demand/case1_real_only/battery_demand.npy' with shape (168, 37).
+		[INFO] Building Case 2 (fill NaN)
+		[INFO] Resuming Case 2 from checkpoint: './data/battery_demand/case2_nan_filled/battery_demand_ckpt.npz'
+		[INFO] Case 2 resume index = 1385, current series shape = (1553, 37)
+		[INFO] Case 2 generating:   0%|          | 0/10 [00:00<?, ?it/s]		[INFO] Case 2 generating:  10%|█         | 1/10 [00:05<00:48,  5.44s/it]		[INFO] Case 2 generating:  20%|██        | 2/10 [00:10<00:43,  5.38s/it]		[INFO] Case 2 generating:  30%|███       | 3/10 [00:16<00:37,  5.33s/it]		[INFO] Case 2 generating:  40%|████      | 4/10 [00:21<00:32,  5.38s/it]		[INFO] Case 2 generating:  50%|█████     | 5/10 [00:26<00:26,  5.38s/it]		[INFO] Case 2 generating:  60%|██████    | 6/10 [00:32<00:21,  5.36s/it]		[INFO] Case 2 generating:  70%|███████   | 7/10 [00:37<00:15,  5.33s/it]		[INFO] Case 2 generating:  80%|████████  | 8/10 [00:42<00:10,  5.32s/it]		[INFO] Case 2 generating:  90%|█████████ | 9/10 [00:48<00:05,  5.32s/it]		[INFO] Case 2 generating: 100%|██████████| 10/10 [00:53<00:00,  5.32s/it]		[INFO] Case 2 generating: 100%|██████████| 10/10 [00:53<00:00,  5.34s/it]
+		[INFO] Saved case 2: './data/battery_demand/case2_nan_filled/battery_demand.npy', shape=(1563, 37)
+		[INFO] Case 0: Successfully added test pair 2024-03-15 & 2024-03-16
+		Data: [10536, 28, 30, 35, 37, 37, 36, 33, 26, 10, 6, 10, 14, 19, 18, 15, 20, 26, 15, 9, 16, 21, 20, 8, 12, 15, 24, 31, 35, 32, 35, 34, 32, 31, 30, 22, 14, 18, 27, 18, 19, 19, 25, 25, 25, 26, 27, 17, 19]
+		[INFO] Case 0: Successfully added test pair 2024-03-29 & 2024-03-30
+		Data: [10872, 13, 26, 31, 33, 33, 33, 31, 15, 8, 19, 11, 15, 18, 16, 18, 18, 19, 7, 4, 23, 23, 16, 17, 18, 18, 19, 24, 29, 30, 30, 22, 27, 21, 14, 15, 16, 20, 18, 23, 27, 18, 2, 10, 23, 22, 22, 17, 21]
+
+	1.6 Generating battery schedule...
+		[INFO] Saved availability and details for Case 1 at './data/battery_demand/case1_real_only'
+		[INFO] Saved availability and details for Case 2 at './data/battery_demand/case2_nan_filled'
+[ERROR] Could not load battery demand from './data/battery_demand/case3_extended_generated/battery_demand.npy': [Errno 2] No such file or directory: './data/battery_demand/case3_extended_generated/battery_demand.npy'
+
+
+==================================================
+PART 2: MILP Optimization...
+==================================================
+
+	2.1 Optimizing Case 1...
+Traceback (most recent call last):
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/main.py", line 65, in <module>
+    main()
+    ~~~~^^
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/main.py", line 26, in main
+    allocator = EnergyAllocator(case_id=case_num, tolerance=target_tolerance)
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/MILP/EnergyAllocator.py", line 49, in __init__
+    index, available, SOC_a_v, SOC_d_v, t_a_v, t_d_v = batteryreader.get_battery_details(self.input_case_dir)
+                                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/MILP/batteryreader.py", line 26, in get_battery_details
+    raise FileNotFoundError(f"Could not find data in {case_dir}")
+FileNotFoundError: Could not find data in ./data/battery_demand/tol33/case1_real_only

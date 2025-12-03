@@ -1,0 +1,251 @@
+nohup: ignoring input
+Crash diagnostics ON
+
+
+==================================================
+PART 1: Data preprocess for 2023-01-01 00:00:00 to 2024-09-30 23:00:00...
+==================================================
+
+	1.1 Preprocessing radiation data...
+		[INFO] Radiation data already exists at './data/timeseries/radiation_data.csv'
+
+	1.2 Preprocessing temperature data...
+		[INFO] Temperature data already exists at './data/timeseries/temperature_data.csv'
+
+	1.3 Preprocessing building data...
+		[INFO] Building data already exists at './data/timeseries/building_data.csv'
+
+	1.4 Preprocessing electricity cost data...
+		[INFO] Electricity cost data already exists at './data/timeseries/electricitycostG2B_data.csv' and './data/timeseries/electricitycostG2V_data.csv'
+
+	1.5 Preprocessing battery demand series data...
+		[INFO] Found existing battery data at 'data/battery_demand/resample_full.csv' and 'data/battery_demand/resample_train.csv'
+
+		[INFO] Number of series for clean windows = (168, 37)
+		[INFO] Number of eligible series for Case 2 = (1395, 37)
+		[INFO] Case 1 exists — loaded battery demand from 'data/battery_demand/case1_real_only/battery_demand.npy' with shape (168, 37).
+		[INFO] Case 2 exists — loaded battery demand from 'data/battery_demand/case2_nan_filled/battery_demand.npy' with shape (1563, 37).
+		[INFO] Case 0: Successfully added test pair 2024-03-15 & 2024-03-16
+		Data: [10536, 28, 30, 35, 37, 37, 36, 33, 26, 10, 6, 10, 14, 19, 18, 15, 20, 26, 15, 9, 16, 21, 20, 8, 12, 15, 24, 31, 35, 32, 35, 34, 32, 31, 30, 22, 14, 18, 27, 18, 19, 19, 25, 25, 25, 26, 27, 17, 19]
+		[INFO] Case 0: Successfully added test pair 2024-03-29 & 2024-03-30
+		Data: [10872, 13, 26, 31, 33, 33, 33, 31, 15, 8, 19, 11, 15, 18, 16, 18, 18, 19, 7, 4, 23, 23, 16, 17, 18, 18, 19, 24, 29, 30, 30, 22, 27, 21, 14, 15, 16, 20, 18, 23, 27, 18, 2, 10, 23, 22, 22, 17, 21]
+
+	1.6 Generating battery schedule...
+		[INFO] Case 1 exists — loaded from 'data/battery_demand/case1_real_only/battery_availability.npy' and 'data/battery_demand/case1_real_only/battery_details.npy' shape (168, 385, 36) and (4, 168, 385)
+		[INFO] Case 2 exists — loaded from 'data/battery_demand/case2_nan_filled/battery_availability.npy' and 'data/battery_demand/case2_nan_filled/battery_details.npy' shape (1563, 385, 36) and (4, 1563, 385)
+[ERROR] Could not load battery demand from 'data/battery_demand/case3_extended_generated/battery_demand.npy': [Errno 2] No such file or directory: 'data/battery_demand/case3_extended_generated/battery_demand.npy'
+
+
+==================================================
+PART 2: MILP Optimization...
+==================================================
+
+	2.1 Optimizing Case 1...
+		[INFO] Loaded 168 samples from 'data/battery_demand/case1_real_only'
+		[INFO] Results already exist at './data/optimization_results/case1_real_only/immediate_charging/V2B.npy'. Skipping immediate_charging run.
+		[INFO] Results already exist at './data/optimization_results/case1_real_only/optimization/V2B.npy'. Skipping optimization run.
+Plotting scenario 0/167
+Plotting scenario 1/167
+Plotting scenario 2/167
+Plotting scenario 3/167
+Plotting scenario 4/167
+Plotting scenario 5/167
+Plotting scenario 6/167
+Plotting scenario 7/167
+Plotting scenario 8/167
+Plotting scenario 9/167
+Plotting scenario 10/167
+Plotting scenario 11/167
+Plotting scenario 12/167
+Plotting scenario 13/167
+Plotting scenario 14/167
+Plotting scenario 15/167
+Plotting scenario 16/167
+Plotting scenario 17/167
+Plotting scenario 18/167
+Plotting scenario 19/167
+Plotting scenario 20/167
+Plotting scenario 21/167
+Plotting scenario 22/167
+Plotting scenario 23/167
+Plotting scenario 24/167
+Plotting scenario 25/167
+Plotting scenario 26/167
+Plotting scenario 27/167
+Plotting scenario 28/167
+Plotting scenario 29/167
+Plotting scenario 30/167
+Plotting scenario 31/167
+Plotting scenario 32/167
+Plotting scenario 33/167
+Plotting scenario 34/167
+Plotting scenario 35/167
+Plotting scenario 36/167
+Plotting scenario 37/167
+Plotting scenario 38/167
+Plotting scenario 39/167
+Plotting scenario 40/167
+Plotting scenario 41/167
+Plotting scenario 42/167
+Plotting scenario 43/167
+Plotting scenario 44/167
+Plotting scenario 45/167
+Plotting scenario 46/167
+Plotting scenario 47/167
+Plotting scenario 48/167
+Plotting scenario 49/167
+Plotting scenario 50/167
+Plotting scenario 51/167
+Plotting scenario 52/167
+Plotting scenario 53/167
+Plotting scenario 54/167
+Plotting scenario 55/167
+Plotting scenario 56/167
+Plotting scenario 57/167
+Plotting scenario 58/167
+Plotting scenario 59/167
+Plotting scenario 60/167
+Plotting scenario 61/167
+Plotting scenario 62/167
+Plotting scenario 63/167
+Plotting scenario 64/167
+Plotting scenario 65/167
+Plotting scenario 66/167
+Plotting scenario 67/167
+Plotting scenario 68/167
+Plotting scenario 69/167
+Plotting scenario 70/167
+Plotting scenario 71/167
+Plotting scenario 72/167
+Plotting scenario 73/167
+Plotting scenario 74/167
+Plotting scenario 75/167
+Plotting scenario 76/167
+Plotting scenario 77/167
+Plotting scenario 78/167
+Plotting scenario 79/167
+Plotting scenario 80/167
+Plotting scenario 81/167
+Plotting scenario 82/167
+Plotting scenario 83/167
+Plotting scenario 84/167
+Plotting scenario 85/167
+Plotting scenario 86/167
+Plotting scenario 87/167
+Plotting scenario 88/167
+Plotting scenario 89/167
+Plotting scenario 90/167
+Plotting scenario 91/167
+Plotting scenario 92/167
+Plotting scenario 93/167
+Plotting scenario 94/167
+Plotting scenario 95/167
+Plotting scenario 96/167
+Plotting scenario 97/167
+Plotting scenario 98/167
+Plotting scenario 99/167
+Plotting scenario 100/167
+Plotting scenario 101/167
+Plotting scenario 102/167
+Plotting scenario 103/167
+Plotting scenario 104/167
+Plotting scenario 105/167
+Plotting scenario 106/167
+Plotting scenario 107/167
+Plotting scenario 108/167
+Plotting scenario 109/167
+Plotting scenario 110/167
+Plotting scenario 111/167
+Plotting scenario 112/167
+Plotting scenario 113/167
+Plotting scenario 114/167
+Plotting scenario 115/167
+Plotting scenario 116/167
+Plotting scenario 117/167
+Plotting scenario 118/167
+Plotting scenario 119/167
+Plotting scenario 120/167
+Plotting scenario 121/167
+Plotting scenario 122/167
+Plotting scenario 123/167
+Plotting scenario 124/167
+Plotting scenario 125/167
+Plotting scenario 126/167
+Plotting scenario 127/167
+Plotting scenario 128/167
+Plotting scenario 129/167
+Plotting scenario 130/167
+Plotting scenario 131/167
+Plotting scenario 132/167
+Plotting scenario 133/167
+Plotting scenario 134/167
+Plotting scenario 135/167
+Plotting scenario 136/167
+Plotting scenario 137/167
+Plotting scenario 138/167
+Plotting scenario 139/167
+Plotting scenario 140/167
+Plotting scenario 141/167
+Plotting scenario 142/167
+Plotting scenario 143/167
+Plotting scenario 144/167
+Plotting scenario 145/167
+Plotting scenario 146/167
+Plotting scenario 147/167
+Plotting scenario 148/167
+Plotting scenario 149/167
+Plotting scenario 150/167
+Plotting scenario 151/167
+Plotting scenario 152/167
+Plotting scenario 153/167
+Plotting scenario 154/167
+Plotting scenario 155/167
+Plotting scenario 156/167
+Plotting scenario 157/167
+Plotting scenario 158/167
+Plotting scenario 159/167
+Plotting scenario 160/167
+Plotting scenario 161/167
+Plotting scenario 162/167
+Plotting scenario 163/167
+Plotting scenario 164/167
+Plotting scenario 165/167
+Plotting scenario 166/167
+Plotting scenario 167/167
+Plotting scenario 0/167
+Plotting scenario 1/167
+Plotting scenario 2/167
+Plotting scenario 3/167
+Plotting scenario 4/167
+Plotting scenario 5/167
+Plotting scenario 6/167
+Plotting scenario 7/167
+Plotting scenario 8/167
+Plotting scenario 9/167
+Plotting scenario 10/167
+Plotting scenario 11/167
+Plotting scenario 12/167
+Plotting scenario 13/167
+Plotting scenario 14/167
+Plotting scenario 15/167
+Plotting scenario 16/167
+Plotting scenario 17/167
+Plotting scenario 18/167
+Plotting scenario 19/167
+Plotting scenario 20/167
+Plotting scenario 21/167
+Plotting scenario 22/167
+Plotting scenario 23/167
+Plotting scenario 24/167
+Plotting scenario 25/167
+Plotting scenario 26/167
+Plotting scenario 27/167
+Plotting scenario 28/167
+Plotting scenario 29/167
+Plotting scenario 30/167
+Plotting scenario 31/167
+Plotting scenario 32/167
+Plotting scenario 33/167
+Plotting scenario 34/167
+Plotting scenario 35/167
+Plotting scenario 36/167

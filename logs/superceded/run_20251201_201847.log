@@ -1,0 +1,28 @@
+nohup: ignoring input
+Crash diagnostics ON
+
+
+==================================================
+PART 1: Data preprocess for 2023-01-01 00:00:00 to 2024-09-30 23:00:00...
+==================================================
+
+	1.1 Preprocessing radiation data...
+		[INFO] Radiation data already exists at './data/timeseries/radiation_data.csv'
+
+	1.2 Preprocessing temperature data...
+		[INFO] Temperature data already exists at './data/timeseries/temperature_data.csv'
+
+	1.3 Preprocessing building data...
+		[INFO] Building data already exists at './data/timeseries/building_data.csv'
+
+	1.4 Preprocessing electricity cost data...
+		[INFO] Electricity cost data already exists at './data/timeseries/electricitycostG2B_data.csv' and './data/timeseries/electricitycostG2V_data.csv'
+
+	1.5 Preprocessing battery demand series data...
+		[INFO] Found existing battery data at './data/battery_demand/resample_full.csv' and './data/battery_demand/resample_train.csv'
+
+		[INFO] Number of series for clean windows = (229, 31)
+		[INFO] Number of eligible series for Case 2 = (1390, 31)
+		[INFO] Saved case 1: './data/battery_demand/case1_real_only/battery_demand.npy', shape=(229, 31)
+		[INFO] Building Case 2 (fill NaN)
+		[INFO] Case 2 generating:   0%|          | 0/1390 [00:00<?, ?it/s]		[INFO] Case 2 generating:   0%|          | 1/1390 [00:03<1:26:01,  3.72s/it]		[INFO] Case 2 generating:   0%|          | 2/1390 [00:07<1:25:07,  3.68s/it]		[INFO] Case 2 generating:   0%|          | 3/1390 [00:11<1:24:51,  3.67s/it]		[INFO] Case 2 generating:   0%|          | 4/1390 [00:14<1:24:30,  3.66s/it]

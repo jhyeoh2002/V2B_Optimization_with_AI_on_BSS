@@ -17,7 +17,7 @@ CASE1 = "case1_real_only"
 CASE2 = "case2_nan_filled"
 CASE3 = "case3_extended_generated"
 
-BATTERYDEMAND_PATH = "battery_demandV2"
+BATTERYDEMAND_DIR = "data/battery_demand"
 
 # ==============================================================================
 # 2. File Paths
@@ -30,7 +30,7 @@ B_PATH_TEMPLATE = './data/raw/Gogoro/台北市大安區_臺大二活停車場站
 # 3. System Specifications (Physical)
 # ==============================================================================
 # --- Battery Specs ---
-BATTERY_CAPACITY = 1.5      # kWh
+BATTERY_CAPACITY = 1.7      # kWh
 BATTERY_COST = 9071         # $/kWh
 BATTERY_CYCLE_LIFE = 2020   # cycles
 
@@ -62,22 +62,22 @@ RANDOM_STATE = 42
 # --- Active Seed Configuration ---
 SEED = None
 WINDOW_SIZE = 36 # Used for general windowing
+TOLERANCE_DEFAULT = 33      # General tolerance (up to 1/3 of window)
 
 # ==============================================================================
 # 5. Optimization & Sampling Parameters
 # ==============================================================================
 WINDOW_LENGTH = WINDOW_SIZE  # hours
-BANDWIDTH = 0.001
-TOP_K = 200
+BANDWIDTH = 0.1
+TOP_K = 1000
 
 # --- Sampling ---
-BOOTSTRAP_SIZE = 1
-NSAMPLE = 100
-# N_EXTENDED = 2000
-MAX_SHIFT = 24
+BOOTSTRAP_SIZE = 50
+NSAMPLE = 500
+N_EXTENDED = 2000
+MAX_SHIFT = 1
 
 # --- Tolerances ---
-TOLERANCE_DEFAULT = 15      # General tolerance (up to 1/3 of window)
 
 # ==============================================================================
 # 6. Output Naming Configuration

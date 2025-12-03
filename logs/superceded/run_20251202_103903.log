@@ -1,0 +1,52 @@
+nohup: ignoring input
+Crash diagnostics ON
+
+
+==================================================
+PART 1: Data preprocess for 2023-01-01 00:00:00 to 2024-09-30 23:00:00...
+==================================================
+
+	1.1 Preprocessing radiation data...
+		[INFO] Radiation data already exists at './data/timeseries/radiation_data.csv'
+
+	1.2 Preprocessing temperature data...
+		[INFO] Temperature data already exists at './data/timeseries/temperature_data.csv'
+
+	1.3 Preprocessing building data...
+		[INFO] Building data already exists at './data/timeseries/building_data.csv'
+
+	1.4 Preprocessing electricity cost data...
+		[INFO] Electricity cost data already exists at './data/timeseries/electricitycostG2B_data.csv' and './data/timeseries/electricitycostG2V_data.csv'
+
+	1.5 Preprocessing battery demand series data...
+		[INFO] Found existing battery data at 'data/battery_demand/resample_full.csv' and 'data/battery_demand/resample_train.csv'
+
+		[INFO] Number of series for clean windows = (168, 37)
+		[INFO] Number of eligible series for Case 2 = (1395, 37)
+		[INFO] Case 1 exists — loaded battery demand from 'data/battery_demand/case1_real_only/battery_demand.npy' with shape (168, 37).
+		[INFO] Case 2 exists — loaded battery demand from 'data/battery_demand/case2_nan_filled/battery_demand.npy' with shape (1563, 37).
+		[INFO] Case 0: Successfully added test pair 2024-03-15 & 2024-03-16
+		Data: [10536, 28, 30, 35, 37, 37, 36, 33, 26, 10, 6, 10, 14, 19, 18, 15, 20, 26, 15, 9, 16, 21, 20, 8, 12, 15, 24, 31, 35, 32, 35, 34, 32, 31, 30, 22, 14, 18, 27, 18, 19, 19, 25, 25, 25, 26, 27, 17, 19]
+		[INFO] Case 0: Successfully added test pair 2024-03-29 & 2024-03-30
+		Data: [10872, 13, 26, 31, 33, 33, 33, 31, 15, 8, 19, 11, 15, 18, 16, 18, 18, 19, 7, 4, 23, 23, 16, 17, 18, 18, 19, 24, 29, 30, 30, 22, 27, 21, 14, 15, 16, 20, 18, 23, 27, 18, 2, 10, 23, 22, 22, 17, 21]
+
+	1.6 Generating battery schedule...
+		[INFO] Case 1 exists — loaded from 'data/battery_demand/case1_real_only/battery_availability.npy' and 'data/battery_demand/case1_real_only/battery_details.npy' shape (168, 385, 36) and (4, 168, 385)
+		[INFO] Case 2 exists — loaded from 'data/battery_demand/case2_nan_filled/battery_availability.npy' and 'data/battery_demand/case2_nan_filled/battery_details.npy' shape (1563, 385, 36) and (4, 1563, 385)
+[ERROR] Could not load battery demand from 'data/battery_demand/case3_extended_generated/battery_demand.npy': [Errno 2] No such file or directory: 'data/battery_demand/case3_extended_generated/battery_demand.npy'
+
+
+==================================================
+PART 2: MILP Optimization...
+==================================================
+
+	2.1 Optimizing Case 1...
+		[INFO] Loaded 168 samples from 'data/battery_demand/case1_real_only'
+		[INFO] Results already exist at './data/optimization_results/case1_real_only/immediate_charging/V2B.npy'. Skipping immediate_charging run.
+		[INFO] Results already exist at './data/optimization_results/case1_real_only/optimization/V2B.npy'. Skipping optimization run.
+		[INFO] Case 1 completed.
+
+	2.2 Optimizing Case 2...
+		[INFO] Loaded 1563 samples from 'data/battery_demand/case2_nan_filled'
+		[INFO] Starting fresh run: mode=immediate_charging
+		[INFO] Processing immediate_charging series:   0%|                   | 0/1563 [00:00<?, ?series/s]		[INFO] Processing immediate_charging series:   1%|         | 20/1563 [00:00<00:09, 161.52series/s]		[INFO] Processing immediate_charging series:   2%|▏        | 37/1563 [00:00<00:09, 160.12series/s]		[INFO] Processing immediate_charging series:   3%|▎        | 54/1563 [00:00<00:12, 124.71series/s]		[INFO] Processing immediate_charging series:   4%|▍        | 68/1563 [00:00<00:12, 118.86series/s]		[INFO] Processing immediate_charging series:   5%|▌         | 81/1563 [00:00<00:16, 89.46series/s]		[INFO] Processing immediate_charging series:   6%|▌         | 91/1563 [00:00<00:17, 82.41series/s]		[INFO] Processing immediate_charging series:   6%|▌        | 100/1563 [00:01<00:19, 74.83series/s]		[INFO] Processing immediate_charging series:   7%|▋        | 110/1563 [00:01<00:20, 69.65series/s]		[INFO] Processing immediate_charging series:   8%|▋        | 120/1563 [00:01<00:22, 64.40series/s]		[INFO] Processing immediate_charging series:   8%|▋        | 130/1563 [00:01<00:23, 59.93series/s]		[INFO] Processing immediate_charging series:   9%|▊        | 140/1563 [00:01<00:25, 55.87series/s]		[INFO] Processing immediate_charging series:  10%|▊        | 150/1563 [00:02<00:27, 52.32series/s]		[INFO] Processing immediate_charging series:  10%|▉        | 160/1563 [00:02<00:28, 49.57series/s]		[INFO] Processing immediate_charging series:  11%|▉        | 170/1563 [00:02<00:29, 47.18series/s]		[INFO] Processing immediate_charging series:  12%|█        | 180/1563 [00:02<00:30, 45.01series/s]		[INFO] Processing immediate_charging series:  12%|█        | 190/1563 [00:03<00:31, 42.99series/s]		[INFO] Processing immediate_charging series:  13%|█▏       | 200/1563 [00:03<00:33, 41.22series/s]		[INFO] Processing immediate_charging series:  13%|█▏       | 210/1563 [00:03<00:34, 39.24series/s]		[INFO] Processing immediate_charging series:  14%|█▎       | 220/1563 [00:03<00:35, 37.51series/s]		[INFO] Processing immediate_charging series:  15%|█▎       | 230/1563 [00:04<00:37, 35.94series/s]		[INFO] Processing immediate_charging series:  15%|█▍       | 240/1563 [00:04<00:38, 34.81series/s]		[INFO] Processing immediate_charging series:  16%|█▍       | 250/1563 [00:04<00:39, 33.40series/s]		[INFO] Processing immediate_charging series:  17%|█▍       | 260/1563 [00:05<00:40, 32.25series/s]		[INFO] Processing immediate_charging series:  17%|█▌       | 270/1563 [00:05<00:41, 31.14series/s]		[INFO] Processing immediate_charging series:  18%|█▌       | 280/1563 [00:05<00:42, 30.09series/s]		[INFO] Processing immediate_charging series:  19%|█▋       | 290/1563 [00:06<00:43, 29.20series/s]		[INFO] Processing immediate_charging series:  19%|█▋       | 300/1563 [00:06<00:44, 28.43series/s]		[INFO] Processing immediate_charging series:  20%|█▊       | 310/1563 [00:06<00:45, 27.60series/s]		[INFO] Processing immediate_charging series:  20%|█▊       | 320/1563 [00:07<00:46, 26.73series/s]		[INFO] Processing immediate_charging series:  21%|█▉       | 330/1563 [00:07<00:47, 26.04series/s]		[INFO] Processing immediate_charging series:  22%|█▉       | 340/1563 [00:08<00:48, 25.33series/s]		[INFO] Processing immediate_charging series:  22%|██       | 350/1563 [00:08<00:49, 24.64series/s]		[INFO] Processing immediate_charging series:  23%|██       | 360/1563 [00:09<00:50, 23.92series/s]		[INFO] Processing immediate_charging series:  24%|██▏      | 370/1563 [00:09<00:51, 23.37series/s]		[INFO] Processing immediate_charging series:  24%|██▏      | 380/1563 [00:09<00:51, 22.79series/s]		[INFO] Processing immediate_charging series:  25%|██▏      | 390/1563 [00:10<00:52, 22.23series/s]		[INFO] Processing immediate_charging series:  26%|██▎      | 400/1563 [00:10<00:53, 21.71series/s]		[INFO] Processing immediate_charging series:  26%|██▎      | 410/1563 [00:11<00:54, 21.19series/s]		[INFO] Processing immediate_charging series:  27%|██▍      | 420/1563 [00:11<00:55, 20.57series/s]		[INFO] Processing immediate_charging series:  28%|██▍      | 430/1563 [00:12<00:56, 20.12series/s]		[INFO] Processing immediate_charging series:  28%|██▌      | 440/1563 [00:13<00:57, 19.62series/s]		[INFO] Processing immediate_charging series:  29%|██▌      | 450/1563 [00:13<00:58, 19.15series/s]		[INFO] Processing immediate_charging series:  29%|██▋      | 460/1563 [00:14<00:58, 18.75series/s]		[INFO] Processing immediate_charging series:  30%|██▋      | 470/1563 [00:14<00:59, 18.45series/s]		[INFO] Processing immediate_charging series:  31%|██▊      | 480/1563 [00:15<00:59, 18.11series/s]		[INFO] Processing immediate_charging series:  31%|██▊      | 490/1563 [00:15<01:00, 17.81series/s]		[INFO] Processing immediate_charging series:  32%|██▉      | 500/1563 [00:16<01:00, 17.50series/s]		[INFO] Processing immediate_charging series:  33%|██▉      | 510/1563 [00:17<01:01, 17.08series/s]		[INFO] Processing immediate_charging series:  33%|██▉      | 520/1563 [00:17<01:02, 16.82series/s]		[INFO] Processing immediate_charging series:  34%|███      | 530/1563 [00:18<01:02, 16.48series/s]
