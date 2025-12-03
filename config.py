@@ -18,7 +18,8 @@ CASE2 = "case2_nan_filled"
 CASE3 = "case3_extended_generated"
 
 BATTERYDEMAND_DIR = "data/battery_demand"
-
+BATTERY_FILE = f"{BATTERYDEMAND_DIR}/resample_full.csv"
+TS_DIR = "data/timeseries"
 # ==============================================================================
 # 2. DATA GENERATION PARAMETERS
 # ==============================================================================
@@ -79,3 +80,53 @@ PROJECT_DETAIL = f"Test"
 PROJECT_NAME = f'WL{WINDOW_LENGTH}_PV{PV_AREA}_{PROJECT_DETAIL}'
 
 # ==============================================================================
+
+import torch
+import os
+
+# ==========================================
+# SYSTEM & HARDWARE
+# ==========================================
+SEED = 42
+NUM_WORKERS = 2
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+# ==========================================
+# DATA PROCESSING
+# ==========================================
+WINDOW_SIZE = 48         # Total window size for optimization logic
+SEQUENCE_LENGTH = 24     # The lookback period for the model
+TOLERANCE = 4            # Tolerance for data merging logic
+
+# Paths
+BASE_OPT_FOLDER = "./data/optimization_results"
+TRAIN_RESULTS_DIR = "./data/training_results"
+TRAIN_FIGURE_DIR = "./figures/training_results"
+
+# ==========================================
+# TRAINING HYPERPARAMETERS
+# ==========================================
+RUN_NAME = f"STAFV4"
+
+EPOCHS = 5000
+BATCH_SIZE = 128
+LEARNING_RATE = 1e-3
+WEIGHT_DECAY = 1e-3
+
+# Learning Rate Scheduler
+GAMMA = 0.75             # Factor to reduce LR by
+LR_PATIENCE = 25         # Epochs to wait before reducing LR
+
+# Early Stopping
+ES_PATIENCE = 150        # Epochs to wait before stopping completely
+
+# ==========================================
+# MODEL ARCHITECTURE
+# ==========================================
+EMBEDDING_DIM = 16
+NUM_EMBEDDINGS = 15000   # Initial guess, updated dynamically in training
+N_HEADS = 4
+# Recommended (Smoother funnel)
+HIDDEN_DIM_1 = 256  # Reduced from 1024
+HIDDEN_DIM_2 = 64  # Reduced from 256
+DROPOUT = 0.5

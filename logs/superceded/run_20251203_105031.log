@@ -1,0 +1,88 @@
+nohup: ignoring input
+Crash diagnostics ON
+
+
+==================================================
+PART 1: Data preprocess for 2023-01-01 00:00:00 to 2024-09-30 23:00:00...
+==================================================
+
+	1.1 Preprocessing radiation data...
+		[INFO] Radiation data already exists at './data/timeseries/radiation_data.csv'
+
+	1.2 Preprocessing temperature data...
+		[INFO] Temperature data already exists at './data/timeseries/temperature_data.csv'
+
+	1.3 Preprocessing building data...
+		[INFO] Building data already exists at './data/timeseries/building_data.csv'
+
+	1.4 Preprocessing electricity cost data...
+		[INFO] Electricity cost data already exists at './data/timeseries/electricitycostG2B_data.csv' and './data/timeseries/electricitycostG2V_data.csv'
+
+	1.5 Preprocessing battery demand series data...
+		[INFO] Found existing battery data at 'data/battery_demand/resample_full.csv' and 'data/battery_demand/resample_train.csv'
+
+		[INFO] Number of series for clean windows = (168, 37)
+		[INFO] Number of eligible series for Case 2 = (1395, 37)
+		[INFO] Case 1 exists — loaded battery demand from 'data/battery_demand/case1_real_only/battery_demand.npy' with shape (168, 37).
+		[INFO] Case 2 exists — loaded battery demand from 'data/battery_demand/case2_nan_filled/battery_demand.npy' with shape (1563, 37).
+		[INFO] Case 0: Successfully added test pair 2024-03-15 & 2024-03-16
+		Data: [10536, 28, 30, 35, 37, 37, 36, 33, 26, 10, 6, 10, 14, 19, 18, 15, 20, 26, 15, 9, 16, 21, 20, 8, 12, 15, 24, 31, 35, 32, 35, 34, 32, 31, 30, 22, 14, 18, 27, 18, 19, 19, 25, 25, 25, 26, 27, 17, 19]
+		[INFO] Case 0: Successfully added test pair 2024-03-29 & 2024-03-30
+		Data: [10872, 13, 26, 31, 33, 33, 33, 31, 15, 8, 19, 11, 15, 18, 16, 18, 18, 19, 7, 4, 23, 23, 16, 17, 18, 18, 19, 24, 29, 30, 30, 22, 27, 21, 14, 15, 16, 20, 18, 23, 27, 18, 2, 10, 23, 22, 22, 17, 21]
+
+	1.6 Generating battery schedule...
+		[INFO] Case 1 exists — loaded from 'data/battery_demand/case1_real_only/battery_availability.npy' and 'data/battery_demand/case1_real_only/battery_details.npy' shape (168, 385, 36) and (4, 168, 385)
+		[INFO] Case 2 exists — loaded from 'data/battery_demand/case2_nan_filled/battery_availability.npy' and 'data/battery_demand/case2_nan_filled/battery_details.npy' shape (1563, 385, 36) and (4, 1563, 385)
+[ERROR] Could not load battery demand from 'data/battery_demand/case3_extended_generated/battery_demand.npy': [Errno 2] No such file or directory: 'data/battery_demand/case3_extended_generated/battery_demand.npy'
+
+
+==================================================
+PART 2: MILP Optimization...
+==================================================
+
+	2.1 Optimizing Case 1...
+		[INFO] Loaded 168 samples from 'data/battery_demand/case1_real_only'
+		[INFO] Results already exist at './data/optimization_results/case1_real_only/immediate_charging/V2B.npy'. Skipping immediate_charging run.
+		[INFO] Results already exist at './data/optimization_results/case1_real_only/optimization/V2B.npy'. Skipping optimization run.
+		[INFO] Case 1 completed.
+
+	2.2 Optimizing Case 2...
+		[INFO] Loaded 1563 samples from 'data/battery_demand/case2_nan_filled'
+		[INFO] Results already exist at './data/optimization_results/case2_nan_filled/immediate_charging/V2B.npy'. Skipping immediate_charging run.
+		[INFO] Results already exist at './data/optimization_results/case2_nan_filled/optimization/V2B.npy'. Skipping optimization run.
+		[INFO] Case 2 completed.
+
+
+==================================================
+PART 3: Supervised Learning...
+==================================================
+
+	3.1 Training Case 1...
+		=== Training Log Started: 2025-12-03 10:50:32.842956 ===
+		Run Name: STAFV2_33_CASE1
+		Device: cuda
+		Epochs: 1000, Batch Size: 4, LR: 0.05
+		============================================================
+Traceback (most recent call last):
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/main.py", line 65, in <module>
+    main()
+    ~~~~^^
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/main.py", line 42, in main
+    train(case_id=case_num, tolerance=target_tolerance)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/supervised_learning/training.py", line 137, in train
+    merge_and_process(
+    ~~~~~~~~~~~~~~~~~^
+        sequence_length=24,
+        ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        case_id=case_id
+        ^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/supervised_learning/dataloader/preprocess.py", line 24, in merge_and_process
+    battery_demand = np.load( f"{case_demand_dir}/battery_demand.npy")
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/site-packages/numpy/lib/_npyio_impl.py", line 451, in load
+    fid = stack.enter_context(open(os.fspath(file), "rb"))
+                              ~~~~^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: './data/battery_demand/tol33/case1_real_only/battery_demand.npy'

@@ -3,6 +3,7 @@ from preprocess.preprocessor import DataPreprocessor
 from MILP.EnergyAllocator import EnergyAllocator
 from supervised_learning.training import train
 import config as cfg
+from testcase.testcase import test_pipeline
 
 def main():
     print("\n", "="*50,f"PART 1: Data preprocess for {cfg.START_DATE} to {cfg.END_DATE}...", "="*50, sep="\n")
@@ -39,8 +40,17 @@ def main():
     for case_num in cases_to_run:
         print(f"\n\t3.{case_num} Training Case {case_num}...")
 
-        train(case_id=case_num, tolerance=target_tolerance)
+        train(case_id=case_num, tolerance=target_tolerance, run_name= cfg.RUN_NAME+f"_CASE{case_num}")
     
+        print(f"\t\t[INFO] Case {case_num} completed.")
+        
+    print("\n", "="*50,"PART 4: Testing...","="*50, sep="\n")
+
+    for case_num in cases_to_run:
+
+        print(f"\n\t4.{case_num} Testing Case {case_num}...")
+
+        test_pipeline(case_id=case_num, tolerance=target_tolerance, run_name= cfg.RUN_NAME+f"_CASE{case_num}")
     
         print(f"\t\t[INFO] Case {case_num} completed.")
 

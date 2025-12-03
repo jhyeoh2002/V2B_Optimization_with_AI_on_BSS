@@ -9,8 +9,8 @@ from typing import List
 
 import matplotlib.pyplot as plt
 
-from time_series_generator.time_series_generator.core import Generator as BlockGenerator
-from time_series_generator.time_series_generator.preprocessing import DataPrepare
+from time_series_generator.core import Generator as BlockGenerator
+from time_series_generator.preprocessing import DataPrepare
 
 class BatterySeriesGenerator:
     """

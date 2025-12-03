@@ -1,0 +1,120 @@
+nohup: ignoring input
+Crash diagnostics ON
+
+
+==================================================
+PART 1: Data preprocess for 2023-01-01 00:00:00 to 2024-09-30 23:00:00...
+==================================================
+
+	1.1 Preprocessing radiation data...
+		[INFO] Radiation data already exists at './data/timeseries/radiation_data.csv'
+
+	1.2 Preprocessing temperature data...
+		[INFO] Temperature data already exists at './data/timeseries/temperature_data.csv'
+
+	1.3 Preprocessing building data...
+		[INFO] Building data already exists at './data/timeseries/building_data.csv'
+
+	1.4 Preprocessing electricity cost data...
+		[INFO] Electricity cost data already exists at './data/timeseries/electricitycostG2B_data.csv' and './data/timeseries/electricitycostG2V_data.csv'
+
+	1.5 Preprocessing battery demand series data...
+		[INFO] Found existing battery data at 'data/battery_demand/resample_full.csv' and 'data/battery_demand/resample_train.csv'
+
+		[INFO] Number of series for clean windows = (110, 49)
+		[INFO] Number of eligible series for Case 2 = (1373, 49)
+		[INFO] Case 1 exists — loaded battery demand from 'data/battery_demand/case1_real_only/battery_demand.npy' with shape (168, 37).
+		[INFO] Case 2 exists — loaded battery demand from 'data/battery_demand/case2_nan_filled/battery_demand.npy' with shape (1563, 37).
+		[INFO] Case 0: Successfully added test pair 2024-03-15 & 2024-03-16
+		Data: [10536, 28, 30, 35, 37, 37, 36, 33, 26, 10, 6, 10, 14, 19, 18, 15, 20, 26, 15, 9, 16, 21, 20, 8, 12, 15, 24, 31, 35, 32, 35, 34, 32, 31, 30, 22, 14, 18, 27, 18, 19, 19, 25, 25, 25, 26, 27, 17, 19]
+		[INFO] Case 0: Successfully added test pair 2024-03-29 & 2024-03-30
+		Data: [10872, 13, 26, 31, 33, 33, 33, 31, 15, 8, 19, 11, 15, 18, 16, 18, 18, 19, 7, 4, 23, 23, 16, 17, 18, 18, 19, 24, 29, 30, 30, 22, 27, 21, 14, 15, 16, 20, 18, 23, 27, 18, 2, 10, 23, 22, 22, 17, 21]
+
+	1.6 Generating battery schedule...
+		[INFO] Case 1 exists — loaded from 'data/battery_demand/case1_real_only/battery_availability.npy' and 'data/battery_demand/case1_real_only/battery_details.npy' shape (168, 385, 36) and (4, 168, 385)
+		[INFO] Case 2 exists — loaded from 'data/battery_demand/case2_nan_filled/battery_availability.npy' and 'data/battery_demand/case2_nan_filled/battery_details.npy' shape (1563, 385, 36) and (4, 1563, 385)
+[ERROR] Could not load battery demand from 'data/battery_demand/case3_extended_generated/battery_demand.npy': [Errno 2] No such file or directory: 'data/battery_demand/case3_extended_generated/battery_demand.npy'
+
+
+==================================================
+PART 2: MILP Optimization...
+==================================================
+
+	2.1 Optimizing Case 1...
+		[INFO] Loaded 168 samples from 'data/battery_demand/case1_real_only'
+		[INFO] Results already exist at './data/optimization_results/case1_real_only/immediate_charging/V2B.npy'. Skipping immediate_charging run.
+		[INFO] Results already exist at './data/optimization_results/case1_real_only/optimization/V2B.npy'. Skipping optimization run.
+		[INFO] Case 1 completed.
+
+	2.2 Optimizing Case 2...
+		[INFO] Loaded 1563 samples from 'data/battery_demand/case2_nan_filled'
+		[INFO] Results already exist at './data/optimization_results/case2_nan_filled/immediate_charging/V2B.npy'. Skipping immediate_charging run.
+		[INFO] Results already exist at './data/optimization_results/case2_nan_filled/optimization/V2B.npy'. Skipping optimization run.
+		[INFO] Case 2 completed.
+
+
+==================================================
+PART 3: Supervised Learning...
+==================================================
+
+	3.1 Training Case 1...
+
+=== Starting Training Run: STAFV3_CASE1 ===
+Device: cuda
+		[INFO] Starting Preprocessing for Case 1...
+		[INFO] Unique quantized indices: 6686
+		[INFO] Suggested num_embeddings: 8023
+		[INFO] Generating sliding windows...
+		[INFO] Saved dataset: ./data/training_results/merged_dataset_STAFV3_CASE1.csv (Shape: (2016, 201))
+		[INFO] Saved metadata: ./data/training_results/feature_info_STAFV3_CASE1.json
+	[Model Config] Detected Dims: {'static': 4, 'series_count': 5, 'seq_len': 24, 'vehicle': 76, 'emb_vocab': 8023}
+		[INFO] Data loaded. Train: 1612, Val: 404
+		[INFO] Fitting new scalers on training data...
+
+Epoch |   LR   | Trn RMSE | Val RMSE | Trn R2 | Val R2 | Stop
+-----------------------------------------------------------------
+    1 | 0.0500 |   8.7780 |  33.5201 | -0.809 | -18.198 | 0/250
+    2 | 0.0500 |   5.4985 |   9.3658 |  0.323 | -0.519 | 0/250
+    3 | 0.0500 |   4.7772 |   4.9250 |  0.507 |  0.584 | 0/250
+    4 | 0.0500 |   4.3576 |   4.6412 |  0.575 |  0.630 | 0/250
+    5 | 0.0500 |   4.1664 |   4.5689 |  0.623 |  0.644 | 0/250
+    6 | 0.0500 |   4.0524 |   4.4410 |  0.647 |  0.668 | 0/250
+    7 | 0.0500 |   4.0589 |   4.4996 |  0.637 |  0.655 | 0/250
+    8 | 0.0500 |   3.9564 |   4.3728 |  0.650 |  0.674 | 1/250
+    9 | 0.0500 |   3.8783 |   4.3227 |  0.669 |  0.680 | 0/250
+   10 | 0.0500 |   3.8642 |   4.2527 |  0.666 |  0.690 | 0/250
+   11 | 0.0500 |   3.7495 |   4.3144 |  0.689 |  0.682 | 0/250
+   12 | 0.0500 |   3.7049 |   4.1864 |  0.696 |  0.701 | 1/250
+   13 | 0.0500 |   3.6369 |   4.0452 |  0.695 |  0.717 | 0/250
+   14 | 0.0500 |   3.6358 |   4.1747 |  0.702 |  0.699 | 0/250
+   15 | 0.0500 |   3.5799 |   4.1576 |  0.715 |  0.702 | 1/250
+   16 | 0.0500 |   3.5676 |   4.1168 |  0.716 |  0.708 | 2/250
+   17 | 0.0500 |   3.6076 |   4.1218 |  0.722 |  0.709 | 3/250
+   18 | 0.0500 |   3.5794 |   4.1056 |  0.718 |  0.709 | 4/250
+   19 | 0.0500 |   3.4298 |   4.0316 |  0.726 |  0.720 | 5/250
+   20 | 0.0500 |   3.5134 |   4.1189 |  0.727 |  0.709 | 0/250
+   21 | 0.0500 |   3.5288 |   4.0832 |  0.739 |  0.715 | 1/250
+   22 | 0.0500 |   3.5050 |   4.1484 |  0.731 |  0.705 | 2/250
+   23 | 0.0500 |   3.6192 |   4.0344 |  0.729 |  0.720 | 3/250
+   24 | 0.0500 |   3.4857 |   4.0607 |  0.739 |  0.719 | 4/250
+   25 | 0.0500 |   3.3661 |   4.1215 |  0.746 |  0.709 | 5/250
+   26 | 0.0500 |   3.3721 |   4.0495 |  0.749 |  0.718 | 6/250
+   27 | 0.0500 |   3.3866 |   3.9526 |  0.747 |  0.731 | 7/250
+   28 | 0.0500 |   3.3394 |   4.0196 |  0.758 |  0.722 | 0/250
+   29 | 0.0500 |   3.2429 |   3.9717 |  0.764 |  0.728 | 1/250
+Traceback (most recent call last):
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/multiprocessing/resource_sharer.py", line 138, in _serve
+    with self._listener.accept() as conn:
+         ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/multiprocessing/connection.py", line 483, in accept
+    answer_challenge(c, self._authkey)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/multiprocessing/connection.py", line 962, in answer_challenge
+    response = connection.recv_bytes(256)        # reject large message
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/multiprocessing/connection.py", line 216, in recv_bytes
+    buf = self._recv_bytes(maxlength)
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/multiprocessing/connection.py", line 430, in _recv_bytes
+    buf = self._recv(4)
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/multiprocessing/connection.py", line 395, in _recv
+    chunk = read(handle, remaining)
+ConnectionResetError: [Errno 104] Connection reset by peer

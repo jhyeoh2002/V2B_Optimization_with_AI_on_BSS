@@ -1,0 +1,54 @@
+nohup: ignoring input
+Crash diagnostics ON
+
+
+==================================================
+PART 1: Data preprocess for 2023-01-01 00:00:00 to 2024-09-30 23:00:00...
+==================================================
+
+	1.1 Preprocessing radiation data...
+		[INFO] Radiation data already exists at './data/timeseries/radiation_data.csv'
+
+	1.2 Preprocessing temperature data...
+		[INFO] Temperature data already exists at './data/timeseries/temperature_data.csv'
+
+	1.3 Preprocessing building data...
+		[INFO] Building data already exists at './data/timeseries/building_data.csv'
+
+	1.4 Preprocessing electricity cost data...
+		[INFO] Electricity cost data already exists at './data/timeseries/electricitycostG2B_data.csv' and './data/timeseries/electricitycostG2V_data.csv'
+
+	1.5 Preprocessing battery demand series data...
+		[INFO] Found existing battery data at 'data/battery_demand/resample_full.csv' and 'data/battery_demand/resample_train.csv'
+
+		[INFO] Number of series for clean windows = (168, 37)
+		[INFO] Number of eligible series for Case 2 = (1395, 37)
+		[INFO] Case 1 exists — loaded battery demand from 'data/battery_demand/case1_real_only/battery_demand.npy' with shape (168, 37).
+		[INFO] Case 2 exists — loaded battery demand from 'data/battery_demand/case2_nan_filled/battery_demand.npy' with shape (1563, 37).
+		[INFO] Case 0: Successfully added test pair 2024-03-15 & 2024-03-16
+		Data: [10536, 28, 30, 35, 37, 37, 36, 33, 26, 10, 6, 10, 14, 19, 18, 15, 20, 26, 15, 9, 16, 21, 20, 8, 12, 15, 24, 31, 35, 32, 35, 34, 32, 31, 30, 22, 14, 18, 27, 18, 19, 19, 25, 25, 25, 26, 27, 17, 19]
+		[INFO] Case 0: Successfully added test pair 2024-03-29 & 2024-03-30
+		Data: [10872, 13, 26, 31, 33, 33, 33, 31, 15, 8, 19, 11, 15, 18, 16, 18, 18, 19, 7, 4, 23, 23, 16, 17, 18, 18, 19, 24, 29, 30, 30, 22, 27, 21, 14, 15, 16, 20, 18, 23, 27, 18, 2, 10, 23, 22, 22, 17, 21]
+
+	1.6 Generating battery schedule...
+		[INFO] Case 1 exists — loaded from 'data/battery_demand/case1_real_only/battery_availability.npy' and 'data/battery_demand/case1_real_only/battery_details.npy' shape (168, 385, 36) and (4, 168, 385)
+		[INFO] Case 2 exists — loaded from 'data/battery_demand/case2_nan_filled/battery_availability.npy' and 'data/battery_demand/case2_nan_filled/battery_details.npy' shape (1563, 385, 36) and (4, 1563, 385)
+[ERROR] Could not load battery demand from 'data/battery_demand/case3_extended_generated/battery_demand.npy': [Errno 2] No such file or directory: 'data/battery_demand/case3_extended_generated/battery_demand.npy'
+
+
+==================================================
+PART 2: MILP Optimization...
+==================================================
+
+	2.1 Optimizing Case 1...
+		[INFO] Loaded 168 samples from 'data/battery_demand/case1_real_only'
+		[INFO] Results already exist at './data/optimization_results/case1_real_only/immediate_charging/V2B.npy'. Skipping immediate_charging run.
+		[INFO] Results already exist at './data/optimization_results/case1_real_only/optimization/V2B.npy'. Skipping optimization run.
+		[INFO] Case 1 completed.
+
+	2.2 Optimizing Case 2...
+		[INFO] Loaded 1563 samples from 'data/battery_demand/case2_nan_filled'
+		[INFO] Results already exist at './data/optimization_results/case2_nan_filled/immediate_charging/V2B.npy'. Skipping immediate_charging run.
+		[INFO] Found checkpoint: './data/optimization_results/case2_nan_filled/optimization_checkpoint.npz'
+		[INFO] Resuming from iteration 90
+		[INFO] Processing optimization series:   0%|                         | 0/1473 [00:00<?, ?series/s]		[INFO] Processing optimization series:   0%|                 | 1/1473 [00:00<17:12,  1.43series/s]		[INFO] Processing optimization series:   0%|                 | 2/1473 [00:01<16:22,  1.50series/s]		[INFO] Processing optimization series:   0%|                 | 3/1473 [00:02<16:36,  1.48series/s]		[INFO] Processing optimization series:   0%|                 | 4/1473 [00:02<16:00,  1.53series/s]		[INFO] Processing optimization series:   0%|                 | 5/1473 [00:03<15:42,  1.56series/s]		[INFO] Processing optimization series:   0%|                 | 6/1473 [00:04<16:43,  1.46series/s]		[INFO] Processing optimization series:   0%|                 | 7/1473 [00:04<16:53,  1.45series/s]		[INFO] Processing optimization series:   1%|                 | 8/1473 [00:05<16:18,  1.50series/s]		[INFO] Processing optimization series:   1%|                 | 9/1473 [00:06<16:25,  1.49series/s]		[INFO] Processing optimization series:   1%|                | 10/1473 [00:06<17:09,  1.42series/s]		[INFO] Processing optimization series:   1%|                | 11/1473 [00:07<16:20,  1.49series/s]		[INFO] Processing optimization series:   1%|▏               | 12/1473 [00:08<16:16,  1.50series/s]		[INFO] Processing optimization series:   1%|▏               | 13/1473 [00:08<15:39,  1.55series/s]		[INFO] Processing optimization series:   1%|▏               | 14/1473 [00:09<15:09,  1.60series/s]		[INFO] Processing optimization series:   1%|▏               | 15/1473 [00:09<15:17,  1.59series/s]		[INFO] Processing optimization series:   1%|▏               | 16/1473 [00:10<14:58,  1.62series/s]		[INFO] Processing optimization series:   1%|▏               | 17/1473 [00:11<14:40,  1.65series/s]
