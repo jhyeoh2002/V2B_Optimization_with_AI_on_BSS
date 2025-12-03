@@ -1,5 +1,4 @@
 import sys
-from tabnanny import check
 import numpy as np
 import os
 
@@ -20,7 +19,7 @@ class EnergyAllocator:
         Initialize the EnergyAllocator for a specific Case ID.
         """
         self.proj_name = cfg.PROJECT_NAME
-        self.win_len = cfg.WINDOW_LENGTH
+        self.win_len = cfg.WINDOW_LENGTH if case_id != 0 else 48
         self.tolerance = tolerance
         self.case_id = case_id
         
@@ -28,6 +27,7 @@ class EnergyAllocator:
         # 1. Define Input Directory (Where data comes from)
         base_data_dir = f"{cfg.BATTERYDEMAND_DIR}/"
         case_map = {
+            0: "case0_test",
             1: "case1_real_only",
             2: "case2_nan_filled",
             3: "case3_extended_generated"
@@ -147,7 +147,7 @@ class EnergyAllocator:
             # print("-"*60)
 
             if mode == "optimization":
-                optimizer = GurobiOptimizer()
+                optimizer = GurobiOptimizer(CASE_ID=self.case_id)
                 result = optimizer.optimize(
                     availability=availability_current,
                     t_dep=t_d_v_current,
@@ -159,7 +159,7 @@ class EnergyAllocator:
                     pv=pv_current
                 )
             elif mode == "immediate_charging":
-                allocator = ImmediateCharging()
+                allocator = ImmediateCharging(case_id=self.case_id)
                 result = allocator.allocate(
                     availability=availability_current,
                     t_dep=t_d_v_current,
@@ -238,6 +238,8 @@ class EnergyAllocator:
         """
         output_dir = os.path.join(self.output_dir, mode)
         os.makedirs(output_dir, exist_ok=True)
+        
+        print((f"\t\t[INFO] Saving results for key: {key} to {output_dir} with shape {value.shape}"))
 
         np.save(os.path.join(output_dir, f"{key}.npy"), np.array(value))
             

@@ -15,7 +15,7 @@ def main():
     print("\n", "="*50,f"PART 2: MILP Optimization...", "="*50, sep="\n")
 
     # Define which cases you want to run
-    cases_to_run = [1,2] 
+    cases_to_run = [0, 1, 2] 
     
     # Use the tolerance from the command line arguments
     target_tolerance = args.tolerance 
@@ -36,8 +36,9 @@ def main():
         
     print("\n", "="*50,"PART 3: Supervised Learning...","="*50, sep="\n")
     
+    cases_to_train = [1, 2]
     
-    for case_num in cases_to_run:
+    for case_num in cases_to_train:
         print(f"\n\t3.{case_num} Training Case {case_num}...")
 
         train(case_id=case_num, tolerance=target_tolerance, run_name= cfg.RUN_NAME+f"_CASE{case_num}")
@@ -45,8 +46,8 @@ def main():
         print(f"\t\t[INFO] Case {case_num} completed.")
         
     print("\n", "="*50,"PART 4: Testing...","="*50, sep="\n")
-
-    for case_num in cases_to_run:
+    
+    for case_num in cases_to_train:
 
         print(f"\n\t4.{case_num} Testing Case {case_num}...")
 

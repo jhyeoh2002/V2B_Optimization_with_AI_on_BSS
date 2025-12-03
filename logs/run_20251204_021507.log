@@ -1,0 +1,167 @@
+nohup: ignoring input
+Crash diagnostics ON
+
+
+==================================================
+PART 1: Data preprocess for 2023-01-01 00:00:00 to 2024-09-30 23:00:00...
+==================================================
+
+	1.1 Preprocessing radiation data...
+		[INFO] Radiation data already exists at './data/timeseries/radiation_data.csv'
+
+	1.2 Preprocessing temperature data...
+		[INFO] Temperature data already exists at './data/timeseries/temperature_data.csv'
+
+	1.3 Preprocessing building data...
+		[INFO] Building data already exists at './data/timeseries/building_data.csv'
+
+	1.4 Preprocessing electricity cost data...
+		[INFO] Electricity cost data already exists at './data/timeseries/electricitycostG2B_data.csv' and './data/timeseries/electricitycostG2V_data.csv'
+
+	1.5 Preprocessing battery demand series data...
+		[INFO] Found existing battery data at 'data/battery_demand/resample_full.csv' and 'data/battery_demand/resample_train.csv'
+
+		[INFO] Number of series for clean windows = (110, 49)
+		[INFO] Number of eligible series for Case 2 = (1373, 49)
+		[INFO] Case 1 exists — loaded battery demand from 'data/battery_demand/case1_real_only/battery_demand.npy' with shape (168, 37).
+		[INFO] Case 2 exists — loaded battery demand from 'data/battery_demand/case2_nan_filled/battery_demand.npy' with shape (1563, 37).
+		[INFO] Case 0 exists — loaded battery demand from 'data/battery_demand/case0_test/battery_demand.npy' with shape (2, 49).
+
+	1.6 Generating battery schedule...
+		[INFO] Case 0 exists — loaded from 'data/battery_demand/case0_test/battery_availability.npy' and 'data/battery_demand/case0_test/battery_details.npy' shape (2, 468, 48) and (4, 2, 468)
+		[INFO] Case 1 exists — loaded from 'data/battery_demand/case1_real_only/battery_availability.npy' and 'data/battery_demand/case1_real_only/battery_details.npy' shape (168, 385, 36) and (4, 168, 385)
+		[INFO] Case 2 exists — loaded from 'data/battery_demand/case2_nan_filled/battery_availability.npy' and 'data/battery_demand/case2_nan_filled/battery_details.npy' shape (1563, 385, 36) and (4, 1563, 385)
+		[ERROR] Could not load battery demand from 'data/battery_demand/case3_extended_generated/battery_demand.npy': [Errno 2] No such file or directory: 'data/battery_demand/case3_extended_generated/battery_demand.npy'
+
+
+==================================================
+PART 2: MILP Optimization...
+==================================================
+
+	2.0 Optimizing Case 0...
+		[INFO] Loaded 2 samples from 'data/battery_demand/case0_test'
+		[INFO] Starting fresh run: mode=immediate_charging
+		[INFO] Processing immediate_charging series:   0%|                      | 0/2 [00:00<?, ?series/s]		[INFO] Processing immediate_charging series: 100%|█████████████| 2/2 [00:00<00:00, 104.64series/s]
+		[INFO] Saving grid_demand results...
+		[INFO] Saving results for key: grid_demand to ./data/optimization_results/case0_test/immediate_charging with shape (2, 48)
+		[INFO] Saving pv_loss results...
+		[INFO] Saving results for key: pv_loss to ./data/optimization_results/case0_test/immediate_charging with shape (2, 48)
+		[INFO] Saving initial_demand results...
+		[INFO] Saving results for key: initial_demand to ./data/optimization_results/case0_test/immediate_charging with shape (2, 48)
+		[INFO] Saving charging_demand results...
+		[INFO] Saving results for key: charging_demand to ./data/optimization_results/case0_test/immediate_charging with shape (2, 48)
+		[INFO] Saving G2B results...
+		[INFO] Saving results for key: G2B to ./data/optimization_results/case0_test/immediate_charging with shape (2, 48)
+		[INFO] Saving P2B results...
+		[INFO] Saving results for key: P2B to ./data/optimization_results/case0_test/immediate_charging with shape (2, 48)
+		[INFO] Saving G2V results...
+		[INFO] Saving results for key: G2V to ./data/optimization_results/case0_test/immediate_charging with shape (2, 48, 468)
+		[INFO] Saving P2V results...
+		[INFO] Saving results for key: P2V to ./data/optimization_results/case0_test/immediate_charging with shape (2, 48, 468)
+		[INFO] Saving V2B results...
+		[INFO] Saving results for key: V2B to ./data/optimization_results/case0_test/immediate_charging with shape (2, 48, 468)
+		[INFO] Saving SOC results...
+		[INFO] Saving results for key: SOC to ./data/optimization_results/case0_test/immediate_charging with shape (2, 48, 468)
+		[INFO] Saving unmet results...
+		[INFO] Saving results for key: unmet to ./data/optimization_results/case0_test/immediate_charging with shape (2, 468)
+		[INFO] Saving objective_value results...
+		[INFO] Saving results for key: objective_value to ./data/optimization_results/case0_test/immediate_charging with shape (2,)
+		[INFO] Saving optimization_time_s results...
+		[INFO] Saving results for key: optimization_time_s to ./data/optimization_results/case0_test/immediate_charging with shape (2,)
+		[INFO] Saving mip_gap_percent results...
+		[INFO] Saving results for key: mip_gap_percent to ./data/optimization_results/case0_test/immediate_charging with shape (2,)
+		[INFO] Saving total_cost results...
+		[INFO] Saving results for key: total_cost to ./data/optimization_results/case0_test/immediate_charging with shape (2,)
+		[INFO] Saving self_sufficiency results...
+		[INFO] Saving results for key: self_sufficiency to ./data/optimization_results/case0_test/immediate_charging with shape (2,)
+		[INFO] Saving pv_utilization results...
+		[INFO] Saving results for key: pv_utilization to ./data/optimization_results/case0_test/immediate_charging with shape (2,)
+		[INFO] Deleted checkpoint after full completion.
+		[INFO] Starting fresh run: mode=optimization
+		[INFO] Processing optimization series:   0%|                            | 0/2 [00:00<?, ?series/s]		[INFO] Processing optimization series:  50%|██████████          | 1/2 [00:01<00:01,  1.13s/series]		[INFO] Processing optimization series: 100%|████████████████████| 2/2 [00:02<00:00,  1.15s/series]		[INFO] Processing optimization series: 100%|████████████████████| 2/2 [00:02<00:00,  1.15s/series]
+		[INFO] Saving grid_demand results...
+		[INFO] Saving results for key: grid_demand to ./data/optimization_results/case0_test/optimization with shape (2, 48)
+		[INFO] Saving pv_loss results...
+		[INFO] Saving results for key: pv_loss to ./data/optimization_results/case0_test/optimization with shape (2, 48)
+		[INFO] Saving initial_demand results...
+		[INFO] Saving results for key: initial_demand to ./data/optimization_results/case0_test/optimization with shape (2, 48)
+		[INFO] Saving charging_demand results...
+		[INFO] Saving results for key: charging_demand to ./data/optimization_results/case0_test/optimization with shape (2, 48)
+		[INFO] Saving G2B results...
+		[INFO] Saving results for key: G2B to ./data/optimization_results/case0_test/optimization with shape (2, 48)
+		[INFO] Saving P2B results...
+		[INFO] Saving results for key: P2B to ./data/optimization_results/case0_test/optimization with shape (2, 48)
+		[INFO] Saving G2V results...
+		[INFO] Saving results for key: G2V to ./data/optimization_results/case0_test/optimization with shape (2, 48, 468)
+		[INFO] Saving P2V results...
+		[INFO] Saving results for key: P2V to ./data/optimization_results/case0_test/optimization with shape (2, 48, 468)
+		[INFO] Saving V2B results...
+		[INFO] Saving results for key: V2B to ./data/optimization_results/case0_test/optimization with shape (2, 48, 468)
+		[INFO] Saving SOC results...
+		[INFO] Saving results for key: SOC to ./data/optimization_results/case0_test/optimization with shape (2, 48, 468)
+		[INFO] Saving unmet results...
+		[INFO] Saving results for key: unmet to ./data/optimization_results/case0_test/optimization with shape (2, 468)
+		[INFO] Saving objective_value results...
+		[INFO] Saving results for key: objective_value to ./data/optimization_results/case0_test/optimization with shape (2,)
+		[INFO] Saving optimization_time_s results...
+		[INFO] Saving results for key: optimization_time_s to ./data/optimization_results/case0_test/optimization with shape (2,)
+		[INFO] Saving mip_gap_percent results...
+		[INFO] Saving results for key: mip_gap_percent to ./data/optimization_results/case0_test/optimization with shape (2,)
+		[INFO] Saving total_cost results...
+		[INFO] Saving results for key: total_cost to ./data/optimization_results/case0_test/optimization with shape (2,)
+		[INFO] Saving self_sufficiency results...
+		[INFO] Saving results for key: self_sufficiency to ./data/optimization_results/case0_test/optimization with shape (2,)
+		[INFO] Saving pv_utilization results...
+		[INFO] Saving results for key: pv_utilization to ./data/optimization_results/case0_test/optimization with shape (2,)
+[ 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23
+ 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47]
+[ 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23
+ 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47]
+		[INFO] Deleted checkpoint after full completion.
+		[INFO] Case 0 completed.
+
+	2.1 Optimizing Case 1...
+		[INFO] Loaded 168 samples from 'data/battery_demand/case1_real_only'
+		[INFO] Results already exist at './data/optimization_results/case1_real_only/immediate_charging/V2B.npy'. Skipping immediate_charging run.
+		[INFO] Results already exist at './data/optimization_results/case1_real_only/optimization/V2B.npy'. Skipping optimization run.
+		[INFO] Case 1 completed.
+
+	2.2 Optimizing Case 2...
+		[INFO] Loaded 1563 samples from 'data/battery_demand/case2_nan_filled'
+		[INFO] Results already exist at './data/optimization_results/case2_nan_filled/immediate_charging/V2B.npy'. Skipping immediate_charging run.
+		[INFO] Results already exist at './data/optimization_results/case2_nan_filled/optimization/V2B.npy'. Skipping optimization run.
+		[INFO] Case 2 completed.
+
+
+==================================================
+PART 3: Supervised Learning...
+==================================================
+
+	3.0 Training Case 0...
+
+=== Starting Training Run: STAFV4_CASE0 ===
+Device: cuda
+		[INFO] Starting Preprocessing for Case 0...
+Traceback (most recent call last):
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/main.py", line 75, in <module>
+    main()
+    ~~~~^^
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/main.py", line 43, in main
+    train(case_id=case_num, tolerance=target_tolerance, run_name= cfg.RUN_NAME+f"_CASE{case_num}")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/supervised_learning/training.py", line 62, in train
+    merge_and_process(
+    ~~~~~~~~~~~~~~~~~^
+        sequence_length=cfg.SEQUENCE_LENGTH,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+        case_id=case_id
+        ^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/supervised_learning/data_pipeline/preprocess.py", line 248, in merge_and_process
+    battery_demand = np.load(f"{case_demand_dir}/battery_demand.npy")
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/site-packages/numpy/lib/_npyio_impl.py", line 451, in load
+    fid = stack.enter_context(open(os.fspath(file), "rb"))
+                              ~~~~^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'None/battery_demand.npy'

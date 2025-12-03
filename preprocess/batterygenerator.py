@@ -102,6 +102,7 @@ class BatterySeriesGenerator:
 
         base_dir = self.battery_dir
         case_dirs = {
+            0: os.path.join(base_dir, "case0_test"),
             1: os.path.join(base_dir, "case1_real_only"),
             2: os.path.join(base_dir, "case2_nan_filled"),
             3: os.path.join(base_dir, "case3_extended_generated"),
@@ -274,57 +275,66 @@ class BatterySeriesGenerator:
         # -------------------------------------------------------------------------
         # Case 0 — Test Case
         # -------------------------------------------------------------------------
+        case0_dir = case_dirs[0]
+        case0_file = os.path.join(case0_dir, "battery_demand.npy")
         
-        full_df = pd.read_csv(self.full_path, index_col=0)
-        full_df.index = pd.to_datetime(full_df.index)
+        if (not rerun) and os.path.exists(case0_file):
+            case0_series = np.load(case0_file)
+            print(f"\t\t[INFO] Case 0 exists — loaded battery demand from '{case0_file}' with shape {case0_series.shape}.")
         
-        # 1. Define your test cases in a list to iterate easily
-        test_cases = [cfg.TEST_DATE1, cfg.TEST_DATE2]
-        
-        # Initialize list if not already done
-        test_series = [] 
-
-        for i, (day1, day2) in enumerate(test_cases):
+        else:
+            full_df = pd.read_csv(self.full_path, index_col=0)
+            full_df.index = pd.to_datetime(full_df.index)
             
-            # 2. Check if both days exist in the dataframe index
-            # Using partial string indexing (e.g., .loc['2024-03-15'])
-            try:
-                # Extract data for the specific days
-                df_d1 = full_df.loc[day1]
-                df_d2 = full_df.loc[day2]
+            # 1. Define your test cases in a list to iterate easily
+            test_cases = [cfg.TEST_DATE1, cfg.TEST_DATE2]
+            
+            # Initialize list if not already done
+            series_case0 = [] 
+
+            for i, (day1, day2) in enumerate(test_cases):
                 
-                # 3. Ensure both days are valid and not empty
-                if not df_d1.empty and not df_d2.empty:
+                # 2. Check if both days exist in the dataframe index
+                # Using partial string indexing (e.g., .loc['2024-03-15'])
+                try:
+                    # Extract data for the specific days
+                    df_d1 = full_df.loc[day1]
+                    df_d2 = full_df.loc[day2]
                     
-                    # Concatenate the two days (vertical stack)
-                    combined_df = pd.concat([df_d1, df_d2])
+                    # 3. Ensure both days are valid and not empty
+                    if not df_d1.empty and not df_d2.empty:
+                        
+                        # Concatenate the two days (vertical stack)
+                        combined_df = pd.concat([df_d1, df_d2])
+                        
+                        # 4. Check length (Optional: Strict check for 48 points)
+                        if len(combined_df) == 48:
+                            # 2. Find the integer index (row number) of the FIRST timestamp
+                            # Get the actual Timestamp object of the first row of day 1
+                            first_timestamp = df_d1.index[0]
+                            
+                            # Find where that timestamp sits in the main dataframe (0 to len-1)
+                            start_row_idx = full_df.index.get_loc(first_timestamp)
+                            
+                            flat_values = combined_df.values.flatten().astype(int).tolist()
+                            
+                            # 5. Append to your series
+                            # Note: formatting as [ID, data...] to match your Case 2 structure
+                            # Using 'i' as the ID (0, 1, etc.)
+                            series_case0.append([start_row_idx] + flat_values)
+                            
+                            print(f"\t\t[INFO] Case 0: Successfully added test pair {day1} & {day2}")
+                            print(f"\t\tData: {series_case0[-1]}")
+                        else:
+                            print(f"[WARNING] Date pair {day1}-{day2} found but length is {len(combined_df)}, expected 48.")
+                            
+                except KeyError:
+                    # This catches if one of the dates is completely missing from the index
+                    print(f"[WARNING] Skipping {day1} or {day2}: Date not found in index.")        
                     
-                    # 4. Check length (Optional: Strict check for 48 points)
-                    if len(combined_df) == 48:
-                        # 2. Find the integer index (row number) of the FIRST timestamp
-                        # Get the actual Timestamp object of the first row of day 1
-                        first_timestamp = df_d1.index[0]
-                        
-                        # Find where that timestamp sits in the main dataframe (0 to len-1)
-                        start_row_idx = full_df.index.get_loc(first_timestamp)
-                        
-                        flat_values = combined_df.values.flatten().astype(int).tolist()
-                        
-                        # 5. Append to your series
-                        # Note: formatting as [ID, data...] to match your Case 2 structure
-                        # Using 'i' as the ID (0, 1, etc.)
-                        test_series.append([start_row_idx] + flat_values)
-                        
-                        print(f"\t\t[INFO] Case 0: Successfully added test pair {day1} & {day2}")
-                        print(f"\t\tData: {test_series[-1]}")
-                    else:
-                        print(f"[WARNING] Date pair {day1}-{day2} found but length is {len(combined_df)}, expected 48.")
-                        
-            except KeyError:
-                # This catches if one of the dates is completely missing from the index
-                print(f"[WARNING] Skipping {day1} or {day2}: Date not found in index.")        
+            case0_series = _save_case(0, series_case0)
         
-        return {1: case1_series, 2: case2_series}
+        return
     # -------------------------------------------------------------------------
     # 2. Artificial data generation
     # -------------------------------------------------------------------------
@@ -367,6 +377,7 @@ class BatterySeriesGenerator:
         
         base_dir = self.battery_dir
         case_dirs = {
+            0: os.path.join(base_dir, "case0_test"),
             1: os.path.join(base_dir, "case1_real_only"),
             2: os.path.join(base_dir, "case2_nan_filled"),
             3: os.path.join(base_dir, "case3_extended_generated"),
@@ -387,10 +398,10 @@ class BatterySeriesGenerator:
             try:
                 battery_demand = np.load(demand_path)
             except Exception as e:
-                print(f"[ERROR] Could not load battery demand from '{demand_path}': {e}")
+                print(f"\t\t[ERROR] Could not load battery demand from '{demand_path}': {e}")
                 continue
     
-            tnum = cfg.WINDOW_SIZE  # subtract index column
+            tnum = battery_demand.shape[1] - 1  # subtract index column
 
             a_vt_list, SOC_a_v_list, SOC_d_v_list, t_a_v_list, t_d_v_list = [], [], [], [], []
 
@@ -432,7 +443,7 @@ class BatterySeriesGenerator:
             np.save(availability_path, a_vt_list_arr)
             np.save(details_path, details)
 
-            print(f"\t\t[INFO] Saved availability and details for Case {key} at '{dir}'")
+            print(f"\t\t[INFO] Saved availability and details for Case {key} at '{dir} shape {a_vt_list_arr.shape} and {details.shape}'")
         
         return 
 

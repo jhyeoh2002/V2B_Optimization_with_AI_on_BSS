@@ -17,7 +17,7 @@ import config as cfg
 
 class GurobiOptimizer:
 
-    def __init__(self):
+    def __init__(self, CASE_ID):
         """
         Initialize the optimizer with configuration parameters.
         """
@@ -26,7 +26,7 @@ class GurobiOptimizer:
         self.min_soc = cfg.MIN_SOC  # Minimum state of charge
         self.max_soc = cfg.MAX_SOC  # Maximum state of charge
         self.ch_eff = cfg.CHARGING_EFFICIENCY  # Charging efficiency
-        self.win_len = cfg.WINDOW_LENGTH  # Optimization window length
+        self.win_len = cfg.WINDOW_LENGTH if CASE_ID != 0 else 48  # Optimization window length
 
         # Flag to indicate whether Gurobi is available in this runtime
         self._gurobi_available = gp is not None

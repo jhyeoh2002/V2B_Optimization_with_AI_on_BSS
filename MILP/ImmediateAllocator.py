@@ -18,7 +18,7 @@ import config as cfg
 
 class ImmediateCharging:
 
-    def __init__(self):
+    def __init__(self, case_id):
         """
         Initialize the optimizer with configuration parameters.
         """
@@ -27,7 +27,7 @@ class ImmediateCharging:
         self.min_soc = cfg.MIN_SOC  # Minimum state of charge
         self.max_soc = cfg.MAX_SOC  # Maximum state of charge
         self.ch_eff = cfg.CHARGING_EFFICIENCY  # Charging efficiency
-        self.win_len = cfg.WINDOW_LENGTH  # Optimization window length
+        self.win_len = cfg.WINDOW_LENGTH if case_id != 0 else 48 # Optimization window length
 
     def allocate(self, availability, t_dep, soc_arr, soc_dep, bldg, elec_G2B, elec_G2V, pv):
         """
