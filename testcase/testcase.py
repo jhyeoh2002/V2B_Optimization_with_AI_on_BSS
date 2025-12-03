@@ -68,43 +68,69 @@ def load_and_prepare_data():
 # ==========================================
 # 3. EXTRACTION LOGIC
 # ==========================================
-def get_test_features(test_dates, b_demand, rad, temp, price, battery_demand):
+def get_test_features(test_dates, b_demand, rad, temp, price, battery_demand, window = 0):
     """
-    Extracts 48-hour data slices based on a list of two date strings.
-    Returns the env_feats list.
+    Extracts a 24-hour data slice based on the first date in test_dates, 
+    starting with an hourly offset defined by 'window'.
+    
+    Args:
+        test_dates (list): A list of date strings (only the first is used).
+        ... (DataFrames): Timeseries dataframes.
+        window (int): Hourly offset (0-23 hours) for the start of the 24h slice.
+        
+    Returns:
+        numpy.ndarray: A single flattened array of all 5 features over 24 steps (length 120), 
+                       or None on error.
     """
     start_date_str = test_dates[0]
-    end_date_str = test_dates[1]
     
-    ts_start = pd.to_datetime(start_date_str).replace(hour=0, minute=0, second=0)
-    ts_end = pd.to_datetime(end_date_str).replace(hour=23, minute=0, second=0)
+    # Define the precise start timestamp with the hourly window offset
+    ts_start_base = pd.to_datetime(start_date_str).replace(hour=0, minute=0, second=0)
+    ts_start = ts_start_base + pd.Timedelta(hours=window)
+    
+    # Define the precise end timestamp (23 hours after ts_start, inclusive)
+    ts_end = ts_start + pd.Timedelta(hours=23) 
     
     print(f"Extracting Data from: {ts_start} to {ts_end}")
     
-    if ts_start not in b_demand.index or ts_end not in b_demand.index:
-        print(f"Error: Range {ts_start} to {ts_end} not found in data.")
-        return None
-
-    # Slice Dataframes
-    slice_demand = b_demand.loc[ts_start:ts_end]
-    slice_rad = rad.loc[ts_start:ts_end]
-    slice_temp = temp.loc[ts_start:ts_end]
-    slice_price = price.loc[ts_start:ts_end]
-    slice_batt = battery_demand.loc[ts_start:ts_end]
-
-    if len(slice_demand) != 48:
-        print(f"WARNING: Expected 48 time steps, got {len(slice_demand)}.")
-
-    # Construct env_feats list
-    env_feats = [
-        slice_demand.iloc[:, 0].values.flatten(),
-        slice_rad.iloc[:, 0].values.flatten(),
-        slice_temp.iloc[:, 0].values.flatten(),
-        slice_price.iloc[:, 0].values.flatten(),
-        slice_batt.iloc[:, 0].values.flatten()
-    ]
+    # --- Data Slicing and Validation ---
     
-    return env_feats
+    # Validate index range availability
+    # We check if the timestamps exist in the index, which is safer than checking only the base date.
+    if ts_start not in b_demand.index or ts_end not in b_demand.index:
+        print(f"Error: Range {ts_start} to {ts_end} not found in data index.")
+        return None
+    
+    # Slice all Dataframes using the calculated windowed range
+    # Note: .loc works on the DatetimeIndex for all inputs, including battery_demand
+    slice_demand = b_demand.loc[ts_start:ts_end].iloc[:, 0].values.flatten()
+    slice_rad = rad.loc[ts_start:ts_end].iloc[:, 0].values.flatten()
+    slice_temp = temp.loc[ts_start:ts_end].iloc[:, 0].values.flatten()
+    slice_price = price.loc[ts_start:ts_end].iloc[:, 0].values.flatten()
+    slice_batt = battery_demand.loc[ts_start:ts_end].iloc[:, 0].values.flatten()
+    
+    if len(slice_demand) != 24:
+        print(f"WARNING: Expected 24 time steps, got {len(slice_demand)}. Check data gaps or resolution.")
+        # Decide if you want to proceed with non-24 length data, or return None.
+        # For model input, returning None might be safer if the sequence length is strict.
+        # return None
+
+    # --- Feature Construction ---
+    
+    # Concatenate all 5 feature arrays into a single, flat 1D NumPy array (length 120)
+    env_feats_flat = np.concatenate([
+        slice_demand,
+        slice_rad,
+        slice_temp,
+        slice_price,
+        slice_batt
+    ])
+    
+    if len(env_feats_flat) != 120:
+        print(f"WARNING: Expected 120 features (24*5), got {len(env_feats_flat)}.")
+
+    # Return the single flat array.
+    return env_feats_flat
 
 # ==========================================
 # 4. MODEL UTILS
