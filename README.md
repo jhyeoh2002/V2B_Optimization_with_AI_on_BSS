@@ -26,9 +26,7 @@ This repository contains data and scripts for optimizing Vehicle-to-Building (V2
     **Source**: *國立台灣大學 推廣中心饋線 用電日報表*, URL: [NTU ePower Platform](https://epower.ga.ntu.edu.tw/fn4/report2.aspx), Accessed: 19 October 2025.
 
 ---
-## Generate Data
 
-      nohup python3 main.py > logs/run_$(date +%Y%m%d_%H%M%S).log 2>&1 &
 
 Class 
 
@@ -50,6 +48,24 @@ This package estimates the posterior distribution using historical analogs and p
 Output is a NumPy array of shape (n_sample, window_size)
 Each row is a generated time series sample
 
+
+## Run example
+
+### Installation
+
+```
+bash pip install -r requirements.txt
+```
+
+### Method 1. Run with python script with default parameters and record in logfiles
+```
+nohup 
+python3 time_series_generator.py > logs/main_run_$(date +%Y%m%d_%H%M%S).log 2>&1 &
+```
+### Method 2. Run in batch with diffrerent parameters
+```
+      bash run_batch.sh
+```
 ---
 
 ## Contact

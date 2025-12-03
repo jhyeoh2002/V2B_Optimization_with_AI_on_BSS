@@ -16,10 +16,6 @@ class DataPrepare:
 
     def generate_grouped_subsequences(
         self,
-        a_path_template: str = cfg.A_PATH_TEMPLATE,
-        b_path_template: str = cfg.B_PATH_TEMPLATE,
-        a_range: range = range(40),
-        b_range: range = range(37),
         remove_dates: List[str] = None     # <–– new parameter
         )  -> pd.Series:
         

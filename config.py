@@ -3,7 +3,7 @@ import numpy as np
 import os
 
 # ==============================================================================
-# 1. Project & Time Configuration
+# 1. Project Configuration
 # ==============================================================================
 START_DATE = "2023-01-01 00:00:00"
 END_DATE = "2024-09-30 23:00:00"
@@ -20,7 +20,7 @@ CASE3 = "case3_extended_generated"
 BATTERYDEMAND_DIR = "data/battery_demand"
 
 # ==============================================================================
-# 2. File Paths
+# 2. DATA GENERATION PARAMETERS
 # ==============================================================================
 # Formatted strings for data loading
 A_PATH_TEMPLATE = './data/raw/Gogoro/台北市大安區_臺大二活停車場站A ({:02d}).csv'

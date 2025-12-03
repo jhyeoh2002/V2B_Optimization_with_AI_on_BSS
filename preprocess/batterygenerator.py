@@ -55,8 +55,8 @@ class BatterySeriesGenerator:
         return tdf
     
     def _preprocess_battery_data(self,
-        a_path_template: str = cfg.A_PATH_TEMPLATE,
-        b_path_template: str = cfg.B_PATH_TEMPLATE,
+        a_path_template: str = './data/raw/Gogoro/台北市大安區_臺大二活停車場站A ({:02d}).csv',
+        b_path_template: str = './data/raw/Gogoro/台北市大安區_臺大二活停車場站B ({:02d}).csv',
         a_range: range = range(40),
         b_range: range = range(37),
         remove_dates: List[str] = cfg.TEST_DATE1 + cfg.TEST_DATE2     # <–– new parameter

@@ -6,12 +6,11 @@ __pycache__/
 *.pyc
 
 # model\
-# *.pth
-
-# *.npy
-# *.npz
-# *.txt
-# *.png
+*.pth
+*.npy
+*.npz
+*.txt
+*.png
 
 # --- Virtual environments ---
 .venv/
@@ -25,6 +24,9 @@ venv/
 .DS_Store
 
 # Ignore a file in a specific folder
+
+cpu_heater.py
+
 data/battery_demand/case2_nan_filled/battery_availability.npy
 data/optimization_results/case2_nan_filled/optimization/G2V.npy
 data/optimization_results/case2_nan_filled/optimization/SOC.npy
