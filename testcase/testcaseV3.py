@@ -93,7 +93,7 @@ def _generate_cyclic_features(index):
 # ==========================================
 # 2. FEATURE CONSTRUCTION (The Critical Fix)
 # ==========================================
-def get_full_test_vector(i, b_demand, rad, temp, price, battery_demand, feature_info):
+def get_full_test_vector(i, iter, b_demand, rad, temp, price, battery_demand, feature_info):
     """
     Constructs the EXACT input vector the model expects:
     [Static (4) | Flattened Series (120) | Vehicle Priorities (76)]
@@ -105,10 +105,8 @@ def get_full_test_vector(i, b_demand, rad, temp, price, battery_demand, feature_
     battery_demand = np.load(f"{case_demand_dir}/battery_demand.npy")
     battery_details = np.load(f"{case_demand_dir}/battery_details.npy") # [arr_soc, dep_soc, arr_time, dep_time]
     battery_schedule = np.load(f"{case_demand_dir}/battery_availability.npy")
-    
-    hour_now = 23
-
-    idx =int( battery_demand[i,0])
+    hour_now = 23+iter
+    idx =int( battery_demand[i,0])+iter
     battery_demand_i = battery_demand[i,1:]
     
     sched_row = battery_schedule[i]
@@ -220,7 +218,7 @@ def load_trained_model(run_name):
 # ==========================================
 # 4. MAIN PIPELINE WRAPPER
 # ==========================================
-def test_pipeline(case_id, tolerance, run_name):
+def test_pipeline(case_id,  run_name):
     print(f"\n{'='*40}")
     print(f"🔬 RUNNING INFERENCE TEST: {run_name}")
     print(f"{'='*40}")
@@ -240,22 +238,23 @@ def test_pipeline(case_id, tolerance, run_name):
     # 3. Define Test Dates (You can pull these from config if preferred)
     # Using a hardcoded list for demonstration, or cfg.TEST_DATES if you have it
     for i in range(2):
-
-        # A. Prepare Input
-        input_tensor = get_full_test_vector(
-            i, b_demand, rad, temp, price, batt, feat_info
-        )
         
-        if input_tensor is None:
-            continue
-
-        # B. Run Model
-        input_tensor = input_tensor.to(cfg.DEVICE)
-        with torch.no_grad():
-            prediction = model(input_tensor)
+        for iter in range(24):
+            # A. Prepare Input
+            input_tensor = get_full_test_vector(
+                i, iter, b_demand, rad, temp, price, batt, feat_info
+            )
             
-        # C. Output Result
-        val = prediction.item()
-        print(f"   📅 {i} -> Pred: {val:.4f} kWh")
+            if input_tensor is None:
+                continue
+
+            # B. Run Model
+            input_tensor = input_tensor.to(cfg.DEVICE)
+            with torch.no_grad():
+                prediction = model(input_tensor)
+                
+            # C. Output Result
+            val = prediction.item()
+            print(f"   📅 {i} -> Pred: {val:.4f} kWh")
 
     print("\n✅ Test Pipeline Complete.")

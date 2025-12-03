@@ -2,6 +2,8 @@ from encodings.punycode import T
 import numpy as np
 import os
 
+from pyparsing import C
+
 # ==============================================================================
 # 1. Project Configuration
 # ==============================================================================
@@ -12,7 +14,7 @@ RESOLUTION = '1h'
 TEST_MODE = False
 TEST_DATE1 = ['2024-03-15', '2024-03-16']
 TEST_DATE2 = ['2024-03-29', '2024-03-30']
-
+CASE0 = "case0_test"
 CASE1 = "case1_real_only"
 CASE2 = "case2_nan_filled"
 CASE3 = "case3_extended_generated"
