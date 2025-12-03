@@ -6,12 +6,12 @@ __pycache__/
 *.pyc
 
 # model\
-*.pth
+# *.pth
 
-*.npy
-*.npz
-*.txt
-*.png
+# *.npy
+# *.npz
+# *.txt
+# *.png
 
 # --- Virtual environments ---
 .venv/
