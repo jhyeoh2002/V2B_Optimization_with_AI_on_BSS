@@ -110,7 +110,7 @@ def train(case_id, tolerance):
     RUN_NAME = f"STAFV2_{tolerance}_CASE{case_id}"
     DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
-    BASE_OP_FOLDER = f"./data/optimization_results/tol{tolerance}"
+    BASE_OP_FOLDER = f"./data/optimization_results"
     CASE_OP_FOLDER = case_dir(BASE_OP_FOLDER, case_id)
     
     DATA_CSV = f"./data/training_results/merged_windowed_dataset_{RUN_NAME}.csv"

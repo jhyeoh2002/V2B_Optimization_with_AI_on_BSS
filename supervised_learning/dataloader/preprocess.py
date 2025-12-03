@@ -17,7 +17,7 @@ sys.path.append(os.path.abspath(".."))
 def merge_and_process(sequence_length=24, save_feature_info=True, tolerance=4, window_size=48, optimization_folder="WL48_PV500_48H_with_2nan", dataset_name="merged_windowed_datasetV3.csv", feature_info_name="feature_infoV3.json", case_id=1):
     """Merge npy + CSV time-series into one supervised learning dataset."""
     
-    demand_dir = f"./data/battery_demand/tol{tolerance}"
+    demand_dir = f"./data/battery_demand/"
     case_demand_dir = case_dir(demand_dir, case_id)
     
     # === Load npy arrays ===
@@ -144,7 +144,9 @@ def merge_and_process(sequence_length=24, save_feature_info=True, tolerance=4, w
         row_feats = static_df.iloc[end_idx - 1, :].tolist()
         for series in [building_window, radiation_window, temperature_window, price_window, battery_window]:
             row_feats.extend(series.tolist())
-        for block in [SOC_current, dep_soc_current, dep_time_current, priority]:
+        # for block in [SOC_current, dep_soc_current, dep_time_current, priority]:
+        # for block in [SOC_current, dep_soc_current, dep_time_current, priority]:
+        for block in [priority]:
             row_feats.extend(np.round(block,4).tolist())
 
         target = float(np.round(ground_truth[i, sequence_length], 3))
@@ -160,7 +162,9 @@ def merge_and_process(sequence_length=24, save_feature_info=True, tolerance=4, w
     ts_names = [f"{name}_T{t+1}" for name in ["building", "radiation", "temperature", "price", "battery"] for t in range(sequence_length)]
     # Use vehicle count from first valid sample
     n_veh_detected = len(SOC_current)
-    batt_names = [f"{name}_V{v+1}" for name in ["SOC_current", "departure_soc", "departure_time", "priority"] for v in range(n_veh_detected)]
+    # batt_names = [f"{name}_V{v+1}" for name in ["SOC_current", "departure_soc", "departure_time", "priority"] for v in range(n_veh_detected)]
+    batt_names = [f"{name}_V{v+1}" for name in ["priority"] for v in range(n_veh_detected)]
+
     cols = static_names + ts_names + batt_names + ["target"]
 
     # === Build DataFrame ===
@@ -175,7 +179,7 @@ def merge_and_process(sequence_length=24, save_feature_info=True, tolerance=4, w
         feature_info = {
             "static_cols": static_names,
             "series_blocks": [[f"{n}_T{t+1}" for t in range(sequence_length)] for n in ["building", "radiation", "temperature", "price", "battery"]],
-            "battery_blocks": [[f"{n}_V{v+1}" for v in range(n_veh_detected)] for n in ["SOC_current", "departure_soc", "departure_time", "priority"]],
+            "battery_blocks": [[f"{n}_V{v+1}" for v in range(n_veh_detected)] for n in ["priority"]],
             "target_col": "target",
             "num_embeddings": suggested_num_embeddings
         }

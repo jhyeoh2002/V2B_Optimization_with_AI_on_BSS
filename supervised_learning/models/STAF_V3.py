@@ -44,12 +44,12 @@ class TemporalAttentiveFusionNet(nn.Module):
         # ======================================================================
         # CALCULATION OF INPUT DIMENSIONS:
         # A. Static Global (Time):              4 features
-        # B. Static Vehicles (76 cars * 4):   304 features
+        # B. Static Vehicles (76 cars * 1):   76 features
         # C. Attended Temporal (5 series * 24): 120 features (Output of Attention)
         # -----------------------------------------------------
-        # TOTAL FUSION INPUT:                 428 features
+        # TOTAL FUSION INPUT:                 200 features
         # ======================================================================
-        fusion_input_dim = 4 + 304 + 120
+        fusion_input_dim = 4 + 76 + 120
         
         # Layer 1
         self.bn0 = nn.BatchNorm1d(fusion_input_dim)
