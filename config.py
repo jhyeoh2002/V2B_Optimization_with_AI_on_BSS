@@ -22,13 +22,6 @@ BATTERYDEMAND_DIR = "data/battery_demand"
 # ==============================================================================
 # 2. DATA GENERATION PARAMETERS
 # ==============================================================================
-# Formatted strings for data loading
-A_PATH_TEMPLATE = './data/raw/Gogoro/台北市大安區_臺大二活停車場站A ({:02d}).csv'
-B_PATH_TEMPLATE = './data/raw/Gogoro/台北市大安區_臺大二活停車場站B ({:02d}).csv'
-
-# ==============================================================================
-# 3. System Specifications (Physical)
-# ==============================================================================
 # --- Battery Specs ---
 BATTERY_CAPACITY = 1.7      # kWh
 BATTERY_COST = 9071         # $/kWh
