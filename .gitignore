@@ -24,3 +24,26 @@ venv/
 # --- macOS ---
 .DS_Store
 
+# Ignore a file in a specific folder
+data/battery_demand/case2_nan_filled/battery_availability.npy
+data/optimization_results/case2_nan_filled/optimization/G2V.npy
+data/optimization_results/case2_nan_filled/optimization/SOC.npy
+data/optimization_results/case2_nan_filled/optimization/P2V.npy
+data/optimization_results/case2_nan_filled/optimization/V2B.npy
+data/optimization_results/case2_nan_filled/immediate_charging/G2V.npy
+data/optimization_results/case2_nan_filled/immediate_charging/SOC.npy
+data/optimization_results/case2_nan_filled/immediate_charging/P2V.npy
+data/optimization_results/case2_nan_filled/immediate_charging/V2B.npy
+data/processed/battery_details_7nan_window48.npy
+data/processed/battery_details_4nan_window48.npy
+data/processed/battery_details_5nan_window48.npy
+data/processed/battery_details_5nan_window36.npy
+data/processed/battery_details_window48.npy
+data/processed/battery_schedule_window48.npy
+data/processed/battery_details_4nan_window36.npy
+data/processed/battery_details_6nan_window36.npy
+data/processed/battery_details_6nan_window48.npy
+MILP/output/WL48_PV500_4nan_run2/immediate_charging/V2B.npy
+MILP/output/WL30_PV500_Test/immediate_charging_log.txt
+MILP/output/WL30_PV1300_Test/immediate_charging_log.txt
+# .git/objects/pack/pack-690f5c998a7b936f742a66948222f95f2c1b5f43.pack
