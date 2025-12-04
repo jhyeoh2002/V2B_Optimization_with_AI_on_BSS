@@ -38,7 +38,7 @@ class EnergyAllocator:
         # 2. Define Output Directory (Where results go)
         # Result path: ./data/optimization_results/tol25/case1_real_only/
         self.output_dir = os.path.join(
-            "./data/optimization_results", 
+            cfg.OPTRESULTS_DIR, 
             case_name
         )
         os.makedirs(self.output_dir, exist_ok=True)
@@ -368,7 +368,7 @@ def plot_energy_flows_for_random_scenario(
     # -------------------------------------------------------------
     # 3. Main plotting loop
     # -------------------------------------------------------------
-    for idx in range(N):
+    for idx in tqdm(range(N)):
 
         # --- Prepare Data Arrays ---
         G2B_i = extend_last(G2B_IMM[idx])

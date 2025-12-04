@@ -19,9 +19,12 @@ CASE1 = "case1_real_only"
 CASE2 = "case2_nan_filled"
 CASE3 = "case3_extended_generated"
 
-BATTERYDEMAND_DIR = "data/battery_demand"
+BATTERYDEMAND_DIR = "data/battery_demandV2"
 BATTERY_FILE = f"{BATTERYDEMAND_DIR}/resample_full.csv"
 TS_DIR = "data/timeseries"
+
+OPTRESULTS_DIR = "data/optimization_resultsV2"
+
 # ==============================================================================
 # 2. DATA GENERATION PARAMETERS
 # ==============================================================================
@@ -46,7 +49,7 @@ NUM_STATIONS = 2
 TOTAL_BATTERIES = BATTERIES_PER_STATION * NUM_STATIONS
 
 # --- Renewable Energy ---
-PV_AREA = 500  # m^2
+PV_AREA = 1200  # m^2
 
 # ==============================================================================
 # 4. Statistical & Randomization Parameters
@@ -96,7 +99,6 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # ==========================================
 # DATA PROCESSING
 # ==========================================
-WINDOW_SIZE = 48         # Total window size for optimization logic
 SEQUENCE_LENGTH = 24     # The lookback period for the model
 TOLERANCE = 4            # Tolerance for data merging logic
 
@@ -108,16 +110,17 @@ TRAIN_FIGURE_DIR = "./figures/training_results"
 # ==========================================
 # TRAINING HYPERPARAMETERS
 # ==========================================
-RUN_NAME = f"STAFV4"
+RUN_NAME = f"STAFV7"
 
 EPOCHS = 5000
-BATCH_SIZE = 128
+BATCH_SIZE = 64
 LEARNING_RATE = 1e-3
 WEIGHT_DECAY = 1e-3
+# WEIGHT_DECAY = LEARNING_RATE
 
 # Learning Rate Scheduler
 GAMMA = 0.75             # Factor to reduce LR by
-LR_PATIENCE = 25         # Epochs to wait before reducing LR
+LR_PATIENCE = 20         # Epochs to wait before reducing LR
 
 # Early Stopping
 ES_PATIENCE = 150        # Epochs to wait before stopping completely
@@ -125,10 +128,11 @@ ES_PATIENCE = 150        # Epochs to wait before stopping completely
 # ==========================================
 # MODEL ARCHITECTURE
 # ==========================================
-EMBEDDING_DIM = 16
-NUM_EMBEDDINGS = 15000   # Initial guess, updated dynamically in training
+EMBEDDING_DIM = 8
+NUM_EMBEDDINGS = 10000   # Initial guess, updated dynamically in training
 N_HEADS = 4
 # Recommended (Smoother funnel)
-HIDDEN_DIM_1 = 256  # Reduced from 1024
-HIDDEN_DIM_2 = 64  # Reduced from 256
-DROPOUT = 0.5
+HIDDEN_DIM_1 = 128  # Reduced from 1024
+HIDDEN_DIM_2 = 32  # Reduced from 256
+DROPOUT = 0.6
+ATTENTION_DROPOUT = 0.6

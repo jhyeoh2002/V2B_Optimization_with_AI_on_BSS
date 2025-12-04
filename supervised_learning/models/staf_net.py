@@ -20,7 +20,7 @@ class TemporalAttentiveFusionNet(nn.Module):
     def __init__(self,
                  # Data Dimensions
                  num_static=4,
-                 num_series=5,
+                 num_series=6,
                  sequence_length=24,
                  vehicle_input_dim=304, # (76 cars * 4 features) or similar
                  

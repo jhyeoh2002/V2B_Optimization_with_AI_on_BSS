@@ -1,0 +1,9 @@
+nohup: ignoring input
+Crash diagnostics ON
+Traceback (most recent call last):
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/main.py", line 4, in <module>
+    from supervised_learning.training import train
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/supervised_learning/training.py", line 21, in <module>
+    def train(case_id, tolerance=cfg.TOLERANCE, run_name=None, rerun = False):
+                                 ^^^^^^^^^^^^^
+AttributeError: module 'config' has no attribute 'TOLERANCE'

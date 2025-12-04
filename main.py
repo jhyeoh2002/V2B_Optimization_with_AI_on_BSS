@@ -36,12 +36,12 @@ def main():
         
     print("\n", "="*50,"PART 3: Supervised Learning...","="*50, sep="\n")
     
-    cases_to_train = [1, 2]
+    cases_to_train = [2, 1]
     
     for case_num in cases_to_train:
         print(f"\n\t3.{case_num} Training Case {case_num}...")
 
-        train(case_id=case_num, tolerance=target_tolerance, run_name= cfg.RUN_NAME+f"_CASE{case_num}")
+        train(case_id=case_num, tolerance=target_tolerance, run_name= cfg.RUN_NAME+f"_CASE{case_num}", rerun=True)
     
         print(f"\t\t[INFO] Case {case_num} completed.")
         

@@ -1,0 +1,194 @@
+nohup: ignoring input
+Crash diagnostics ON
+
+
+==================================================
+PART 1: Data preprocess for 2023-01-01 00:00:00 to 2024-09-30 23:00:00...
+==================================================
+
+	1.1 Preprocessing radiation data...
+		[INFO] Radiation data already exists at './data/timeseries/radiation_data.csv'
+
+	1.2 Preprocessing temperature data...
+		[INFO] Temperature data already exists at './data/timeseries/temperature_data.csv'
+
+	1.3 Preprocessing building data...
+		[INFO] Building data already exists at './data/timeseries/building_data.csv'
+
+	1.4 Preprocessing electricity cost data...
+		[INFO] Electricity cost data already exists at './data/timeseries/electricitycostG2B_data.csv' and './data/timeseries/electricitycostG2V_data.csv'
+
+	1.5 Preprocessing battery demand series data...
+		[INFO] Found existing battery data at 'data/battery_demandV2/resample_full.csv' and 'data/battery_demandV2/resample_train.csv'
+
+		[INFO] Number of series for clean windows = (168, 37)
+		[INFO] Number of eligible series for Case 2 = (1395, 37)
+		[INFO] Case 1 exists — loaded battery demand from 'data/battery_demandV2/case1_real_only/battery_demand.npy' with shape (168, 37).
+		[INFO] Case 2 exists — loaded battery demand from 'data/battery_demandV2/case2_nan_filled/battery_demand.npy' with shape (1563, 37).
+		[INFO] Case 0 exists — loaded battery demand from 'data/battery_demandV2/case0_test/battery_demand.npy' with shape (2, 49).
+
+	1.6 Generating battery schedule...
+		[INFO] Case 0 exists — loaded from 'data/battery_demandV2/case0_test/battery_availability.npy' and 'data/battery_demandV2/case0_test/battery_details.npy' shape (2, 272, 48) and (4, 2, 272)
+		[INFO] Case 1 exists — loaded from 'data/battery_demandV2/case1_real_only/battery_availability.npy' and 'data/battery_demandV2/case1_real_only/battery_details.npy' shape (168, 237, 36) and (4, 168, 237)
+		[INFO] Case 2 exists — loaded from 'data/battery_demandV2/case2_nan_filled/battery_availability.npy' and 'data/battery_demandV2/case2_nan_filled/battery_details.npy' shape (1563, 237, 36) and (4, 1563, 237)
+		[ERROR] Could not load battery demand from 'data/battery_demandV2/case3_extended_generated/battery_demand.npy': [Errno 2] No such file or directory: 'data/battery_demandV2/case3_extended_generated/battery_demand.npy'
+
+
+==================================================
+PART 2: MILP Optimization...
+==================================================
+
+	2.0 Optimizing Case 0...
+		[INFO] Loaded 2 samples from 'data/battery_demandV2/case0_test'
+		[INFO] Results already exist at 'data/optimization_resultsV2/case0_test/immediate_charging/V2B.npy'. Skipping immediate_charging run.
+		[INFO] Results already exist at 'data/optimization_resultsV2/case0_test/optimization/V2B.npy'. Skipping optimization run.
+		[INFO] Case 0 completed.
+
+	2.1 Optimizing Case 1...
+		[INFO] Loaded 168 samples from 'data/battery_demandV2/case1_real_only'
+		[INFO] Results already exist at 'data/optimization_resultsV2/case1_real_only/immediate_charging/V2B.npy'. Skipping immediate_charging run.
+		[INFO] Results already exist at 'data/optimization_resultsV2/case1_real_only/optimization/V2B.npy'. Skipping optimization run.
+		[INFO] Case 1 completed.
+
+	2.2 Optimizing Case 2...
+		[INFO] Loaded 1563 samples from 'data/battery_demandV2/case2_nan_filled'
+		[INFO] Results already exist at 'data/optimization_resultsV2/case2_nan_filled/immediate_charging/V2B.npy'. Skipping immediate_charging run.
+		[INFO] Results already exist at 'data/optimization_resultsV2/case2_nan_filled/optimization/V2B.npy'. Skipping optimization run.
+		[INFO] Case 2 completed.
+
+
+==================================================
+PART 3: Supervised Learning...
+==================================================
+
+	3.2 Training Case 2...
+
+=== Starting Training Run: STAFV6_CASE2 ===
+Device: cuda
+		[INFO] Starting Preprocessing for Case 2...
+		[INFO] Unique quantized indices: 28274
+		[INFO] Suggested num_embeddings: 33928
+		[INFO] Generating sliding windows...
+		[INFO] Saved dataset: ./data/training_results/STAFV6_CASE2/merged_dataset_STAFV6_CASE2.csv (Shape: (18756, 225))
+		[INFO] Saved metadata: ./data/training_results/STAFV6_CASE2/feature_info_STAFV6_CASE2.json
+	[Model Config] Detected Dims: {'static': 4, 'series_count': 6, 'seq_len': 24, 'vehicle': 76, 'emb_vocab': 10000}
+		[INFO] Data loaded. Train: 13129, Val: 5627
+		[INFO] Fitting new scalers on training data...
+		[INFO] Calculating weights for imbalanced regression...
+		[INFO] 
+==================================================
+		[INFO] 🚀 TRAINING SESSION: STAFV6_CASE2
+		[INFO] ==================================================
+		[INFO] Device:             cuda
+		[INFO] Model Parameters:   97,482
+		[INFO] --------------------------------------------------
+		[INFO] Epochs:             5000
+		[INFO] Batch Size:         64
+		[INFO] Learning Rate:      0.001
+		[INFO] Weight Decay:       0.001
+		[INFO] Dropout:            0.6
+		[INFO] --------------------------------------------------
+		[INFO] Hidden Layers:      [64, 32]
+		[INFO] Embedding Dim:      8
+		[INFO] Attention Heads:    4
+		[INFO]==================================================
+
+
+		[INFO]Epoch |    LR    | Trn RMSE | Val RMSE | Trn R2 | Val R2 | Stop
+-----------------------------------------------------------------
+		[INFO]    1 | 0.001000 |   7.5392 |   7.4250 |  0.153 | -0.053 | 0/150
+		[INFO]    2 | 0.001000 |   5.8809 |   5.8588 |  0.489 |  0.344 | 0/150
+		[INFO]    3 | 0.001000 |   5.6169 |   5.3918 |  0.529 |  0.445 | 0/150
+		[INFO]    4 | 0.001000 |   5.4625 |   5.2679 |  0.550 |  0.470 | 0/150
+		[INFO]    5 | 0.001000 |   5.3457 |   4.7780 |  0.574 |  0.564 | 0/150
+		[INFO]    6 | 0.001000 |   5.2337 |   5.2189 |  0.587 |  0.480 | 0/150
+		[INFO]    7 | 0.001000 |   5.2035 |   4.6100 |  0.604 |  0.594 | 1/150
+		[INFO]    8 | 0.001000 |   5.1542 |   5.2356 |  0.606 |  0.476 | 0/150
+		[INFO]    9 | 0.001000 |   5.1050 |   4.8717 |  0.608 |  0.547 | 1/150
+		[INFO]   10 | 0.001000 |   5.1326 |   4.9605 |  0.610 |  0.530 | 2/150
+		[INFO]   11 | 0.001000 |   5.0298 |   5.0728 |  0.622 |  0.508 | 3/150
+		[INFO]   12 | 0.001000 |   5.0959 |   4.7534 |  0.620 |  0.568 | 4/150
+		[INFO]   13 | 0.001000 |   5.0028 |   4.9278 |  0.632 |  0.536 | 5/150
+		[INFO]   14 | 0.001000 |   4.9714 |   4.7970 |  0.628 |  0.560 | 6/150
+		[INFO]   15 | 0.001000 |   4.9586 |   4.7115 |  0.635 |  0.576 | 7/150
+		[INFO]   16 | 0.001000 |   4.9243 |   4.8221 |  0.639 |  0.556 | 8/150
+		[INFO]   17 | 0.001000 |   4.9973 |   4.5589 |  0.629 |  0.603 | 9/150
+		[INFO]   18 | 0.001000 |   4.8768 |   4.6733 |  0.643 |  0.583 | 0/150
+		[INFO]   19 | 0.001000 |   4.8726 |   4.6420 |  0.651 |  0.588 | 1/150
+		[INFO]   20 | 0.001000 |   4.8728 |   4.5085 |  0.644 |  0.612 | 2/150
+		[INFO]   21 | 0.001000 |   4.8590 |   4.7551 |  0.650 |  0.568 | 0/150
+		[INFO]   22 | 0.001000 |   4.8529 |   4.6335 |  0.652 |  0.590 | 1/150
+		[INFO]   23 | 0.001000 |   4.8320 |   4.4480 |  0.658 |  0.622 | 2/150
+		[INFO]   24 | 0.001000 |   4.8423 |   4.6462 |  0.652 |  0.588 | 0/150
+		[INFO]   25 | 0.001000 |   4.7825 |   4.4293 |  0.657 |  0.625 | 1/150
+		[INFO]   26 | 0.001000 |   4.7952 |   4.6901 |  0.660 |  0.580 | 0/150
+		[INFO]   27 | 0.001000 |   4.7186 |   4.4682 |  0.665 |  0.619 | 1/150
+		[INFO]   28 | 0.001000 |   4.7414 |   4.6584 |  0.665 |  0.585 | 2/150
+		[INFO]   29 | 0.001000 |   4.7346 |   4.6744 |  0.666 |  0.583 | 3/150
+		[INFO]   30 | 0.001000 |   4.7461 |   4.7485 |  0.664 |  0.569 | 4/150
+		[INFO]   31 | 0.001000 |   4.6552 |   4.4862 |  0.680 |  0.616 | 5/150
+		[INFO]   32 | 0.001000 |   4.7186 |   4.6734 |  0.673 |  0.583 | 6/150
+		[INFO]   33 | 0.001000 |   4.7037 |   4.6898 |  0.670 |  0.580 | 7/150
+		[INFO]   34 | 0.001000 |   4.7079 |   4.4715 |  0.671 |  0.618 | 8/150
+		[INFO]   35 | 0.001000 |   4.7153 |   4.5877 |  0.670 |  0.598 | 9/150
+		[INFO]   36 | 0.001000 |   4.7080 |   4.3175 |  0.673 |  0.644 | 10/150
+		[INFO]   37 | 0.001000 |   4.6913 |   4.8392 |  0.677 |  0.553 | 0/150
+		[INFO]   38 | 0.001000 |   4.6600 |   4.5363 |  0.677 |  0.607 | 1/150
+		[INFO]   39 | 0.001000 |   4.6265 |   4.6600 |  0.678 |  0.585 | 2/150
+		[INFO]   40 | 0.001000 |   4.6480 |   4.6271 |  0.679 |  0.591 | 3/150
+		[INFO]   41 | 0.001000 |   4.6528 |   4.2654 |  0.681 |  0.652 | 4/150
+		[INFO]   42 | 0.001000 |   4.5971 |   4.4998 |  0.684 |  0.613 | 0/150
+		[INFO]   43 | 0.001000 |   4.6636 |   4.5464 |  0.678 |  0.605 | 1/150
+		[INFO]   44 | 0.001000 |   4.6395 |   4.4955 |  0.682 |  0.614 | 2/150
+		[INFO]   45 | 0.001000 |   4.6440 |   4.5479 |  0.682 |  0.605 | 3/150
+		[INFO]   46 | 0.001000 |   4.5764 |   4.3882 |  0.686 |  0.632 | 4/150
+		[INFO]   47 | 0.001000 |   4.6099 |   4.5350 |  0.681 |  0.607 | 5/150
+		[INFO]   48 | 0.001000 |   4.5923 |   4.4949 |  0.687 |  0.614 | 6/150
+		[INFO]   49 | 0.001000 |   4.6122 |   4.6478 |  0.686 |  0.587 | 7/150
+		[INFO]   50 | 0.001000 |   4.5530 |   4.2630 |  0.693 |  0.653 | 8/150
+		[INFO]   51 | 0.001000 |   4.6225 |   4.6177 |  0.681 |  0.593 | 0/150
+		[INFO]   52 | 0.001000 |   4.6414 |   4.2433 |  0.681 |  0.656 | 1/150
+		[INFO]   53 | 0.001000 |   4.5955 |   4.3042 |  0.685 |  0.646 | 0/150
+		[INFO]   54 | 0.001000 |   4.5916 |   4.1507 |  0.684 |  0.671 | 1/150
+		[INFO]   55 | 0.001000 |   4.6135 |   4.3881 |  0.684 |  0.632 | 0/150
+		[INFO]   56 | 0.001000 |   4.6304 |   4.3784 |  0.684 |  0.634 | 1/150
+		[INFO]   57 | 0.001000 |   4.5733 |   4.5490 |  0.689 |  0.605 | 2/150
+		[INFO]   58 | 0.001000 |   4.5645 |   4.5426 |  0.690 |  0.606 | 3/150
+		[INFO]   59 | 0.001000 |   4.5406 |   4.4138 |  0.696 |  0.628 | 4/150
+		[INFO]   60 | 0.001000 |   4.5995 |   4.6545 |  0.687 |  0.586 | 5/150
+		[INFO]   61 | 0.001000 |   4.5871 |   4.2318 |  0.689 |  0.658 | 6/150
+		[INFO]   62 | 0.001000 |   4.5756 |   4.3288 |  0.690 |  0.642 | 7/150
+		[INFO]   63 | 0.001000 |   4.5376 |   4.3614 |  0.697 |  0.637 | 8/150
+		[INFO]   64 | 0.001000 |   4.5185 |   4.6718 |  0.696 |  0.583 | 9/150
+		[INFO]   65 | 0.001000 |   4.5565 |   4.8338 |  0.691 |  0.554 | 10/150
+		[INFO]   66 | 0.001000 |   4.5088 |   4.3042 |  0.695 |  0.646 | 11/150
+		[INFO]   67 | 0.001000 |   4.4986 |   4.4865 |  0.693 |  0.616 | 12/150
+		[INFO]   68 | 0.001000 |   4.5560 |   4.3959 |  0.685 |  0.631 | 13/150
+		[INFO]   69 | 0.001000 |   4.5442 |   4.7130 |  0.690 |  0.576 | 14/150
+		[INFO]   70 | 0.001000 |   4.5373 |   4.4396 |  0.695 |  0.624 | 15/150
+		[INFO]   71 | 0.001000 |   4.5130 |   4.4684 |  0.698 |  0.619 | 16/150
+		[INFO]   72 | 0.001000 |   4.5288 |   4.0894 |  0.692 |  0.681 | 17/150
+		[INFO]   73 | 0.001000 |   4.5271 |   4.5517 |  0.693 |  0.604 | 0/150
+		[INFO]   74 | 0.001000 |   4.5603 |   4.3041 |  0.694 |  0.646 | 1/150
+		[INFO]   75 | 0.001000 |   4.5087 |   4.4807 |  0.699 |  0.617 | 2/150
+		[INFO]   76 | 0.001000 |   4.5412 |   4.5679 |  0.690 |  0.601 | 3/150
+		[INFO]   77 | 0.001000 |   4.5263 |   4.2279 |  0.699 |  0.659 | 4/150
+		[INFO]   78 | 0.001000 |   4.4960 |   4.2371 |  0.698 |  0.657 | 5/150
+		[INFO]   79 | 0.001000 |   4.4912 |   4.2383 |  0.698 |  0.657 | 6/150
+		[INFO]   80 | 0.001000 |   4.4689 |   4.1904 |  0.702 |  0.665 | 7/150
+		[INFO]   81 | 0.001000 |   4.4838 |   4.5062 |  0.703 |  0.612 | 8/150
+		[INFO]   82 | 0.001000 |   4.5406 |   4.2961 |  0.697 |  0.647 | 9/150
+		[INFO]   83 | 0.001000 |   4.4772 |   4.3347 |  0.697 |  0.641 | 10/150
+		[INFO]   84 | 0.001000 |   4.5014 |   4.4545 |  0.694 |  0.621 | 11/150
+		[INFO]   85 | 0.001000 |   4.5230 |   4.3394 |  0.704 |  0.640 | 12/150
+		[INFO]   86 | 0.001000 |   4.5510 |   4.3770 |  0.692 |  0.634 | 13/150
+		[INFO]   87 | 0.001000 |   4.4433 |   4.1931 |  0.707 |  0.664 | 14/150
+		[INFO]   88 | 0.001000 |   4.5743 |   4.4907 |  0.693 |  0.615 | 15/150
+		[INFO]   89 | 0.001000 |   4.5092 |   4.2598 |  0.693 |  0.653 | 16/150
+		[INFO]   90 | 0.001000 |   4.5111 |   4.2929 |  0.701 |  0.648 | 17/150
+		[INFO]   91 | 0.001000 |   4.4867 |   4.2324 |  0.702 |  0.658 | 18/150
+		[INFO]   92 | 0.001000 |   4.4623 |   4.7854 |  0.706 |  0.563 | 19/150
+		[INFO]   93 | 0.001000 |   4.4918 |   4.3904 |  0.706 |  0.632 | 20/150
+		[INFO]   94 | 0.000750 |   4.4689 |   4.3685 |  0.706 |  0.635 | 21/150
+		[INFO]   95 | 0.000750 |   4.5327 |   4.6748 |  0.703 |  0.583 | 22/150
+		[INFO]   96 | 0.000750 |   4.4624 |   4.1787 |  0.704 |  0.666 | 23/150

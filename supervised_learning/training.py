@@ -77,7 +77,7 @@ def train(case_id, tolerance=cfg.TOLERANCE, run_name=None, rerun = False):
         "seq_len": len(feat_info["series_blocks"][0]),
         "vehicle": sum(len(block) for block in feat_info["battery_blocks"]),
         # Fallback to config default if not in json
-        "emb_vocab": feat_info.get("num_embeddings", cfg.NUM_EMBEDDINGS) 
+        "emb_vocab": cfg.NUM_EMBEDDINGS
     }
     print(f"\t[Model Config] Detected Dims: {dims}")
 
@@ -106,7 +106,8 @@ def train(case_id, tolerance=cfg.TOLERANCE, run_name=None, rerun = False):
         n_heads=cfg.N_HEADS,
         fc_hidden_dim1=cfg.HIDDEN_DIM_1,
         fc_hidden_dim2=cfg.HIDDEN_DIM_2,
-        dropout=cfg.DROPOUT
+        dropout=cfg.DROPOUT,
+        attention_dropout=cfg.ATTENTION_DROPOUT
     ).to(cfg.DEVICE)
 
     criterion = nn.MSELoss()
@@ -208,7 +209,7 @@ def train(case_id, tolerance=cfg.TOLERANCE, run_name=None, rerun = False):
 
     # --- 5. Wrap Up ---
         
-        if epoch % 15 == 1:
+        if epoch % 3 == 1:
             plot_training_curves(history, paths["plot"])
             
     print(f"Training Complete. Results saved to: {paths['output_dir']}")

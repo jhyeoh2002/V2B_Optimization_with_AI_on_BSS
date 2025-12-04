@@ -10,7 +10,7 @@ def schedule_batteries(fully_charged_series, n_station, tnum, SOC_thr=0.9, max_s
     N_V_t = []  # Hourly number of required fully charged batteries
     t_a_v = []  # Arrival time of each battery
 
-    N_V_temp = [int(max((available[i] - available[i + 1])+8, 0)) for i in range(len(available) - 1)]
+    N_V_temp = [int(max((available[i] - available[i + 1])+3, 0)) for i in range(len(available) - 1)]
     N_V_temp.insert(0, 0)  # Assuming no arrivals at hour 0
     
     N_V_t += N_V_temp

@@ -34,22 +34,10 @@ def _calculate_priority(soc_current, dep_soc, dep_time, current_hour):
 def allocate_and_update_state(ai_power_decision, current_socs, avail_mask, dep_socs, dep_times, hour_now):
     """
     Apply constraints, force charge logic, and physics updates.
-    
-    Args:
-        ai_power_decision (float): Total power requested by AI (kW).
-        current_socs (np.array): Current SOC state of all vehicles [0.0 - 1.0].
-        avail_mask (np.array): Boolean mask of vehicles present at site.
-        dep_socs (np.array): Target SOCs.
-        dep_times (np.array): Departure times.
-        hour_now (int): Current simulation hour.
-        
-    Returns:
-        new_socs (np.array): Updated SOCs for next hour.
-        executed_power (float): Actual total power used.
     """
     # System Constants (Adjust to your real battery specs)
-    BATTERY_CAPACITY_KWH = 60.0 
-    MAX_CHARGER_POWER = 7.0 # kW per charger
+    BATTERY_CAPACITY_KWH = 1.7 
+    MAX_CHARGER_POWER = 14.0 # kW per charger
     
     # 1. Identify Active Vehicles
     # We only care about vehicles that are present AND have a target > current
@@ -61,16 +49,14 @@ def allocate_and_update_state(ai_power_decision, current_socs, avail_mask, dep_s
     force_charge_mask = needs_charge_mask & (time_left <= 2.0)
     
     # Calculate power needed for force-charge vehicles
-    # Give them MAX_CHARGER_POWER or whatever is needed to hit 100%
     force_power_allocation = np.zeros_like(current_socs)
     force_power_allocation[force_charge_mask] = MAX_CHARGER_POWER
     
     total_force_power = np.sum(force_power_allocation)
     
     # 3. AI Allocation (Remaining Power)
-    # The AI decides the generic load, but we subtract what we MUST use for force charging
     remaining_power_budget = ai_power_decision - total_force_power
-    remaining_power_budget = max(0.0, remaining_power_budget) # Can't be negative
+    remaining_power_budget = max(0.0, remaining_power_budget)
     
     # Distribute remaining budget based on Priority
     priorities = _calculate_priority(current_socs, dep_socs, dep_times, hour_now)
@@ -109,22 +95,15 @@ def allocate_and_update_state(ai_power_decision, current_socs, avail_mask, dep_s
 def get_dynamic_input(i, iter, current_socs, b_demand, rad, temp, price, battery_demand_full, battery_details, battery_schedule, feature_info):
     """
     Constructs input vector using the LIVE `current_socs` passed from the loop.
+    Enforces shape matching with the trained model.
     """
-    # Time indexing: 
-    # iter 0 = Hour 23 (start of sim) -> predicting for next hour
-    # We need a 24-hour window ending at the current time.
-    
-    # 'battery_demand_full' is length 48. 
-    # Window start slides: 0->24, 1->25, etc.
+    # Time indexing
     start_idx = iter
     end_idx = iter + 24
     
     # 1. Series Features (120 dims)
-    # Slicing the environment data
     env_start = int(battery_demand_full[i, 0]) + iter
     
-    # Slicing the Battery Demand history (Sliding Window)
-    # We take the row 'i', ignore column 0 (index), and slice the 24h window
     batt_demand_window = battery_demand_full[i, 1:][start_idx : end_idx]
     
     series_flat = np.concatenate([
@@ -139,35 +118,49 @@ def get_dynamic_input(i, iter, current_socs, b_demand, rad, temp, price, battery
         return None # Boundary check
 
     # 2. Static Features (4 dims)
-    # Using the LAST hour of the window as "current time"
     current_time_idx = env_start + 23 
     static_df = _generate_cyclic_features(b_demand.index)
     static_vec = static_df.iloc[current_time_idx].tolist()
 
     # 3. Vehicle Features (Dynamic part)
-    # Current hour in 0-23 format for availability checks
     hour_of_day = (23 + iter) % 24
     
-    # Get mask for current hour
-    sched_row = battery_schedule[i] # [Vehicles, 24] or [Vehicles, 48]? Assuming fit to day
-    sched_row = sched_row[~np.isnan(sched_row)].reshape(-1, 48)
-    # Assuming sched_row aligns with the specific day we are simulating
+    # Get mask for current hour (Safe handling of NaNs)
+    sched_row = battery_schedule[i] 
+    # Replace NaNs with 0 to preserve shape for reshaping
+    sched_row = np.nan_to_num(sched_row, nan=0.0)
+    
+    # Assuming sched_row is [Vehicles x 48] or [Vehicles x 24] flattened?
+    # Ideally sched_row is already 2D [Vehicles, 48]. If it's flattened 1D, reshape:
+    if sched_row.ndim == 1:
+        sched_row = sched_row.reshape(-1, 48)
+        
     avail_flags = sched_row[:, hour_of_day] 
     
-    # Calculate Priority dynamically based on the passed-in SOCs
+    # Calculate Priority
     dep_socs = battery_details[1][i]
-    dep_socs = dep_socs[~np.isnan(dep_socs)]
+    dep_socs = np.nan_to_num(dep_socs, nan=0.0) # Safe fill
     dep_times = battery_details[3][i]
-    dep_times = dep_times[~np.isnan(dep_times)]
+    dep_times = np.nan_to_num(dep_times, nan=0.0) # Safe fill
 
-    # IMPORTANT: Ensure NaN handling if vehicles aren't in this case
-    # This generates the vector of size [N_VEHICLES]
     prio_vec = _calculate_priority(current_socs, dep_socs, dep_times, hour_of_day)
     
-    # Zero out priority for unavailable cars so model ignores them
+    # Zero out priority for unavailable cars
     active_mask = (avail_flags > 0)
     prio_vec = prio_vec * active_mask
     
+    # --- DIMENSION FIX: Ensure prio_vec matches model expectation ---
+    expected_veh_dim = sum(len(b) for b in feature_info['battery_blocks'])
+    current_veh_dim = len(prio_vec)
+    
+    if current_veh_dim > expected_veh_dim:
+        # Truncate if we have more vehicles than model expects
+        prio_vec = prio_vec[:expected_veh_dim]
+    elif current_veh_dim < expected_veh_dim:
+        # Pad if we have fewer
+        pad_len = expected_veh_dim - current_veh_dim
+        prio_vec = np.pad(prio_vec, (0, pad_len), 'constant')
+        
     # 4. Concatenate
     full_vector = np.concatenate([static_vec, series_flat, prio_vec])
     
@@ -193,7 +186,6 @@ def _read_clean_csv(path):
     return df.ffill().bfill()
 
 def load_data_and_model(case_id, run_name):
-    # Load Model (Same as your logic)
     base_path = os.path.join(cfg.TRAIN_RESULTS_DIR, run_name)
     with open(os.path.join(base_path, f"feature_info_{run_name}.json"), 'r') as f:
         feat_info = json.load(f)
@@ -238,36 +230,21 @@ def run_dynamic_simulation(case_id, run_name):
     # 2. Select Day to Test
     day_idx = 0 
     
-    # 3. INITIALIZATION (The "Reference" Step)
-    # We read the SOC state at Hour 23 (index 23) from the optimized file
-    # This is our starting point for the simulation.
+    # 3. INITIALIZATION
     print("[INFO] Loading Initial State from Optimization file...")
     SOC_opt = np.load(f"data/optimization_results/case0_test/optimization/SOC.npy")
     
-    # SOC_opt shape: [Days, Vehicles, Hours]? Or [Days, Hours, Vehicles]? 
-    # Assuming shape [Days, Vehicles, 24] based on your code `soc_row = SOC[i].T`
-    
     # Get SOCs at the END of the previous period (Hour 23)
-    # This becomes the starting SOC for our simulation loop (Iter 0)
     current_soc_state = SOC_opt[day_idx].T[:, 23] 
-    # print(len(current_soc_state))
-
-    # print(current_soc_state)
     
-    # Handle NaNs (vehicles not there)
-    current_soc_state = current_soc_state[~np.isnan(current_soc_state)]
-    # print(len(current_soc_state))
-
-    # print(current_soc_state)
+    # FIX: Do NOT remove NaNs, just fill them with 0. 
+    # Removing them breaks alignment with 'batt_sched' and the physics loop.
+    current_soc_state = np.nan_to_num(current_soc_state, nan=0.0)
     
     # 4. SIMULATION LOOP (Iter 0 to 23)
-    # Iter 0 corresponds to prediction for Hour 0 of the NEXT day (or Hour 24 contiguous)
     simulation_results = []
     
     for iter in range(24):
-        # Current Global Hour (23 + iter -> 23, 24, 25...)
-        # Wait, if iter 0 is the first prediction, we are at hour 23 looking forward.
-        
         # A. BUILD INPUT (Using current_soc_state)
         input_tensor = get_dynamic_input(
             day_idx, iter, current_soc_state, 
@@ -280,18 +257,17 @@ def run_dynamic_simulation(case_id, run_name):
         with torch.no_grad():
             pred_power_kw = model(input_tensor.to(cfg.DEVICE)).item()
             
-        # C. ALLOCATION & UPDATE (The Feedback Loop)
-        # Get details for this hour
-        hour_idx = (23 + iter) % 24 # Wrap around 0-23 if needed, or keep continuous
+        # C. ALLOCATION & UPDATE
+        hour_idx = (23 + iter) % 24
         
-        # Get availability for the moment
-        sched_row = batt_sched[day_idx]
+        # Get availability (Fixing potential nan issues)
+        sched_row = np.nan_to_num(batt_sched[day_idx], nan=0.0)
+        if sched_row.ndim == 1: sched_row = sched_row.reshape(-1, 48)
+        
         avail_mask = (sched_row[:, hour_idx] > 0).astype(float)
         
-        target_socs = batt_details[1][day_idx]
-        target_socs = target_socs[~np.isnan(target_socs)]
-        target_times = batt_details[3][day_idx]
-        target_times = target_times[~np.isnan(target_times)]
+        target_socs = np.nan_to_num(batt_details[1][day_idx], nan=0.0)
+        target_times = np.nan_to_num(batt_details[3][day_idx], nan=0.0)
         
         # *** CRITICAL UPDATE ***
         next_socs, executed_power = allocate_and_update_state(
@@ -304,11 +280,12 @@ def run_dynamic_simulation(case_id, run_name):
         )
         
         # D. LOGGING
-        print(f"Hour {24+iter}: AI Request={pred_power_kw:.2f}kW | Executed={executed_power:.2f}kW | Avg SOC={np.mean(next_socs[avail_mask>0]):.2f}")
+        # Only calc mean for cars currently present
+        avg_soc = np.mean(next_socs[avail_mask > 0]) if np.sum(avail_mask) > 0 else 0.0
+        print(f"Hour {24+iter}: AI Request={pred_power_kw:.2f}kW | Executed={executed_power:.2f}kW | Avg SOC={avg_soc:.2f}")
         simulation_results.append(executed_power)
         
         # E. STATE TRANSITION
-        # The output of this hour becomes the input for the next iter
         current_soc_state = next_socs
 
     print("\n✅ Simulation Complete.")

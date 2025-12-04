@@ -4,7 +4,7 @@ import joblib
 import torch
 import numpy as np
 import pandas as pd
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset, DataLoader, WeightedRandomSampler
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 
@@ -161,7 +161,8 @@ def get_dataloaders(
     num_workers=2,
     scaler_dir="scalers",
     fit_scaler=True,
-    random_seed=42
+    random_seed=42,
+    use_weighted_sampler=True
 ):
     """
     Orchestrates the data pipeline: Load CSV -> Split -> Scale -> DataLoader.
@@ -201,11 +202,45 @@ def get_dataloaders(
     train_ds = TimeSeriesDataset(train_df, static_cols, series_cols, battery_cols, target_col, scalers)
     val_ds = TimeSeriesDataset(val_df, static_cols, series_cols, battery_cols, target_col, scalers)
 
-    # 5. Create Loaders
+    # 5. Create Imbalanced Sampler (If requested)
+    train_sampler = None
+    if use_weighted_sampler:
+        print("\t\t[INFO] Calculating weights for imbalanced regression...")
+        targets = train_df[target_col].values
+        
+        # A. Histogram binning to find density
+        # We use 50 bins to capture the distribution fine-grained enough
+        counts, bins = np.histogram(targets, bins=140)
+        
+        # B. Assign each sample to a bin
+        # -1 because digitize returns 1-based index
+        sample_bins = np.digitize(targets, bins) - 1
+        # Clip to ensure indices are valid (handle edges)
+        sample_bins = np.clip(sample_bins, 0, len(counts) - 1)
+        
+        # C. Calculate Inverse Frequency Weight
+        # Add epsilon to counts to avoid div-by-zero
+        # weights = 1.0 / (counts[sample_bins] + 1e-6)
+        weights = 1.0 / ((np.sqrt(counts[sample_bins]) + 1e-6)+ 1e-3)
+        # D. Create Sampler
+        # Replacement=True allows oversampling rare cases
+        train_sampler = WeightedRandomSampler(
+            weights=weights,
+            num_samples=len(train_df),
+            replacement=True
+        )
+
+    # 6. Create Loaders
+    # NOTE: When using sampler, 'shuffle' must be False (sampler handles randomness)
     train_loader = DataLoader(
-        train_ds, batch_size=batch_size, shuffle=True, 
-        num_workers=num_workers, pin_memory=True
+        train_ds, 
+        batch_size=batch_size, 
+        shuffle=(train_sampler is None), # Only shuffle if NO sampler
+        sampler=train_sampler,
+        num_workers=num_workers, 
+        pin_memory=True
     )
+    
     val_loader = DataLoader(
         val_ds, batch_size=batch_size, shuffle=False, 
         num_workers=num_workers, pin_memory=True

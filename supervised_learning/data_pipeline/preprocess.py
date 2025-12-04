@@ -109,7 +109,7 @@ def create_sliding_windows(
         SOC (np.array): State of Charge traces.
         departure_soc, departure_times (np.array): Vehicle metadata.
         static_df (pd.DataFrame): Pre-computed time features.
-        env_data (list): List of DataFrames [building, radiation, temp, price].
+        env_data (list): List of DataFrames [building, radiation, temp, priceG2B, priceG2V].
         ground_truth (np.array): Optimization targets.
         
     Returns:
@@ -120,7 +120,7 @@ def create_sliding_windows(
     valid_samples = 0
     
     # Unpack environment data for easier access
-    b_demand, rad, temp, price = env_data
+    b_demand, rad, temp, priceG2B, priceG2V = env_data
     
     # Random index logic from original code (handling negative start indices)
     extended_index = np.random.uniform(
@@ -175,7 +175,8 @@ def create_sliding_windows(
                 b_demand.iloc[start_idx:end_idx, 0].values,
                 rad.iloc[start_idx:end_idx, 0].values,
                 temp.iloc[start_idx:end_idx, 0].values,
-                price.iloc[start_idx:end_idx, 0].values,
+                priceG2B.iloc[start_idx:end_idx, 0].values,
+                priceG2V.iloc[start_idx:end_idx, 0].values,
                 battery_demand[i, 1 + n: 1 + n + sequence_length] # Battery series
             ]
 
@@ -211,7 +212,7 @@ def create_sliding_windows(
             row_feats.extend(np.round(priority, 4).tolist())
             
             # Append Target
-            target = float(np.round(optimal_ch[hour_now], 3))
+            target = float(np.round(optimal_ch[hour_now], 1))
             row_feats.append(target)
             
             rows.append(row_feats)
@@ -266,7 +267,8 @@ def merge_and_process(
     # --- 2. Load Time Series ---
     ts_dir = "./data/timeseries"
     b_demand = _read_clean_csv(f"{ts_dir}/building_data.csv")
-    price = _read_clean_csv(f"{ts_dir}/electricitycostG2B_data.csv")
+    priceG2B = _read_clean_csv(f"{ts_dir}/electricitycostG2B_data.csv")
+    priceG2V = _read_clean_csv(f"{ts_dir}/electricitycostG2V_data.csv")
     rad = _read_clean_csv(f"{ts_dir}/radiation_data.csv")
     temp = _read_clean_csv(f"{ts_dir}/temperature_data.csv")
     
@@ -276,7 +278,7 @@ def merge_and_process(
 
     # --- 3. Analyze Embeddings (Optional info) ---
     suggested_emb = _analyze_quantization([
-        b_demand.values, rad.values, temp.values, price.values, battery_demand[:, 1:]
+        b_demand.values, rad.values, temp.values, priceG2B.values, priceG2V.values, battery_demand[:, 1:]
     ])
 
     # --- 4. Create Windows ---
@@ -292,14 +294,14 @@ def merge_and_process(
         departure_soc=departure_soc,
         departure_times=departure_times,
         static_df=static_df,
-        env_data=[b_demand, rad, temp, price],
+        env_data=[b_demand, rad, temp, priceG2B, priceG2V],
         ground_truth=ground_truth
     )
 
     # --- 5. Format & Save ---
     # Define Column Names
     static_names = ["sin_hour", "cos_hour", "sin_day", "cos_day"]
-    series_names = ["building", "radiation", "temperature", "price", "battery"]
+    series_names = ["building", "radiation", "temperature", "priceG2B", "priceG2V", "battery"]
     ts_cols = [f"{n}_T{t+1}" for n in series_names for t in range(sequence_length)]
     
     # Use detected vehicle count
