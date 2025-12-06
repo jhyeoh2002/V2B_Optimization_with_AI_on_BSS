@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from itertools import chain
 from util.case_dir import case_dir
+import config as cfg
 
 # Add project root to path if needed
 sys.path.append(os.path.abspath(".."))
@@ -186,21 +187,21 @@ def create_sliding_windows(
             
             # Slice current timestep data
             curr_soc = soc_row[active_mask, hour_now]
+
+            # # Get matching departure info
+            # curr_dep_soc = departure_soc[i][~np.isnan(departure_soc[i])][active_mask]
+            # curr_dep_time = departure_times[i][~np.isnan(departure_times[i])][active_mask]
             
-            # Get matching departure info
-            curr_dep_soc = departure_soc[i][~np.isnan(departure_soc[i])][active_mask]
-            curr_dep_time = departure_times[i][~np.isnan(departure_times[i])][active_mask]
-            
-            # Update detected vehicles for column naming later
+            # # Update detected vehicles for column naming later
             if len(curr_soc) > n_veh_detected:
                 n_veh_detected = len(curr_soc)
 
-            # Calculate Priority
-            priority = _calculate_priority(curr_soc, curr_dep_soc, curr_dep_time, hour_now)
+            # # Calculate Priority
+            # priority = _calculate_priority(curr_soc, curr_dep_soc, curr_dep_time, hour_now)
 
-            # Filter Residual NaNs
-            mask_valid = ~(np.isnan(curr_soc) | np.isnan(priority))
-            priority = priority[mask_valid]
+            # # Filter Residual NaNs
+            # mask_valid = ~(np.isnan(curr_soc) | np.isnan(priority))
+            # priority = priority[mask_valid]
 
             # 3. Assemble Row
             # Static (Time) + Environmental (Series) + Vehicle (Priority) + Target
@@ -209,7 +210,7 @@ def create_sliding_windows(
             for series in env_feats:
                 row_feats.extend(series.tolist())
             
-            row_feats.extend(np.round(priority, 4).tolist())
+            row_feats.extend(np.round(curr_soc, 4).tolist())
             
             # Append Target
             target = float(np.round(optimal_ch[hour_now], 1))
@@ -305,9 +306,14 @@ def merge_and_process(
     ts_cols = [f"{n}_T{t+1}" for n in series_names for t in range(sequence_length)]
     
     # Use detected vehicle count
-    batt_cols = [f"priority_V{v+1}" for v in range(n_veh)]
+    batt_cols = [f"SOC_V{v+1}" for v in range(n_veh)]
     
     all_cols = static_names + ts_cols + batt_cols + ["target"]
+    
+    print("Column names",all_cols)
+    print("Number of columns:", len(all_cols))
+    print("Number of rows:", len(rows))
+    
     
     df_processed = pd.DataFrame(rows, columns=all_cols)
     df_processed.to_csv(dataset_name, index=False)
@@ -318,10 +324,17 @@ def merge_and_process(
         feature_info = {
             "static_cols": static_names,
             "series_blocks": [[f"{n}_T{t+1}" for t in range(sequence_length)] for n in series_names],
-            "battery_blocks": [[f"priority_V{v+1}" for v in range(n_veh)]],
+            "battery_blocks": [[f"SOC_V{v+1}" for v in range(n_veh)]],
             "target_col": "target",
-            "num_embeddings": suggested_emb
+            "embedding_dim": cfg.EMBEDDING_DIM,
+            "num_embeddings": cfg.NUM_EMBEDDINGS,
+            "n_heads": cfg.N_HEADS,
+            "hidden_dim_1": cfg.HIDDEN_DIM_1,
+            "hidden_dim_2": cfg.HIDDEN_DIM_2,
+            "dropout": cfg.DROPOUT,
+            "attention_dropout": cfg.ATTENTION_DROPOUT         
         }
+        
         with open(feature_info_name, "w") as f:
             json.dump(feature_info, f, indent=4)
         print(f"\t\t[INFO] Saved metadata: {feature_info_name}")

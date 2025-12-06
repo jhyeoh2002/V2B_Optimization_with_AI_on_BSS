@@ -13,6 +13,8 @@ def schedule_batteries(fully_charged_series, n_station, tnum, SOC_thr=0.9, max_s
     N_V_temp = [int(max((available[i] - available[i + 1])+3, 0)) for i in range(len(available) - 1)]
     N_V_temp.insert(0, 0)  # Assuming no arrivals at hour 0
     
+    print(f"[DEBUG] N_V_temp: {N_V_temp}")  # Debugging line to check N_V_temp values
+    
     N_V_t += N_V_temp
     n_total = sum(N_V_t) + n_station  #Total battery numbers if each battery is numbered separately
          

@@ -1,0 +1,120 @@
+nohup: ignoring input
+Crash diagnostics ON
+
+
+==================================================
+PART 1: Data preprocess for 2023-01-01 00:00:00 to 2024-09-30 23:00:00...
+==================================================
+
+	1.1 Preprocessing radiation data...
+		[INFO] Radiation data already exists at './data/timeseries/radiation_data.csv'
+
+	1.2 Preprocessing temperature data...
+		[INFO] Temperature data already exists at './data/timeseries/temperature_data.csv'
+
+	1.3 Preprocessing building data...
+		[INFO] Building data already exists at './data/timeseries/building_data.csv'
+
+	1.4 Preprocessing electricity cost data...
+		[INFO] Electricity cost data already exists at './data/timeseries/electricitycostG2B_data.csv' and './data/timeseries/electricitycostG2V_data.csv'
+
+	1.5 Preprocessing battery demand series data...
+		[INFO] Found existing battery data at 'data/battery_demandV2/resample_full.csv' and 'data/battery_demandV2/resample_train.csv'
+
+		[INFO] Number of series for clean windows = (168, 37)
+		[INFO] Number of eligible series for Case 2 = (1395, 37)
+		[INFO] Case 1 exists — loaded battery demand from 'data/battery_demandV2/case1_real_only/battery_demand.npy' with shape (168, 37).
+		[INFO] Case 2 exists — loaded battery demand from 'data/battery_demandV2/case2_nan_filled/battery_demand.npy' with shape (1563, 37).
+		[INFO] Case 0 exists — loaded battery demand from 'data/battery_demandV2/case0_test/battery_demand.npy' with shape (2, 49).
+
+	1.6 Generating battery schedule...
+		[INFO] Case 0 exists — loaded from 'data/battery_demandV2/case0_test/battery_availability.npy' and 'data/battery_demandV2/case0_test/battery_details.npy' shape (2, 272, 48) and (4, 2, 272)
+		[INFO] Case 1 exists — loaded from 'data/battery_demandV2/case1_real_only/battery_availability.npy' and 'data/battery_demandV2/case1_real_only/battery_details.npy' shape (168, 237, 36) and (4, 168, 237)
+		[INFO] Case 2 exists — loaded from 'data/battery_demandV2/case2_nan_filled/battery_availability.npy' and 'data/battery_demandV2/case2_nan_filled/battery_details.npy' shape (1563, 237, 36) and (4, 1563, 237)
+		[ERROR] Could not load battery demand from 'data/battery_demandV2/case3_extended_generated/battery_demand.npy': [Errno 2] No such file or directory: 'data/battery_demandV2/case3_extended_generated/battery_demand.npy'
+
+
+==================================================
+PART 2: MILP Optimization...
+==================================================
+
+	2.0 Optimizing Case 0...
+		[INFO] Loaded 2 samples from 'data/battery_demandV2/case0_test'
+		[INFO] Results already exist at 'data/optimization_resultsV2/case0_test/immediate_charging/V2B.npy'. Skipping immediate_charging run.
+		[INFO] Results already exist at 'data/optimization_resultsV2/case0_test/optimization/V2B.npy'. Skipping optimization run.
+		[INFO] Case 0 completed.
+
+	2.1 Optimizing Case 1...
+		[INFO] Loaded 168 samples from 'data/battery_demandV2/case1_real_only'
+		[INFO] Results already exist at 'data/optimization_resultsV2/case1_real_only/immediate_charging/V2B.npy'. Skipping immediate_charging run.
+		[INFO] Results already exist at 'data/optimization_resultsV2/case1_real_only/optimization/V2B.npy'. Skipping optimization run.
+		[INFO] Case 1 completed.
+
+	2.2 Optimizing Case 2...
+		[INFO] Loaded 1563 samples from 'data/battery_demandV2/case2_nan_filled'
+		[INFO] Results already exist at 'data/optimization_resultsV2/case2_nan_filled/immediate_charging/V2B.npy'. Skipping immediate_charging run.
+		[INFO] Results already exist at 'data/optimization_resultsV2/case2_nan_filled/optimization/V2B.npy'. Skipping optimization run.
+		[INFO] Case 2 completed.
+
+
+==================================================
+PART 3: Supervised Learning...
+==================================================
+
+	3.2 Training Case 2...
+
+=== Starting Training Run: STAF_currentSOC_V2_CASE2 ===
+Device: cuda
+		[INFO] Starting Preprocessing for Case 2...
+		[INFO] Unique quantized indices: 28274
+		[INFO] Suggested num_embeddings: 33928
+		[INFO] Generating sliding windows...
+Column names ['sin_hour', 'cos_hour', 'sin_day', 'cos_day', 'building_T1', 'building_T2', 'building_T3', 'building_T4', 'building_T5', 'building_T6', 'building_T7', 'building_T8', 'building_T9', 'building_T10', 'building_T11', 'building_T12', 'building_T13', 'building_T14', 'building_T15', 'building_T16', 'building_T17', 'building_T18', 'building_T19', 'building_T20', 'building_T21', 'building_T22', 'building_T23', 'building_T24', 'radiation_T1', 'radiation_T2', 'radiation_T3', 'radiation_T4', 'radiation_T5', 'radiation_T6', 'radiation_T7', 'radiation_T8', 'radiation_T9', 'radiation_T10', 'radiation_T11', 'radiation_T12', 'radiation_T13', 'radiation_T14', 'radiation_T15', 'radiation_T16', 'radiation_T17', 'radiation_T18', 'radiation_T19', 'radiation_T20', 'radiation_T21', 'radiation_T22', 'radiation_T23', 'radiation_T24', 'temperature_T1', 'temperature_T2', 'temperature_T3', 'temperature_T4', 'temperature_T5', 'temperature_T6', 'temperature_T7', 'temperature_T8', 'temperature_T9', 'temperature_T10', 'temperature_T11', 'temperature_T12', 'temperature_T13', 'temperature_T14', 'temperature_T15', 'temperature_T16', 'temperature_T17', 'temperature_T18', 'temperature_T19', 'temperature_T20', 'temperature_T21', 'temperature_T22', 'temperature_T23', 'temperature_T24', 'priceG2B_T1', 'priceG2B_T2', 'priceG2B_T3', 'priceG2B_T4', 'priceG2B_T5', 'priceG2B_T6', 'priceG2B_T7', 'priceG2B_T8', 'priceG2B_T9', 'priceG2B_T10', 'priceG2B_T11', 'priceG2B_T12', 'priceG2B_T13', 'priceG2B_T14', 'priceG2B_T15', 'priceG2B_T16', 'priceG2B_T17', 'priceG2B_T18', 'priceG2B_T19', 'priceG2B_T20', 'priceG2B_T21', 'priceG2B_T22', 'priceG2B_T23', 'priceG2B_T24', 'priceG2V_T1', 'priceG2V_T2', 'priceG2V_T3', 'priceG2V_T4', 'priceG2V_T5', 'priceG2V_T6', 'priceG2V_T7', 'priceG2V_T8', 'priceG2V_T9', 'priceG2V_T10', 'priceG2V_T11', 'priceG2V_T12', 'priceG2V_T13', 'priceG2V_T14', 'priceG2V_T15', 'priceG2V_T16', 'priceG2V_T17', 'priceG2V_T18', 'priceG2V_T19', 'priceG2V_T20', 'priceG2V_T21', 'priceG2V_T22', 'priceG2V_T23', 'priceG2V_T24', 'battery_T1', 'battery_T2', 'battery_T3', 'battery_T4', 'battery_T5', 'battery_T6', 'battery_T7', 'battery_T8', 'battery_T9', 'battery_T10', 'battery_T11', 'battery_T12', 'battery_T13', 'battery_T14', 'battery_T15', 'battery_T16', 'battery_T17', 'battery_T18', 'battery_T19', 'battery_T20', 'battery_T21', 'battery_T22', 'battery_T23', 'battery_T24', 'SOC_V1', 'SOC_V2', 'SOC_V3', 'SOC_V4', 'SOC_V5', 'SOC_V6', 'SOC_V7', 'SOC_V8', 'SOC_V9', 'SOC_V10', 'SOC_V11', 'SOC_V12', 'SOC_V13', 'SOC_V14', 'SOC_V15', 'SOC_V16', 'SOC_V17', 'SOC_V18', 'SOC_V19', 'SOC_V20', 'SOC_V21', 'SOC_V22', 'SOC_V23', 'SOC_V24', 'SOC_V25', 'SOC_V26', 'SOC_V27', 'SOC_V28', 'SOC_V29', 'SOC_V30', 'SOC_V31', 'SOC_V32', 'SOC_V33', 'SOC_V34', 'SOC_V35', 'SOC_V36', 'SOC_V37', 'SOC_V38', 'SOC_V39', 'SOC_V40', 'SOC_V41', 'SOC_V42', 'SOC_V43', 'SOC_V44', 'SOC_V45', 'SOC_V46', 'SOC_V47', 'SOC_V48', 'SOC_V49', 'SOC_V50', 'SOC_V51', 'SOC_V52', 'SOC_V53', 'SOC_V54', 'SOC_V55', 'SOC_V56', 'SOC_V57', 'SOC_V58', 'SOC_V59', 'SOC_V60', 'SOC_V61', 'SOC_V62', 'SOC_V63', 'SOC_V64', 'SOC_V65', 'SOC_V66', 'SOC_V67', 'SOC_V68', 'SOC_V69', 'SOC_V70', 'SOC_V71', 'SOC_V72', 'SOC_V73', 'SOC_V74', 'SOC_V75', 'SOC_V76', 'target']
+Number of columns: 225
+Number of rows: 18756
+		[INFO] Saved dataset: ./data/training_results/STAF_currentSOC_V2_CASE2/merged_dataset_STAF_currentSOC_V2_CASE2.csv (Shape: (18756, 225))
+		[INFO] Saved metadata: ./data/training_results/STAF_currentSOC_V2_CASE2/feature_info_STAF_currentSOC_V2_CASE2.json
+	[Model Config] Detected Dims: {'static': 4, 'series_count': 6, 'seq_len': 24, 'vehicle': 76, 'emb_vocab': 8000}
+		[INFO] Data loaded. Train: 13129, Val: 5627
+		[INFO] Fitting new scalers on training data...
+		[INFO] Calculating weights for imbalanced regression...
+		[INFO] 
+==================================================
+		[INFO] 🚀 TRAINING SESSION: STAF_currentSOC_V2_CASE2
+		[INFO] ==================================================
+		[INFO] Device:             cuda
+		[INFO] Model Parameters:   214,026
+		[INFO] --------------------------------------------------
+		[INFO] Epochs:             5000
+		[INFO] Batch Size:         64
+		[INFO] Learning Rate:      0.001
+		[INFO] Weight Decay:       0.001
+		[INFO] Dropout:            0.6
+		[INFO] --------------------------------------------------
+		[INFO] Hidden Layers:      [512, 64]
+		[INFO] Embedding Dim:      8
+		[INFO] Attention Heads:    4
+		[INFO]==================================================
+
+
+		[INFO]Epoch |    LR    | Trn RMSE | Val RMSE | Trn R2 | Val R2 | Stop
+-----------------------------------------------------------------
+		[INFO]    1 | 0.001000 |   5.9904 |   6.2897 |  0.473 |  0.244 | 0/150
+		[INFO]    2 | 0.001000 |   4.6599 |   5.4173 |  0.681 |  0.440 | 0/150
+		[INFO]    3 | 0.001000 |   4.4083 |   5.8156 |  0.721 |  0.354 | 0/150
+		[INFO]    4 | 0.001000 |   4.2101 |   5.3613 |  0.738 |  0.451 | 1/150
+		[INFO]    5 | 0.001000 |   4.1502 |   5.1270 |  0.746 |  0.498 | 0/150
+		[INFO]    6 | 0.001000 |   4.0963 |   4.6187 |  0.747 |  0.593 | 0/150
+		[INFO]    7 | 0.001000 |   4.0264 |   4.6848 |  0.760 |  0.581 | 0/150
+		[INFO]    8 | 0.001000 |   4.0265 |   4.8013 |  0.761 |  0.560 | 1/150
+		[INFO]    9 | 0.001000 |   3.9273 |   4.6179 |  0.773 |  0.593 | 2/150
+		[INFO]   10 | 0.001000 |   3.8728 |   4.7527 |  0.778 |  0.569 | 0/150
+		[INFO]   11 | 0.001000 |   3.8354 |   4.6607 |  0.783 |  0.585 | 1/150
+		[INFO]   12 | 0.001000 |   3.8188 |   4.5254 |  0.784 |  0.609 | 2/150
+		[INFO]   13 | 0.001000 |   3.7806 |   4.5241 |  0.788 |  0.609 | 0/150
+		[INFO]   14 | 0.001000 |   3.7969 |   4.6012 |  0.784 |  0.596 | 0/150
+		[INFO]   15 | 0.001000 |   3.7163 |   4.4688 |  0.793 |  0.619 | 1/150
+		[INFO]   16 | 0.001000 |   3.7277 |   4.2210 |  0.795 |  0.660 | 0/150
+		[INFO]   17 | 0.001000 |   3.7274 |   4.1810 |  0.796 |  0.666 | 0/150
+		[INFO]   18 | 0.001000 |   3.7168 |   4.4795 |  0.798 |  0.617 | 0/150
+		[INFO]   19 | 0.001000 |   3.6773 |   4.2921 |  0.800 |  0.648 | 1/150

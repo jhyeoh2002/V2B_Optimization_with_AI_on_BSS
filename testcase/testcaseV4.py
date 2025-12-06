@@ -1,3 +1,4 @@
+from matplotlib import axis
 import pandas as pd
 import numpy as np
 import os
@@ -92,7 +93,7 @@ def allocate_and_update_state(ai_power_decision, current_socs, avail_mask, dep_s
 # ==========================================
 # 2. FEATURE CONSTRUCTION (Dynamic)
 # ==========================================
-def get_dynamic_input(i, iter, current_socs, b_demand, rad, temp, price, battery_demand_full, battery_details, battery_schedule, feature_info):
+def get_dynamic_input(i, iter, current_socs, b_demand, rad, temp, priceG2B, priceG2V, battery_demand_full, battery_details, battery_schedule, feature_info):
     """
     Constructs input vector using the LIVE `current_socs` passed from the loop.
     Enforces shape matching with the trained model.
@@ -110,12 +111,13 @@ def get_dynamic_input(i, iter, current_socs, b_demand, rad, temp, price, battery
         b_demand.iloc[env_start : env_start + 24, 0].values,
         rad.iloc[env_start : env_start + 24, 0].values,
         temp.iloc[env_start : env_start + 24, 0].values,
-        price.iloc[env_start : env_start + 24, 0].values,
+        priceG2B.iloc[env_start : env_start + 24, 0].values,
+        priceG2V.iloc[env_start : env_start + 24, 0].values,
         batt_demand_window
     ])
     
-    if len(series_flat) != 120:
-        return None # Boundary check
+    # if len(series_flat) != 120:
+    #     return None # Boundary check
 
     # 2. Static Features (4 dims)
     current_time_idx = env_start + 23 
@@ -136,33 +138,38 @@ def get_dynamic_input(i, iter, current_socs, b_demand, rad, temp, price, battery
         sched_row = sched_row.reshape(-1, 48)
         
     avail_flags = sched_row[:, hour_of_day] 
-    
+    # print("battery_detail", battery_details.shape)
     # Calculate Priority
-    dep_socs = battery_details[1][i]
-    dep_socs = np.nan_to_num(dep_socs, nan=0.0) # Safe fill
-    dep_times = battery_details[3][i]
-    dep_times = np.nan_to_num(dep_times, nan=0.0) # Safe fill
+    # dep_socs = battery_details[1][i]
+    # print(dep_socs.shape)
+    # dep_socs = dep_socs[~np.isnan(dep_socs)]  # Clean NaNs
+    # dep_times = battery_details[3][i]
+    # print(dep_times.shape)
 
-    prio_vec = _calculate_priority(current_socs, dep_socs, dep_times, hour_of_day)
+    # dep_times = dep_times[~np.isnan(dep_times)]  # Clean NaNs
+
+    # prio_vec = _calculate_priority(current_socs, dep_socs, dep_times, hour_of_day)
     
     # Zero out priority for unavailable cars
     active_mask = (avail_flags > 0)
-    prio_vec = prio_vec * active_mask
+    # prio_vec = prio_vec * active_mask
+    current_socs = current_socs[active_mask]
+    print("current_socs", current_socs.shape)
     
-    # --- DIMENSION FIX: Ensure prio_vec matches model expectation ---
-    expected_veh_dim = sum(len(b) for b in feature_info['battery_blocks'])
-    current_veh_dim = len(prio_vec)
+    # # --- DIMENSION FIX: Ensure prio_vec matches model expectation ---
+    # expected_veh_dim = sum(len(b) for b in feature_info['battery_blocks'])
+    # current_veh_dim = len(prio_vec)
     
-    if current_veh_dim > expected_veh_dim:
-        # Truncate if we have more vehicles than model expects
-        prio_vec = prio_vec[:expected_veh_dim]
-    elif current_veh_dim < expected_veh_dim:
-        # Pad if we have fewer
-        pad_len = expected_veh_dim - current_veh_dim
-        prio_vec = np.pad(prio_vec, (0, pad_len), 'constant')
+    # if current_veh_dim > expected_veh_dim:
+    #     # Truncate if we have more vehicles than model expects
+    #     prio_vec = prio_vec[:expected_veh_dim]
+    # elif current_veh_dim < expected_veh_dim:
+    #     # Pad if we have fewer
+    #     pad_len = expected_veh_dim - current_veh_dim
+    #     prio_vec = np.pad(prio_vec, (0, pad_len), 'constant')
         
     # 4. Concatenate
-    full_vector = np.concatenate([static_vec, series_flat, prio_vec])
+    full_vector = np.concatenate([static_vec, series_flat, current_socs])
     
     return torch.tensor(full_vector, dtype=torch.float32).unsqueeze(0)
 
@@ -195,18 +202,19 @@ def load_data_and_model(case_id, run_name):
         "series": len(feat_info["series_blocks"]),
         "seq": len(feat_info["series_blocks"][0]),
         "veh": sum(len(b) for b in feat_info["battery_blocks"]),
-        "vocab": feat_info.get("num_embeddings", cfg.NUM_EMBEDDINGS)
+        "vocab": 5000
     }
     
     model = STAF(dims["static"], dims["series"], dims["seq"], dims["veh"], dims["vocab"],
-                 cfg.EMBEDDING_DIM, cfg.N_HEADS, cfg.HIDDEN_DIM_1, cfg.HIDDEN_DIM_2, cfg.DROPOUT).to(cfg.DEVICE)
+                 cfg.EMBEDDING_DIM, cfg.N_HEADS, 256, 64, cfg.DROPOUT).to(cfg.DEVICE)
     model.load_state_dict(torch.load(os.path.join(base_path, "checkpoints", "best_model.pth"), map_location=cfg.DEVICE))
     model.eval()
 
     # Load Data
     ts_dir = "./data/timeseries"
     b_demand = _read_clean_csv(f"{ts_dir}/building_data.csv")
-    price = _read_clean_csv(f"{ts_dir}/electricitycostG2B_data.csv")
+    priceG2B = _read_clean_csv(f"{ts_dir}/electricitycostG2B_data.csv")
+    priceG2V = _read_clean_csv(f"{ts_dir}/electricitycostG2V_data.csv")
     rad = _read_clean_csv(f"{ts_dir}/radiation_data.csv")
     temp = _read_clean_csv(f"{ts_dir}/temperature_data.csv")
     
@@ -216,7 +224,7 @@ def load_data_and_model(case_id, run_name):
     batt_details = np.load(f"{c_dir}/battery_details.npy")
     batt_sched = np.load(f"{c_dir}/battery_availability.npy")
     
-    return model, feat_info, b_demand, rad, temp, price, batt_demand, batt_details, batt_sched
+    return model, feat_info, b_demand, rad, temp, priceG2B, priceG2V, batt_demand, batt_details, batt_sched
 
 # ==========================================
 # 4. MAIN SIMULATION LOOP
@@ -225,33 +233,40 @@ def run_dynamic_simulation(case_id, run_name):
     print(f"🚀 Starting Dynamic Simulation (Updating SOC per hour)")
     
     # 1. Load Everything
-    model, feat_info, b_demand, rad, temp, price, batt_demand, batt_details, batt_sched = load_data_and_model(case_id, run_name)
+    model, feat_info, b_demand, rad, temp, priceG2B, priceG2V, batt_demand, batt_details, batt_sched = load_data_and_model(case_id, run_name)
     
     # 2. Select Day to Test
     day_idx = 0 
     
     # 3. INITIALIZATION
     print("[INFO] Loading Initial State from Optimization file...")
-    SOC_opt = np.load(f"data/optimization_results/case0_test/optimization/SOC.npy")
-    
+    SOC_opt = np.load(f"data/optimization_resultsV2/case0_test/optimization/SOC.npy")
+    # print("Initial SOC State:", SOC_opt.shape)
+
     # Get SOCs at the END of the previous period (Hour 23)
     current_soc_state = SOC_opt[day_idx].T[:, 23] 
     
     # FIX: Do NOT remove NaNs, just fill them with 0. 
     # Removing them breaks alignment with 'batt_sched' and the physics loop.
-    current_soc_state = np.nan_to_num(current_soc_state, nan=0.0)
-    
+    # print("Initial SOC State:", current_soc_state.shape)
+    # current_soc_state = np.nan_to_num(current_soc_state, nan=0.0)
+    # current_soc_state = current_soc_state[~np.isnan(current_soc_state)]  # Clean NaNs
+    # print("Initial SOC State:", current_soc_state.shape)
+
     # 4. SIMULATION LOOP (Iter 0 to 23)
     simulation_results = []
     
     for iter in range(24):
+        
         # A. BUILD INPUT (Using current_soc_state)
         input_tensor = get_dynamic_input(
             day_idx, iter, current_soc_state, 
-            b_demand, rad, temp, price, batt_demand, batt_details, batt_sched, feat_info
+            b_demand, rad, temp, priceG2B, priceG2V, batt_demand, batt_details, batt_sched, feat_info
         )
-        
-        if input_tensor is None: break
+        # print("inputtensor",input_tensor)
+        if input_tensor is None: 
+            print("⚠️ Input is None, ending simulation early.")
+            break
 
         # B. AI PREDICTION
         with torch.no_grad():

@@ -19,11 +19,11 @@ CASE1 = "case1_real_only"
 CASE2 = "case2_nan_filled"
 CASE3 = "case3_extended_generated"
 
-BATTERYDEMAND_DIR = "data/battery_demandV2"
+BATTERYDEMAND_DIR = "data/battery_demandV3"
 BATTERY_FILE = f"{BATTERYDEMAND_DIR}/resample_full.csv"
 TS_DIR = "data/timeseries"
 
-OPTRESULTS_DIR = "data/optimization_resultsV2"
+OPTRESULTS_DIR = "data/optimization_resultsV3"
 
 # ==============================================================================
 # 2. DATA GENERATION PARAMETERS
@@ -110,26 +110,26 @@ TRAIN_FIGURE_DIR = "./figures/training_results"
 # ==========================================
 # TRAINING HYPERPARAMETERS
 # ==========================================
-RUN_NAME = f"STAFV7"
+RUN_NAME = f"STAF_currentSOC_V8"
 
 EPOCHS = 5000
-BATCH_SIZE = 64
-LEARNING_RATE = 1e-3
-WEIGHT_DECAY = 1e-3
+BATCH_SIZE = 32
+LEARNING_RATE = 5e-4
+WEIGHT_DECAY = 5e-4
 # WEIGHT_DECAY = LEARNING_RATE
 
 # Learning Rate Scheduler
-GAMMA = 0.75             # Factor to reduce LR by
-LR_PATIENCE = 20         # Epochs to wait before reducing LR
+GAMMA = 0.5             # Factor to reduce LR by
+LR_PATIENCE = 50         # Epochs to wait before reducing LR
 
 # Early Stopping
-ES_PATIENCE = 150        # Epochs to wait before stopping completely
+ES_PATIENCE = 100        # Epochs to wait before stopping completely
 
 # ==========================================
 # MODEL ARCHITECTURE
 # ==========================================
 EMBEDDING_DIM = 8
-NUM_EMBEDDINGS = 10000   # Initial guess, updated dynamically in training
+NUM_EMBEDDINGS = 1000  
 N_HEADS = 4
 # Recommended (Smoother funnel)
 HIDDEN_DIM_1 = 128  # Reduced from 1024

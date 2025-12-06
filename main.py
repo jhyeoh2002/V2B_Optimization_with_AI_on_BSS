@@ -20,40 +20,40 @@ def main():
     # Use the tolerance from the command line arguments
     target_tolerance = args.tolerance 
 
-    for case_num in cases_to_run:
-        print(f"\n\t2.{case_num} Optimizing Case {case_num}...")
+    # for case_num in cases_to_run:
+    #     print(f"\n\t2.{case_num} Optimizing Case {case_num}...")
 
-        # 1. Initialize Allocator for this specific case
-        allocator = EnergyAllocator(case_id=case_num, tolerance=target_tolerance)
+    #     # 1. Initialize Allocator for this specific case
+    #     allocator = EnergyAllocator(case_id=case_num, tolerance=target_tolerance)
         
-        # 3. (Optional) Run Immediate Charging Baseline
-        allocator.run_iterations(mode="immediate_charging", rerun=False)
+    #     # 3. (Optional) Run Immediate Charging Baseline
+    #     allocator.run_iterations(mode="immediate_charging", rerun=False)
         
-        # 2. Run Optimization
-        allocator.run_iterations(mode="optimization", rerun=False)
+    #     # 2. Run Optimization
+    #     allocator.run_iterations(mode="optimization", rerun=False)
         
-        print(f"\t\t[INFO] Case {case_num} completed.")
+    #     print(f"\t\t[INFO] Case {case_num} completed.")
         
-    print("\n", "="*50,"PART 3: Supervised Learning...","="*50, sep="\n")
+    # print("\n", "="*50,"PART 3: Supervised Learning...","="*50, sep="\n")
     
-    cases_to_train = [2, 1]
+    # cases_to_train = [2, 1]
     
-    for case_num in cases_to_train:
-        print(f"\n\t3.{case_num} Training Case {case_num}...")
+    # for case_num in cases_to_train:
+    #     print(f"\n\t3.{case_num} Training Case {case_num}...")
 
-        train(case_id=case_num, tolerance=target_tolerance, run_name= cfg.RUN_NAME+f"_CASE{case_num}", rerun=True)
+    #     train(case_id=case_num, tolerance=target_tolerance, run_name= cfg.RUN_NAME+f"_CASE{case_num}", rerun=False)
     
-        print(f"\t\t[INFO] Case {case_num} completed.")
+    #     print(f"\t\t[INFO] Case {case_num} completed.")
         
-    print("\n", "="*50,"PART 4: Testing...","="*50, sep="\n")
+    # print("\n", "="*50,"PART 4: Testing...","="*50, sep="\n")
     
-    for case_num in cases_to_train:
+    # for case_num in cases_to_train:
 
-        print(f"\n\t4.{case_num} Testing Case {case_num}...")
+    #     print(f"\n\t4.{case_num} Testing Case {case_num}...")
 
-        run_dynamic_simulation(case_id=case_num, run_name= cfg.RUN_NAME+f"_CASE{case_num}")
+    #     run_dynamic_simulation(case_id=case_num, run_name= cfg.RUN_NAME+f"_CASE{case_num}")
     
-        print(f"\t\t[INFO] Case {case_num} completed.")
+    #     print(f"\t\t[INFO] Case {case_num} completed.")
 
 if __name__ == "__main__":
     

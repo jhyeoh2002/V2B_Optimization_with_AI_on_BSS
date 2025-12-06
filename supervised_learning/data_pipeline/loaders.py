@@ -209,8 +209,8 @@ def get_dataloaders(
         targets = train_df[target_col].values
         
         # A. Histogram binning to find density
-        # We use 50 bins to capture the distribution fine-grained enough
-        counts, bins = np.histogram(targets, bins=140)
+        # We use 15 bins to capture the distribution fine-grained enough
+        counts, bins = np.histogram(targets, bins=15)
         
         # B. Assign each sample to a bin
         # -1 because digitize returns 1-based index
@@ -220,8 +220,8 @@ def get_dataloaders(
         
         # C. Calculate Inverse Frequency Weight
         # Add epsilon to counts to avoid div-by-zero
-        # weights = 1.0 / (counts[sample_bins] + 1e-6)
-        weights = 1.0 / ((np.sqrt(counts[sample_bins]) + 1e-6)+ 1e-3)
+        weights = 1.0 / (counts[sample_bins] + 1e-6)
+        # weights = 1.0 / ((np.sqrt(counts[sample_bins]) + 1e-6)+ 1e-3)
         # D. Create Sampler
         # Replacement=True allows oversampling rare cases
         train_sampler = WeightedRandomSampler(

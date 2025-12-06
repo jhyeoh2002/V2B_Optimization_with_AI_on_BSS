@@ -1,0 +1,176 @@
+nohup: ignoring input
+Crash diagnostics ON
+
+
+==================================================
+PART 1: Data preprocess for 2023-01-01 00:00:00 to 2024-09-30 23:00:00...
+==================================================
+
+	1.1 Preprocessing radiation data...
+		[INFO] Radiation data already exists at './data/timeseries/radiation_data.csv'
+
+	1.2 Preprocessing temperature data...
+		[INFO] Temperature data already exists at './data/timeseries/temperature_data.csv'
+
+	1.3 Preprocessing building data...
+		[INFO] Building data already exists at './data/timeseries/building_data.csv'
+
+	1.4 Preprocessing electricity cost data...
+		[INFO] Electricity cost data already exists at './data/timeseries/electricitycostG2B_data.csv' and './data/timeseries/electricitycostG2V_data.csv'
+
+	1.5 Preprocessing battery demand series data...
+		[INFO] Found existing battery data at 'data/battery_demandV2/resample_full.csv' and 'data/battery_demandV2/resample_train.csv'
+
+		[INFO] Number of series for clean windows = (168, 37)
+		[INFO] Number of eligible series for Case 2 = (1395, 37)
+		[INFO] Case 1 exists — loaded battery demand from 'data/battery_demandV2/case1_real_only/battery_demand.npy' with shape (168, 37).
+		[INFO] Case 2 exists — loaded battery demand from 'data/battery_demandV2/case2_nan_filled/battery_demand.npy' with shape (1563, 37).
+		[INFO] Case 0 exists — loaded battery demand from 'data/battery_demandV2/case0_test/battery_demand.npy' with shape (2, 49).
+
+	1.6 Generating battery schedule...
+		[INFO] Saved availability and details for Case 0 at 'data/battery_demandV2/case0_test shape (2, 272, 48) and (4, 2, 272)'
+		[INFO] Saved availability and details for Case 1 at 'data/battery_demandV2/case1_real_only shape (168, 237, 36) and (4, 168, 237)'
+		[INFO] Saved availability and details for Case 2 at 'data/battery_demandV2/case2_nan_filled shape (1563, 237, 36) and (4, 1563, 237)'
+		[ERROR] Could not load battery demand from 'data/battery_demandV2/case3_extended_generated/battery_demand.npy': [Errno 2] No such file or directory: 'data/battery_demandV2/case3_extended_generated/battery_demand.npy'
+
+
+==================================================
+PART 2: MILP Optimization...
+==================================================
+
+	2.0 Optimizing Case 0...
+		[INFO] Loaded 2 samples from 'data/battery_demandV2/case0_test'
+		[INFO] Starting fresh run: mode=immediate_charging
+		[INFO] Processing immediate_charging series:   0%|                      | 0/2 [00:00<?, ?series/s]		[INFO] Processing immediate_charging series: 100%|██████████████| 2/2 [00:00<00:00, 81.22series/s]
+		[INFO] Saving grid_demand results...
+		[INFO] Saving results for key: grid_demand to data/optimization_resultsV2/case0_test/immediate_charging with shape (2, 48)
+		[INFO] Saving pv_loss results...
+		[INFO] Saving results for key: pv_loss to data/optimization_resultsV2/case0_test/immediate_charging with shape (2, 48)
+		[INFO] Saving initial_demand results...
+		[INFO] Saving results for key: initial_demand to data/optimization_resultsV2/case0_test/immediate_charging with shape (2, 48)
+		[INFO] Saving charging_demand results...
+		[INFO] Saving results for key: charging_demand to data/optimization_resultsV2/case0_test/immediate_charging with shape (2, 48)
+		[INFO] Saving G2B results...
+		[INFO] Saving results for key: G2B to data/optimization_resultsV2/case0_test/immediate_charging with shape (2, 48)
+		[INFO] Saving P2B results...
+		[INFO] Saving results for key: P2B to data/optimization_resultsV2/case0_test/immediate_charging with shape (2, 48)
+		[INFO] Saving G2V results...
+		[INFO] Saving results for key: G2V to data/optimization_resultsV2/case0_test/immediate_charging with shape (2, 48, 272)
+		[INFO] Saving P2V results...
+		[INFO] Saving results for key: P2V to data/optimization_resultsV2/case0_test/immediate_charging with shape (2, 48, 272)
+		[INFO] Saving V2B results...
+		[INFO] Saving results for key: V2B to data/optimization_resultsV2/case0_test/immediate_charging with shape (2, 48, 272)
+		[INFO] Saving SOC results...
+		[INFO] Saving results for key: SOC to data/optimization_resultsV2/case0_test/immediate_charging with shape (2, 48, 272)
+		[INFO] Saving unmet results...
+		[INFO] Saving results for key: unmet to data/optimization_resultsV2/case0_test/immediate_charging with shape (2, 272)
+		[INFO] Saving objective_value results...
+		[INFO] Saving results for key: objective_value to data/optimization_resultsV2/case0_test/immediate_charging with shape (2,)
+		[INFO] Saving optimization_time_s results...
+		[INFO] Saving results for key: optimization_time_s to data/optimization_resultsV2/case0_test/immediate_charging with shape (2,)
+		[INFO] Saving mip_gap_percent results...
+		[INFO] Saving results for key: mip_gap_percent to data/optimization_resultsV2/case0_test/immediate_charging with shape (2,)
+		[INFO] Saving total_cost results...
+		[INFO] Saving results for key: total_cost to data/optimization_resultsV2/case0_test/immediate_charging with shape (2,)
+		[INFO] Saving self_sufficiency results...
+		[INFO] Saving results for key: self_sufficiency to data/optimization_resultsV2/case0_test/immediate_charging with shape (2,)
+		[INFO] Saving pv_utilization results...
+		[INFO] Saving results for key: pv_utilization to data/optimization_resultsV2/case0_test/immediate_charging with shape (2,)
+		[INFO] Deleted checkpoint after full completion.
+		[INFO] Starting fresh run: mode=optimization
+		[INFO] Processing optimization series:   0%|                            | 0/2 [00:00<?, ?series/s]		[INFO] Processing optimization series:  50%|██████████          | 1/2 [00:01<00:01,  1.58s/series]		[INFO] Processing optimization series: 100%|████████████████████| 2/2 [00:03<00:00,  1.57s/series]		[INFO] Processing optimization series: 100%|████████████████████| 2/2 [00:03<00:00,  1.57s/series]
+		[INFO] Saving grid_demand results...
+		[INFO] Saving results for key: grid_demand to data/optimization_resultsV2/case0_test/optimization with shape (2, 48)
+		[INFO] Saving pv_loss results...
+		[INFO] Saving results for key: pv_loss to data/optimization_resultsV2/case0_test/optimization with shape (2, 48)
+		[INFO] Saving initial_demand results...
+		[INFO] Saving results for key: initial_demand to data/optimization_resultsV2/case0_test/optimization with shape (2, 48)
+		[INFO] Saving charging_demand results...
+		[INFO] Saving results for key: charging_demand to data/optimization_resultsV2/case0_test/optimization with shape (2, 48)
+		[INFO] Saving G2B results...
+		[INFO] Saving results for key: G2B to data/optimization_resultsV2/case0_test/optimization with shape (2, 48)
+		[INFO] Saving P2B results...
+		[INFO] Saving results for key: P2B to data/optimization_resultsV2/case0_test/optimization with shape (2, 48)
+		[INFO] Saving G2V results...
+		[INFO] Saving results for key: G2V to data/optimization_resultsV2/case0_test/optimization with shape (2, 48, 272)
+		[INFO] Saving P2V results...
+		[INFO] Saving results for key: P2V to data/optimization_resultsV2/case0_test/optimization with shape (2, 48, 272)
+		[INFO] Saving V2B results...
+		[INFO] Saving results for key: V2B to data/optimization_resultsV2/case0_test/optimization with shape (2, 48, 272)
+		[INFO] Saving SOC results...
+		[INFO] Saving results for key: SOC to data/optimization_resultsV2/case0_test/optimization with shape (2, 48, 272)
+		[INFO] Saving unmet results...
+		[INFO] Saving results for key: unmet to data/optimization_resultsV2/case0_test/optimization with shape (2, 272)
+		[INFO] Saving objective_value results...
+		[INFO] Saving results for key: objective_value to data/optimization_resultsV2/case0_test/optimization with shape (2,)
+		[INFO] Saving optimization_time_s results...
+		[INFO] Saving results for key: optimization_time_s to data/optimization_resultsV2/case0_test/optimization with shape (2,)
+		[INFO] Saving mip_gap_percent results...
+		[INFO] Saving results for key: mip_gap_percent to data/optimization_resultsV2/case0_test/optimization with shape (2,)
+		[INFO] Saving total_cost results...
+		[INFO] Saving results for key: total_cost to data/optimization_resultsV2/case0_test/optimization with shape (2,)
+		[INFO] Saving self_sufficiency results...
+		[INFO] Saving results for key: self_sufficiency to data/optimization_resultsV2/case0_test/optimization with shape (2,)
+		[INFO] Saving pv_utilization results...
+		[INFO] Saving results for key: pv_utilization to data/optimization_resultsV2/case0_test/optimization with shape (2,)
+		[INFO] Deleted checkpoint after full completion.
+		[INFO] Case 0 completed.
+
+	2.1 Optimizing Case 1...
+		[INFO] Loaded 168 samples from 'data/battery_demandV2/case1_real_only'
+		[INFO] Starting fresh run: mode=immediate_charging
+		[INFO] Processing immediate_charging series:   0%|                    | 0/168 [00:00<?, ?series/s]		[INFO] Processing immediate_charging series:   8%|▊         | 13/168 [00:00<00:01, 127.09series/s]		[INFO] Processing immediate_charging series:  15%|█▌        | 26/168 [00:00<00:01, 117.42series/s]		[INFO] Processing immediate_charging series:  23%|██▎       | 38/168 [00:00<00:01, 105.29series/s]		[INFO] Processing immediate_charging series:  29%|███▏       | 49/168 [00:00<00:01, 96.16series/s]		[INFO] Processing immediate_charging series:  35%|███▊       | 59/168 [00:00<00:01, 86.39series/s]		[INFO] Processing immediate_charging series:  40%|████▍      | 68/168 [00:00<00:01, 78.76series/s]		[INFO] Processing immediate_charging series:  46%|█████      | 77/168 [00:00<00:01, 70.93series/s]		[INFO] Processing immediate_charging series:  51%|█████▌     | 85/168 [00:01<00:01, 62.06series/s]		[INFO] Processing immediate_charging series:  55%|██████     | 92/168 [00:01<00:01, 53.88series/s]		[INFO] Processing immediate_charging series:  60%|█████▉    | 100/168 [00:01<00:01, 49.98series/s]		[INFO] Processing immediate_charging series:  65%|██████▌   | 110/168 [00:01<00:01, 47.60series/s]		[INFO] Processing immediate_charging series:  71%|███████▏  | 120/168 [00:01<00:01, 45.97series/s]		[INFO] Processing immediate_charging series:  77%|███████▋  | 130/168 [00:02<00:00, 44.11series/s]		[INFO] Processing immediate_charging series:  83%|████████▎ | 140/168 [00:02<00:00, 41.94series/s]		[INFO] Processing immediate_charging series:  89%|████████▉ | 150/168 [00:02<00:00, 39.81series/s]		[INFO] Processing immediate_charging series:  95%|█████████▌| 160/168 [00:03<00:00, 37.24series/s]		[INFO] Processing immediate_charging series: 100%|██████████| 168/168 [00:03<00:00, 33.78series/s]		[INFO] Processing immediate_charging series: 100%|██████████| 168/168 [00:03<00:00, 50.66series/s]
+		[INFO] Saving grid_demand results...
+		[INFO] Saving results for key: grid_demand to data/optimization_resultsV2/case1_real_only/immediate_charging with shape (168, 36)
+		[INFO] Saving pv_loss results...
+		[INFO] Saving results for key: pv_loss to data/optimization_resultsV2/case1_real_only/immediate_charging with shape (168, 36)
+		[INFO] Saving initial_demand results...
+		[INFO] Saving results for key: initial_demand to data/optimization_resultsV2/case1_real_only/immediate_charging with shape (168, 36)
+		[INFO] Saving charging_demand results...
+		[INFO] Saving results for key: charging_demand to data/optimization_resultsV2/case1_real_only/immediate_charging with shape (168, 36)
+		[INFO] Saving G2B results...
+		[INFO] Saving results for key: G2B to data/optimization_resultsV2/case1_real_only/immediate_charging with shape (168, 36)
+		[INFO] Saving P2B results...
+		[INFO] Saving results for key: P2B to data/optimization_resultsV2/case1_real_only/immediate_charging with shape (168, 36)
+		[INFO] Saving G2V results...
+		[INFO] Saving results for key: G2V to data/optimization_resultsV2/case1_real_only/immediate_charging with shape (168, 36, 237)
+		[INFO] Saving P2V results...
+		[INFO] Saving results for key: P2V to data/optimization_resultsV2/case1_real_only/immediate_charging with shape (168, 36, 237)
+		[INFO] Saving V2B results...
+		[INFO] Saving results for key: V2B to data/optimization_resultsV2/case1_real_only/immediate_charging with shape (168, 36, 237)
+		[INFO] Saving SOC results...
+		[INFO] Saving results for key: SOC to data/optimization_resultsV2/case1_real_only/immediate_charging with shape (168, 36, 237)
+		[INFO] Saving unmet results...
+		[INFO] Saving results for key: unmet to data/optimization_resultsV2/case1_real_only/immediate_charging with shape (168, 237)
+		[INFO] Saving objective_value results...
+		[INFO] Saving results for key: objective_value to data/optimization_resultsV2/case1_real_only/immediate_charging with shape (168,)
+		[INFO] Saving optimization_time_s results...
+		[INFO] Saving results for key: optimization_time_s to data/optimization_resultsV2/case1_real_only/immediate_charging with shape (168,)
+		[INFO] Saving mip_gap_percent results...
+		[INFO] Saving results for key: mip_gap_percent to data/optimization_resultsV2/case1_real_only/immediate_charging with shape (168,)
+		[INFO] Saving total_cost results...
+		[INFO] Saving results for key: total_cost to data/optimization_resultsV2/case1_real_only/immediate_charging with shape (168,)
+		[INFO] Saving self_sufficiency results...
+		[INFO] Saving results for key: self_sufficiency to data/optimization_resultsV2/case1_real_only/immediate_charging with shape (168,)
+		[INFO] Saving pv_utilization results...
+		[INFO] Saving results for key: pv_utilization to data/optimization_resultsV2/case1_real_only/immediate_charging with shape (168,)
+		[INFO] Deleted checkpoint after full completion.
+		[INFO] Starting fresh run: mode=optimization
+		[INFO] Processing optimization series:   0%|                          | 0/168 [00:00<?, ?series/s]		[INFO] Processing optimization series:   1%|                  | 1/168 [00:01<02:53,  1.04s/series]		[INFO] Processing optimization series:   1%|▏                 | 2/168 [00:02<02:52,  1.04s/series]		[INFO] Processing optimization series:   2%|▎                 | 3/168 [00:03<02:43,  1.01series/s]		[INFO] Processing optimization series:   2%|▍                 | 4/168 [00:03<02:39,  1.03series/s]		[INFO] Processing optimization series:   3%|▌                 | 5/168 [00:05<02:45,  1.01s/series]		[INFO] Processing optimization series:   4%|▋                 | 6/168 [00:06<02:42,  1.01s/series]		[INFO] Processing optimization series:   4%|▊                 | 7/168 [00:07<02:45,  1.03s/series]		[INFO] Processing optimization series:   5%|▊                 | 8/168 [00:07<02:35,  1.03series/s]		[INFO] Processing optimization series:   5%|▉                 | 9/168 [00:08<02:22,  1.12series/s]		[INFO] Processing optimization series:   6%|█                | 10/168 [00:09<01:55,  1.37series/s]		[INFO] Processing optimization series:   7%|█                | 11/168 [00:09<01:36,  1.63series/s]		[INFO] Processing optimization series:   7%|█▏               | 12/168 [00:09<01:29,  1.73series/s]		[INFO] Processing optimization series:   8%|█▎               | 13/168 [00:10<01:25,  1.81series/s]		[INFO] Processing optimization series:   8%|█▍               | 14/168 [00:10<01:19,  1.93series/s]		[INFO] Processing optimization series:   9%|█▌               | 15/168 [00:11<01:14,  2.05series/s]		[INFO] Processing optimization series:  10%|█▌               | 16/168 [00:11<01:09,  2.19series/s]		[INFO] Processing optimization series:  10%|█▋               | 17/168 [00:12<01:05,  2.29series/s]		[INFO] Processing optimization series:  11%|█▊               | 18/168 [00:12<01:04,  2.31series/s]		[INFO] Processing optimization series:  11%|█▉               | 19/168 [00:12<01:01,  2.41series/s]		[INFO] Processing optimization series:  12%|██               | 20/168 [00:13<00:59,  2.47series/s]		[INFO] Processing optimization series:  12%|██▏              | 21/168 [00:13<00:57,  2.54series/s]		[INFO] Processing optimization series:  13%|██▏              | 22/168 [00:14<00:59,  2.44series/s]		[INFO] Processing optimization series:  14%|██▎              | 23/168 [00:14<00:59,  2.45series/s]		[INFO] Processing optimization series:  14%|██▍              | 24/168 [00:14<00:59,  2.40series/s]		[INFO] Processing optimization series:  15%|██▌              | 25/168 [00:15<00:59,  2.39series/s]		[INFO] Processing optimization series:  15%|██▋              | 26/168 [00:15<00:59,  2.40series/s]		[INFO] Processing optimization series:  16%|██▋              | 27/168 [00:16<00:58,  2.42series/s]		[INFO] Processing optimization series:  17%|██▊              | 28/168 [00:16<00:55,  2.52series/s]		[INFO] Processing optimization series:  17%|██▉              | 29/168 [00:16<00:54,  2.54series/s]		[INFO] Processing optimization series:  18%|███              | 30/168 [00:17<00:55,  2.50series/s]		[INFO] Processing optimization series:  18%|███▏             | 31/168 [00:17<00:56,  2.44series/s]		[INFO] Processing optimization series:  19%|███▏             | 32/168 [00:18<00:55,  2.47series/s]		[INFO] Processing optimization series:  20%|███▎             | 33/168 [00:18<00:54,  2.48series/s]		[INFO] Processing optimization series:  20%|███▍             | 34/168 [00:18<00:54,  2.47series/s]		[INFO] Processing optimization series:  21%|███▌             | 35/168 [00:19<00:57,  2.31series/s]		[INFO] Processing optimization series:  21%|███▋             | 36/168 [00:19<00:56,  2.35series/s]		[INFO] Processing optimization series:  22%|███▋             | 37/168 [00:20<00:55,  2.36series/s]		[INFO] Processing optimization series:  23%|███▊             | 38/168 [00:20<00:55,  2.34series/s]		[INFO] Processing optimization series:  23%|███▉             | 39/168 [00:21<00:54,  2.38series/s]		[INFO] Processing optimization series:  24%|████             | 40/168 [00:21<00:56,  2.26series/s]		[INFO] Processing optimization series:  24%|████▏            | 41/168 [00:21<00:56,  2.24series/s]		[INFO] Processing optimization series:  25%|████▎            | 42/168 [00:22<00:59,  2.12series/s]		[INFO] Processing optimization series:  26%|████▎            | 43/168 [00:23<01:16,  1.63series/s]		[INFO] Processing optimization series:  26%|████▍            | 44/168 [00:24<01:32,  1.34series/s]		[INFO] Processing optimization series:  27%|████▌            | 45/168 [00:25<01:42,  1.20series/s]		[INFO] Processing optimization series:  27%|████▋            | 46/168 [00:26<01:49,  1.12series/s]		[INFO] Processing optimization series:  28%|████▊            | 47/168 [00:27<01:43,  1.17series/s]		[INFO] Processing optimization series:  29%|████▊            | 48/168 [00:27<01:29,  1.35series/s]		[INFO] Processing optimization series:  29%|████▉            | 49/168 [00:28<01:15,  1.58series/s]		[INFO] Processing optimization series:  30%|█████            | 50/168 [00:28<01:08,  1.74series/s]		[INFO] Processing optimization series:  30%|█████▏           | 51/168 [00:29<01:00,  1.92series/s]		[INFO] Processing optimization series:  31%|█████▎           | 52/168 [00:29<00:55,  2.08series/s]Fatal Python error: Segmentation fault
+
+Thread 0x00007847c85ac640 (most recent call first):
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/threading.py", line 363 in wait
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/threading.py", line 659 in wait
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/site-packages/tqdm/_monitor.py", line 60 in run
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/threading.py", line 1043 in _bootstrap_inner
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/threading.py", line 1014 in _bootstrap
+
+Current thread 0x0000784947e55440 (most recent call first):
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/MILP/GurobiOptimizer.py", line 147 in <genexpr>
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/MILP/GurobiOptimizer.py", line 147 in <genexpr>
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/MILP/GurobiOptimizer.py", line 147 in optimize
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/MILP/EnergyAllocator.py", line 151 in run_iterations
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/main.py", line 33 in main
+  File "/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/main.py", line 76 in <module>
+
+Extension modules: numpy._core._multiarray_umath, numpy.linalg._umath_linalg, numpy.random._common, numpy.random.bit_generator, numpy.random._bounded_integers, numpy.random._mt19937, numpy.random.mtrand, numpy.random._philox, numpy.random._pcg64, numpy.random._sfc64, numpy.random._generator, pandas._libs.tslibs.ccalendar, pandas._libs.tslibs.np_datetime, pandas._libs.tslibs.dtypes, pandas._libs.tslibs.base, pandas._libs.tslibs.nattype, pandas._libs.tslibs.timezones, pandas._libs.tslibs.fields, pandas._libs.tslibs.timedeltas, pandas._libs.tslibs.tzconversion, pandas._libs.tslibs.timestamps, pandas._libs.properties, pandas._libs.tslibs.offsets, pandas._libs.tslibs.strptime, pandas._libs.tslibs.parsing, pandas._libs.tslibs.conversion, pandas._libs.tslibs.period, pandas._libs.tslibs.vectorized, pandas._libs.ops_dispatch, pandas._libs.missing, pandas._libs.hashtable, pandas._libs.algos, pandas._libs.interval, pandas._libs.lib, pandas._libs.ops, pandas._libs.hashing, pandas._libs.arrays, pandas._libs.tslib, pandas._libs.sparse, pandas._libs.internals, pandas._libs.indexing, pandas._libs.index, pandas._libs.writers, pandas._libs.join, pandas._libs.window.aggregations, pandas._libs.window.indexers, pandas._libs.reshape, pandas._libs.groupby, pandas._libs.json, pandas._libs.parsers, pandas._libs.testing, torch._C, torch._C._dynamo.autograd_compiler, torch._C._dynamo.eval_frame, torch._C._dynamo.guards, torch._C._dynamo.utils, torch._C._fft, torch._C._linalg, torch._C._nested, torch._C._nn, torch._C._sparse, torch._C._special, _cffi_backend, scipy._lib._ccallback_c, scipy.sparse._sparsetools, _csparsetools, scipy.sparse._csparsetools, scipy.linalg._fblas, scipy.linalg._flapack, scipy.linalg.cython_lapack, scipy.linalg._cythonized_array_utils, scipy.linalg._solve_toeplitz, scipy.linalg._decomp_lu_cython, scipy.linalg._matfuncs_sqrtm_triu, scipy.linalg._matfuncs_expm, scipy.linalg._linalg_pythran, scipy.linalg.cython_blas, scipy.linalg._decomp_update, scipy.sparse.linalg._dsolve._superlu, scipy.sparse.linalg._eigen.arpack._arpack, scipy.sparse.linalg._propack._spropack, scipy.sparse.linalg._propack._dpropack, scipy.sparse.linalg._propack._cpropack, scipy.sparse.linalg._propack._zpropack, scipy.sparse.csgraph._tools, scipy.sparse.csgraph._shortest_path, scipy.sparse.csgraph._traversal, scipy.sparse.csgraph._min_spanning_tree, scipy.sparse.csgraph._flow, scipy.sparse.csgraph._matching, scipy.sparse.csgraph._reordering, scipy.spatial._ckdtree, scipy._lib.messagestream, scipy.spatial._qhull, scipy.spatial._voronoi, scipy.spatial._distance_wrap, scipy.spatial._hausdorff, scipy.special._ufuncs_cxx, scipy.special._ufuncs, scipy.special._specfun, scipy.special._comb, scipy.special._ellip_harm_2, scipy.spatial.transform._rotation, scipy.optimize._group_columns, scipy.optimize._trlib._trlib, scipy.optimize._lbfgsb, _moduleTNC, scipy.optimize._moduleTNC, scipy.optimize._cobyla, scipy.optimize._slsqp, scipy.optimize._minpack, scipy.optimize._lsq.givens_elimination, scipy.optimize._zeros, scipy.optimize._cython_nnls, scipy._lib._uarray._uarray, scipy.linalg._decomp_interpolative, scipy.optimize._bglu_dense, scipy.optimize._lsap, scipy.optimize._direct, scipy.integrate._odepack, scipy.integrate._quadpack, scipy.integrate._vode, scipy.integrate._dop, scipy.integrate._lsoda, scipy.interpolate._fitpack, scipy.interpolate._dfitpack, scipy.interpolate._dierckx, scipy.interpolate._ppoly, scipy.interpolate._interpnd, scipy.interpolate._rbfinterp_pythran, scipy.interpolate._rgi_cython, scipy.interpolate._bspl, scipy.special.cython_special, scipy.stats._stats, scipy.stats._sobol, scipy.stats._qmc_cy, scipy.stats._biasedurn, scipy.stats._stats_pythran, scipy.stats._levy_stable.levyst, scipy.stats._ansari_swilk_statistics, scipy.stats._mvn, scipy.stats._rcont.rcont, scipy.ndimage._nd_image, scipy.ndimage._rank_filter_1d, _ni_label, scipy.ndimage._ni_label, PIL._imaging, kiwisolver._cext, gurobipy._util, gurobipy._exception, gurobipy._attrutil, gurobipy._core, gurobipy._batch, gurobipy._matrixapi, gurobipy._helpers, gurobipy._modelutil, gurobipy._model, psutil._psutil_linux, psutil._psutil_posix, sklearn.__check_build._check_build, sklearn.utils._isfinite, sklearn.utils.sparsefuncs_fast, sklearn.utils.murmurhash, sklearn.utils._openmp_helpers, sklearn.metrics.cluster._expected_mutual_info_fast, sklearn.preprocessing._csr_polynomial_expansion, sklearn.preprocessing._target_encoder_fast, sklearn.metrics._dist_metrics, sklearn.metrics._pairwise_distances_reduction._datasets_pair, sklearn.utils._cython_blas, sklearn.metrics._pairwise_distances_reduction._base, sklearn.metrics._pairwise_distances_reduction._middle_term_computer, sklearn.utils._heap, sklearn.utils._sorting, sklearn.metrics._pairwise_distances_reduction._argkmin, sklearn.metrics._pairwise_distances_reduction._argkmin_classmode, sklearn.utils._vector_sentinel, sklearn.metrics._pairwise_distances_reduction._radius_neighbors, sklearn.metrics._pairwise_distances_reduction._radius_neighbors_classmode, sklearn.metrics._pairwise_fast, sklearn.utils._random, PIL._imagingmath (total: 182)

@@ -1,0 +1,162 @@
+nohup: ignoring input
+Crash diagnostics ON
+
+
+==================================================
+PART 1: Data preprocess for 2023-01-01 00:00:00 to 2024-09-30 23:00:00...
+==================================================
+
+	1.1 Preprocessing radiation data...
+		[INFO] Radiation data already exists at './data/timeseries/radiation_data.csv'
+
+	1.2 Preprocessing temperature data...
+		[INFO] Temperature data already exists at './data/timeseries/temperature_data.csv'
+
+	1.3 Preprocessing building data...
+		[INFO] Building data already exists at './data/timeseries/building_data.csv'
+
+	1.4 Preprocessing electricity cost data...
+		[INFO] Electricity cost data already exists at './data/timeseries/electricitycostG2B_data.csv' and './data/timeseries/electricitycostG2V_data.csv'
+
+	1.5 Preprocessing battery demand series data...
+		[INFO] Found existing battery data at 'data/battery_demandV2/resample_full.csv' and 'data/battery_demandV2/resample_train.csv'
+
+		[INFO] Number of series for clean windows = (168, 37)
+		[INFO] Number of eligible series for Case 2 = (1395, 37)
+		[INFO] Case 1 exists — loaded battery demand from 'data/battery_demandV2/case1_real_only/battery_demand.npy' with shape (168, 37).
+		[INFO] Case 2 exists — loaded battery demand from 'data/battery_demandV2/case2_nan_filled/battery_demand.npy' with shape (1563, 37).
+		[INFO] Case 0 exists — loaded battery demand from 'data/battery_demandV2/case0_test/battery_demand.npy' with shape (2, 49).
+
+	1.6 Generating battery schedule...
+		[INFO] Case 0 exists — loaded from 'data/battery_demandV2/case0_test/battery_availability.npy' and 'data/battery_demandV2/case0_test/battery_details.npy' shape (2, 272, 48) and (4, 2, 272)
+		[INFO] Case 1 exists — loaded from 'data/battery_demandV2/case1_real_only/battery_availability.npy' and 'data/battery_demandV2/case1_real_only/battery_details.npy' shape (168, 237, 36) and (4, 168, 237)
+		[INFO] Case 2 exists — loaded from 'data/battery_demandV2/case2_nan_filled/battery_availability.npy' and 'data/battery_demandV2/case2_nan_filled/battery_details.npy' shape (1563, 237, 36) and (4, 1563, 237)
+		[ERROR] Could not load battery demand from 'data/battery_demandV2/case3_extended_generated/battery_demand.npy': [Errno 2] No such file or directory: 'data/battery_demandV2/case3_extended_generated/battery_demand.npy'
+
+
+==================================================
+PART 2: MILP Optimization...
+==================================================
+
+	2.0 Optimizing Case 0...
+		[INFO] Loaded 2 samples from 'data/battery_demandV2/case0_test'
+		[INFO] Results already exist at 'data/optimization_resultsV2/case0_test/immediate_charging/V2B.npy'. Skipping immediate_charging run.
+		[INFO] Results already exist at 'data/optimization_resultsV2/case0_test/optimization/V2B.npy'. Skipping optimization run.
+		[INFO] Case 0 completed.
+
+	2.1 Optimizing Case 1...
+		[INFO] Loaded 168 samples from 'data/battery_demandV2/case1_real_only'
+		[INFO] Results already exist at 'data/optimization_resultsV2/case1_real_only/immediate_charging/V2B.npy'. Skipping immediate_charging run.
+		[INFO] Results already exist at 'data/optimization_resultsV2/case1_real_only/optimization/V2B.npy'. Skipping optimization run.
+		[INFO] Case 1 completed.
+
+	2.2 Optimizing Case 2...
+		[INFO] Loaded 1563 samples from 'data/battery_demandV2/case2_nan_filled'
+		[INFO] Results already exist at 'data/optimization_resultsV2/case2_nan_filled/immediate_charging/V2B.npy'. Skipping immediate_charging run.
+		[INFO] Results already exist at 'data/optimization_resultsV2/case2_nan_filled/optimization/V2B.npy'. Skipping optimization run.
+		[INFO] Case 2 completed.
+
+
+==================================================
+PART 3: Supervised Learning...
+==================================================
+
+	3.1 Training Case 1...
+
+=== Starting Training Run: STAFV5_CASE1 ===
+Device: cuda
+		[INFO] Starting Preprocessing for Case 1...
+		[INFO] Unique quantized indices: 6686
+		[INFO] Suggested num_embeddings: 8023
+		[INFO] Generating sliding windows...
+		[INFO] Saved dataset: ./data/training_results/STAFV5_CASE1/merged_dataset_STAFV5_CASE1.csv (Shape: (2016, 225))
+		[INFO] Saved metadata: ./data/training_results/STAFV5_CASE1/feature_info_STAFV5_CASE1.json
+	[Model Config] Detected Dims: {'static': 4, 'series_count': 6, 'seq_len': 24, 'vehicle': 76, 'emb_vocab': 8023}
+		[INFO] Data loaded. Train: 1411, Val: 605
+		[INFO] Fitting new scalers on training data...
+		[INFO] Calculating weights for imbalanced regression...
+		[INFO] 
+==================================================
+		[INFO] 🚀 TRAINING SESSION: STAFV5_CASE1
+		[INFO] ==================================================
+		[INFO] Device:             cuda
+		[INFO] Model Parameters:   204,738
+		[INFO] --------------------------------------------------
+		[INFO] Epochs:             5000
+		[INFO] Batch Size:         128
+		[INFO] Learning Rate:      0.001
+		[INFO] Weight Decay:       0.001
+		[INFO] Dropout:            0.5
+		[INFO] --------------------------------------------------
+		[INFO] Hidden Layers:      [256, 64]
+		[INFO] Embedding Dim:      16
+		[INFO] Attention Heads:    4
+		[INFO]==================================================
+
+
+		[INFO]Epoch |    LR    | Trn RMSE | Val RMSE | Trn R2 | Val R2 | Stop
+-----------------------------------------------------------------
+		[INFO]    1 | 0.001000 |   7.6857 |  11.2583 |  0.096 | -1.469 | 0/150
+		[INFO]    2 | 0.001000 |   7.5121 |  10.7247 |  0.222 | -1.241 | 0/150
+		[INFO]    3 | 0.001000 |   7.0328 |  10.3924 |  0.312 | -1.105 | 0/150
+		[INFO]    4 | 0.001000 |   6.4609 |   9.6571 |  0.376 | -0.818 | 0/150
+		[INFO]    5 | 0.001000 |   6.0963 |   9.5035 |  0.443 | -0.761 | 0/150
+		[INFO]    6 | 0.001000 |   6.5152 |   9.2908 |  0.487 | -0.683 | 0/150
+		[INFO]    7 | 0.001000 |   5.9544 |   8.1603 |  0.534 | -0.297 | 0/150
+		[INFO]    8 | 0.001000 |   5.3736 |   8.5256 |  0.565 | -0.415 | 0/150
+		[INFO]    9 | 0.001000 |   5.4579 |   7.9273 |  0.605 | -0.224 | 1/150
+		[INFO]   10 | 0.001000 |   4.8716 |   7.9185 |  0.647 | -0.223 | 0/150
+		[INFO]   11 | 0.001000 |   4.9515 |   7.6459 |  0.678 | -0.138 | 0/150
+		[INFO]   12 | 0.001000 |   5.2929 |   7.0722 |  0.688 |  0.029 | 0/150
+		[INFO]   13 | 0.001000 |   4.7133 |   6.8318 |  0.683 |  0.093 | 0/150
+		[INFO]   14 | 0.001000 |   4.6193 |   6.9902 |  0.680 |  0.050 | 0/150
+		[INFO]   15 | 0.001000 |   5.2928 |   7.1003 |  0.710 |  0.019 | 1/150
+		[INFO]   16 | 0.001000 |   4.3903 |   7.3645 |  0.706 | -0.055 | 2/150
+		[INFO]   17 | 0.001000 |   4.6693 |   6.8968 |  0.717 |  0.075 | 3/150
+		[INFO]   18 | 0.001000 |   5.3170 |   6.4756 |  0.724 |  0.186 | 4/150
+		[INFO]   19 | 0.001000 |   4.3068 |   6.5048 |  0.718 |  0.179 | 0/150
+		[INFO]   20 | 0.001000 |   4.0641 |   5.9390 |  0.742 |  0.314 | 1/150
+		[INFO]   21 | 0.001000 |   5.3404 |   6.9225 |  0.746 |  0.066 | 0/150
+		[INFO]   22 | 0.001000 |   4.4997 |   6.9269 |  0.735 |  0.066 | 1/150
+		[INFO]   23 | 0.001000 |   4.1427 |   6.6786 |  0.754 |  0.130 | 2/150
+		[INFO]   24 | 0.001000 |   4.3926 |   6.5809 |  0.750 |  0.155 | 3/150
+		[INFO]   25 | 0.001000 |   4.6160 |   6.6361 |  0.734 |  0.143 | 4/150
+		[INFO]   26 | 0.001000 |   4.0829 |   5.9714 |  0.785 |  0.306 | 5/150
+		[INFO]   27 | 0.001000 |   3.9683 |   6.0802 |  0.741 |  0.282 | 6/150
+		[INFO]   28 | 0.001000 |   4.4715 |   6.4033 |  0.759 |  0.201 | 7/150
+		[INFO]   29 | 0.001000 |   3.9675 |   6.1973 |  0.778 |  0.253 | 8/150
+		[INFO]   30 | 0.001000 |   4.2322 |   6.3148 |  0.766 |  0.224 | 9/150
+		[INFO]   31 | 0.001000 |   4.5454 |   5.8981 |  0.762 |  0.323 | 10/150
+		[INFO]   32 | 0.001000 |   4.5591 |   6.3375 |  0.746 |  0.220 | 0/150
+		[INFO]   33 | 0.001000 |   4.1977 |   6.3960 |  0.757 |  0.205 | 1/150
+		[INFO]   34 | 0.001000 |   3.9169 |   5.9567 |  0.762 |  0.311 | 2/150
+		[INFO]   35 | 0.001000 |   4.1165 |   6.2390 |  0.745 |  0.243 | 3/150
+		[INFO]   36 | 0.001000 |   3.7030 |   6.0424 |  0.792 |  0.290 | 4/150
+		[INFO]   37 | 0.001000 |   4.5457 |   6.0682 |  0.785 |  0.284 | 5/150
+		[INFO]   38 | 0.001000 |   3.9789 |   6.0967 |  0.799 |  0.277 | 6/150
+		[INFO]   39 | 0.001000 |   3.8110 |   5.8095 |  0.778 |  0.343 | 7/150
+		[INFO]   40 | 0.001000 |   3.9255 |   6.2012 |  0.803 |  0.251 | 0/150
+		[INFO]   41 | 0.001000 |   3.8548 |   6.0888 |  0.808 |  0.277 | 1/150
+		[INFO]   42 | 0.001000 |   4.3690 |   5.7747 |  0.800 |  0.350 | 2/150
+		[INFO]   43 | 0.001000 |   3.8589 |   5.9707 |  0.795 |  0.303 | 0/150
+		[INFO]   44 | 0.001000 |   5.4446 |   6.6047 |  0.760 |  0.149 | 1/150
+		[INFO]   45 | 0.001000 |   3.9432 |   6.1687 |  0.772 |  0.256 | 2/150
+		[INFO]   46 | 0.001000 |   3.8059 |   6.3565 |  0.790 |  0.209 | 3/150
+		[INFO]   47 | 0.001000 |   3.6445 |   5.6100 |  0.800 |  0.384 | 4/150
+		[INFO]   48 | 0.001000 |   3.7668 |   5.8107 |  0.780 |  0.340 | 0/150
+Traceback (most recent call last):
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/multiprocessing/resource_sharer.py", line 138, in _serve
+    with self._listener.accept() as conn:
+         ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/multiprocessing/connection.py", line 483, in accept
+    answer_challenge(c, self._authkey)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/multiprocessing/connection.py", line 953, in answer_challenge
+    message = connection.recv_bytes(256)         # reject large message
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/multiprocessing/connection.py", line 216, in recv_bytes
+    buf = self._recv_bytes(maxlength)
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/multiprocessing/connection.py", line 430, in _recv_bytes
+    buf = self._recv(4)
+  File "/home/lisa4090/anaconda3/envs/AIonBSS/lib/python3.13/multiprocessing/connection.py", line 395, in _recv
+    chunk = read(handle, remaining)
+ConnectionResetError: [Errno 104] Connection reset by peer

@@ -35,6 +35,7 @@ def train(case_id, tolerance=cfg.TOLERANCE, run_name=None, rerun = False):
         "output_dir": output_dir,
         "scaler_dir": os.path.join(output_dir, "scalers"),
         "checkpoints": os.path.join(output_dir, "checkpoints"),
+        "history": os.path.join(output_dir, "history"),
         "plot": os.path.join(figure_dir, "training_plot.png")
     }
     
@@ -45,6 +46,7 @@ def train(case_id, tolerance=cfg.TOLERANCE, run_name=None, rerun = False):
     
     # Create necessary folders
     ensure_dir(paths["checkpoints"], clean=True)
+    ensure_dir(paths["history"], clean=True)
     ensure_dir(paths["scaler_dir"], clean=False)
     ensure_dir(figure_dir, clean=True)
     
@@ -201,6 +203,9 @@ def train(case_id, tolerance=cfg.TOLERANCE, run_name=None, rerun = False):
             best_val_loss = val_rmse
             no_improve = 0
             torch.save(model.state_dict(), os.path.join(paths["checkpoints"], "best_model.pth"))
+            # Save history as .npy files
+            for key, value in history.items():
+                np.save(os.path.join(paths["history"], f"{key}.npy"), np.array(value))
         else:
             no_improve += 1
             if no_improve >= cfg.ES_PATIENCE:
@@ -209,7 +214,7 @@ def train(case_id, tolerance=cfg.TOLERANCE, run_name=None, rerun = False):
 
     # --- 5. Wrap Up ---
         
-        if epoch % 3 == 1:
+        if epoch % 2 == 1:
             plot_training_curves(history, paths["plot"])
             
     print(f"Training Complete. Results saved to: {paths['output_dir']}")

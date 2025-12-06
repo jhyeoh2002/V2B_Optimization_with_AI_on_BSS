@@ -1,27 +1,0 @@
-nohup: ignoring input
-Crash diagnostics ON
-
-
-==================================================
-PART 1: Data preprocess for 2023-01-01 00:00:00 to 2024-09-30 23:00:00...
-==================================================
-
-	1.1 Preprocessing radiation data...
-		[INFO] Radiation data already exists at './data/timeseries/radiation_data.csv'
-
-	1.2 Preprocessing temperature data...
-		[INFO] Temperature data already exists at './data/timeseries/temperature_data.csv'
-
-	1.3 Preprocessing building data...
-		[INFO] Building data already exists at './data/timeseries/building_data.csv'
-
-	1.4 Preprocessing electricity cost data...
-		[INFO] Electricity cost data already exists at './data/timeseries/electricitycostG2B_data.csv' and './data/timeseries/electricitycostG2V_data.csv'
-
-	1.5 Preprocessing battery demand series data...
-
-		[INFO] Number of series for clean windows = (168, 37)
-		[INFO] Number of eligible series for Case 2 = (1395, 37)
-		[INFO] Saved case 1: 'data/battery_demandV2/case1_real_only/battery_demand.npy', shape=(168, 37)
-		[INFO] Building Case 2 (fill NaN)
-		[INFO] Case 2 generating:   0%|          | 0/1395 [00:00<?, ?it/s]		[INFO] Case 2 generating:   0%|          | 1/1395 [00:05<2:12:08,  5.69s/it]		[INFO] Case 2 generating:   0%|          | 2/1395 [00:11<2:09:43,  5.59s/it]		[INFO] Case 2 generating:   0%|          | 3/1395 [00:16<2:08:11,  5.53s/it]		[INFO] Case 2 generating:   0%|          | 4/1395 [00:22<2:07:51,  5.51s/it]		[INFO] Case 2 generating:   0%|          | 5/1395 [00:27<2:07:44,  5.51s/it]		[INFO] Case 2 generating:   0%|          | 6/1395 [00:33<2:07:38,  5.51s/it]		[INFO] Case 2 generating:   1%|          | 7/1395 [00:38<2:07:06,  5.49s/it]		[INFO] Case 2 generating:   1%|          | 8/1395 [00:44<2:06:14,  5.46s/it]		[INFO] Case 2 generating:   1%|          | 9/1395 [00:49<2:05:19,  5.43s/it]		[INFO] Case 2 generating:   1%|          | 10/1395 [00:54<2:05:41,  5.45s/it]		[INFO] Case 2 generating:   1%|          | 11/1395 [01:00<2:05:42,  5.45s/it]		[INFO] Case 2 generating:   1%|          | 12/1395 [01:05<2:05:36,  5.45s/it]		[INFO] Case 2 generating:   1%|          | 13/1395 [01:11<2:05:55,  5.47s/it]		[INFO] Case 2 generating:   1%|          | 14/1395 [01:17<2:10:55,  5.69s/it]		[INFO] Case 2 generating:   1%|          | 15/1395 [01:22<2:09:25,  5.63s/it]		[INFO] Case 2 generating:   1%|          | 16/1395 [01:28<2:08:29,  5.59s/it]		[INFO] Case 2 generating:   1%|          | 17/1395 [01:33<2:07:54,  5.57s/it]		[INFO] Case 2 generating:   1%|▏         | 18/1395 [01:40<2:11:26,  5.73s/it]		[INFO] Case 2 generating:   1%|▏         | 19/1395 [01:50<2:42:33,  7.09s/it]		[INFO] Case 2 generating:   1%|▏         | 20/1395 [01:58<2:52:49,  7.54s/it]

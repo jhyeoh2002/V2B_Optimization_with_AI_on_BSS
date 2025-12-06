@@ -1,0 +1,619 @@
+nohup: ignoring input
+Crash diagnostics ON
+
+
+==================================================
+PART 1: Data preprocess for 2023-01-01 00:00:00 to 2024-09-30 23:00:00...
+==================================================
+
+	1.1 Preprocessing radiation data...
+		[INFO] Radiation data already exists at './data/timeseries/radiation_data.csv'
+
+	1.2 Preprocessing temperature data...
+		[INFO] Temperature data already exists at './data/timeseries/temperature_data.csv'
+
+	1.3 Preprocessing building data...
+		[INFO] Building data already exists at './data/timeseries/building_data.csv'
+
+	1.4 Preprocessing electricity cost data...
+		[INFO] Electricity cost data already exists at './data/timeseries/electricitycostG2B_data.csv' and './data/timeseries/electricitycostG2V_data.csv'
+
+	1.5 Preprocessing battery demand series data...
+		[INFO] Found existing battery data at 'data/battery_demandV2/resample_full.csv' and 'data/battery_demandV2/resample_train.csv'
+
+		[INFO] Number of series for clean windows = (168, 37)
+		[INFO] Number of eligible series for Case 2 = (1395, 37)
+		[INFO] Case 1 exists — loaded battery demand from 'data/battery_demandV2/case1_real_only/battery_demand.npy' with shape (168, 37).
+		[INFO] Case 2 exists — loaded battery demand from 'data/battery_demandV2/case2_nan_filled/battery_demand.npy' with shape (1563, 37).
+		[INFO] Case 0 exists — loaded battery demand from 'data/battery_demandV2/case0_test/battery_demand.npy' with shape (2, 49).
+
+	1.6 Generating battery schedule...
+		[INFO] Case 0 exists — loaded from 'data/battery_demandV2/case0_test/battery_availability.npy' and 'data/battery_demandV2/case0_test/battery_details.npy' shape (2, 272, 48) and (4, 2, 272)
+		[INFO] Case 1 exists — loaded from 'data/battery_demandV2/case1_real_only/battery_availability.npy' and 'data/battery_demandV2/case1_real_only/battery_details.npy' shape (168, 237, 36) and (4, 168, 237)
+		[INFO] Case 2 exists — loaded from 'data/battery_demandV2/case2_nan_filled/battery_availability.npy' and 'data/battery_demandV2/case2_nan_filled/battery_details.npy' shape (1563, 237, 36) and (4, 1563, 237)
+		[ERROR] Could not load battery demand from 'data/battery_demandV2/case3_extended_generated/battery_demand.npy': [Errno 2] No such file or directory: 'data/battery_demandV2/case3_extended_generated/battery_demand.npy'
+
+
+==================================================
+PART 2: MILP Optimization...
+==================================================
+
+	2.0 Optimizing Case 0...
+		[INFO] Loaded 2 samples from 'data/battery_demandV2/case0_test'
+		[INFO] Results already exist at 'data/optimization_resultsV2/case0_test/immediate_charging/V2B.npy'. Skipping immediate_charging run.
+		[INFO] Results already exist at 'data/optimization_resultsV2/case0_test/optimization/V2B.npy'. Skipping optimization run.
+		[INFO] Case 0 completed.
+
+	2.1 Optimizing Case 1...
+		[INFO] Loaded 168 samples from 'data/battery_demandV2/case1_real_only'
+		[INFO] Results already exist at 'data/optimization_resultsV2/case1_real_only/immediate_charging/V2B.npy'. Skipping immediate_charging run.
+		[INFO] Results already exist at 'data/optimization_resultsV2/case1_real_only/optimization/V2B.npy'. Skipping optimization run.
+		[INFO] Case 1 completed.
+
+	2.2 Optimizing Case 2...
+		[INFO] Loaded 1563 samples from 'data/battery_demandV2/case2_nan_filled'
+		[INFO] Results already exist at 'data/optimization_resultsV2/case2_nan_filled/immediate_charging/V2B.npy'. Skipping immediate_charging run.
+		[INFO] Results already exist at 'data/optimization_resultsV2/case2_nan_filled/optimization/V2B.npy'. Skipping optimization run.
+		[INFO] Case 2 completed.
+
+
+==================================================
+PART 3: Supervised Learning...
+==================================================
+
+	3.2 Training Case 2...
+
+=== Starting Training Run: STAF_currentSOC_V7_CASE2 ===
+Device: cuda
+		[INFO] Starting Preprocessing for Case 2...
+		[INFO] Unique quantized indices: 28274
+		[INFO] Suggested num_embeddings: 33928
+		[INFO] Generating sliding windows...
+Column names ['sin_hour', 'cos_hour', 'sin_day', 'cos_day', 'building_T1', 'building_T2', 'building_T3', 'building_T4', 'building_T5', 'building_T6', 'building_T7', 'building_T8', 'building_T9', 'building_T10', 'building_T11', 'building_T12', 'building_T13', 'building_T14', 'building_T15', 'building_T16', 'building_T17', 'building_T18', 'building_T19', 'building_T20', 'building_T21', 'building_T22', 'building_T23', 'building_T24', 'radiation_T1', 'radiation_T2', 'radiation_T3', 'radiation_T4', 'radiation_T5', 'radiation_T6', 'radiation_T7', 'radiation_T8', 'radiation_T9', 'radiation_T10', 'radiation_T11', 'radiation_T12', 'radiation_T13', 'radiation_T14', 'radiation_T15', 'radiation_T16', 'radiation_T17', 'radiation_T18', 'radiation_T19', 'radiation_T20', 'radiation_T21', 'radiation_T22', 'radiation_T23', 'radiation_T24', 'temperature_T1', 'temperature_T2', 'temperature_T3', 'temperature_T4', 'temperature_T5', 'temperature_T6', 'temperature_T7', 'temperature_T8', 'temperature_T9', 'temperature_T10', 'temperature_T11', 'temperature_T12', 'temperature_T13', 'temperature_T14', 'temperature_T15', 'temperature_T16', 'temperature_T17', 'temperature_T18', 'temperature_T19', 'temperature_T20', 'temperature_T21', 'temperature_T22', 'temperature_T23', 'temperature_T24', 'priceG2B_T1', 'priceG2B_T2', 'priceG2B_T3', 'priceG2B_T4', 'priceG2B_T5', 'priceG2B_T6', 'priceG2B_T7', 'priceG2B_T8', 'priceG2B_T9', 'priceG2B_T10', 'priceG2B_T11', 'priceG2B_T12', 'priceG2B_T13', 'priceG2B_T14', 'priceG2B_T15', 'priceG2B_T16', 'priceG2B_T17', 'priceG2B_T18', 'priceG2B_T19', 'priceG2B_T20', 'priceG2B_T21', 'priceG2B_T22', 'priceG2B_T23', 'priceG2B_T24', 'priceG2V_T1', 'priceG2V_T2', 'priceG2V_T3', 'priceG2V_T4', 'priceG2V_T5', 'priceG2V_T6', 'priceG2V_T7', 'priceG2V_T8', 'priceG2V_T9', 'priceG2V_T10', 'priceG2V_T11', 'priceG2V_T12', 'priceG2V_T13', 'priceG2V_T14', 'priceG2V_T15', 'priceG2V_T16', 'priceG2V_T17', 'priceG2V_T18', 'priceG2V_T19', 'priceG2V_T20', 'priceG2V_T21', 'priceG2V_T22', 'priceG2V_T23', 'priceG2V_T24', 'battery_T1', 'battery_T2', 'battery_T3', 'battery_T4', 'battery_T5', 'battery_T6', 'battery_T7', 'battery_T8', 'battery_T9', 'battery_T10', 'battery_T11', 'battery_T12', 'battery_T13', 'battery_T14', 'battery_T15', 'battery_T16', 'battery_T17', 'battery_T18', 'battery_T19', 'battery_T20', 'battery_T21', 'battery_T22', 'battery_T23', 'battery_T24', 'SOC_V1', 'SOC_V2', 'SOC_V3', 'SOC_V4', 'SOC_V5', 'SOC_V6', 'SOC_V7', 'SOC_V8', 'SOC_V9', 'SOC_V10', 'SOC_V11', 'SOC_V12', 'SOC_V13', 'SOC_V14', 'SOC_V15', 'SOC_V16', 'SOC_V17', 'SOC_V18', 'SOC_V19', 'SOC_V20', 'SOC_V21', 'SOC_V22', 'SOC_V23', 'SOC_V24', 'SOC_V25', 'SOC_V26', 'SOC_V27', 'SOC_V28', 'SOC_V29', 'SOC_V30', 'SOC_V31', 'SOC_V32', 'SOC_V33', 'SOC_V34', 'SOC_V35', 'SOC_V36', 'SOC_V37', 'SOC_V38', 'SOC_V39', 'SOC_V40', 'SOC_V41', 'SOC_V42', 'SOC_V43', 'SOC_V44', 'SOC_V45', 'SOC_V46', 'SOC_V47', 'SOC_V48', 'SOC_V49', 'SOC_V50', 'SOC_V51', 'SOC_V52', 'SOC_V53', 'SOC_V54', 'SOC_V55', 'SOC_V56', 'SOC_V57', 'SOC_V58', 'SOC_V59', 'SOC_V60', 'SOC_V61', 'SOC_V62', 'SOC_V63', 'SOC_V64', 'SOC_V65', 'SOC_V66', 'SOC_V67', 'SOC_V68', 'SOC_V69', 'SOC_V70', 'SOC_V71', 'SOC_V72', 'SOC_V73', 'SOC_V74', 'SOC_V75', 'SOC_V76', 'target']
+Number of columns: 225
+Number of rows: 18756
+		[INFO] Saved dataset: ./data/training_results/STAF_currentSOC_V7_CASE2/merged_dataset_STAF_currentSOC_V7_CASE2.csv (Shape: (18756, 225))
+		[INFO] Saved metadata: ./data/training_results/STAF_currentSOC_V7_CASE2/feature_info_STAF_currentSOC_V7_CASE2.json
+	[Model Config] Detected Dims: {'static': 4, 'series_count': 6, 'seq_len': 24, 'vehicle': 76, 'emb_vocab': 1000}
+		[INFO] Data loaded. Train: 13129, Val: 5627
+		[INFO] Fitting new scalers on training data...
+		[INFO] Calculating weights for imbalanced regression...
+		[INFO] 
+==================================================
+		[INFO] 🚀 TRAINING SESSION: STAF_currentSOC_V7_CASE2
+		[INFO] ==================================================
+		[INFO] Device:             cuda
+		[INFO] Model Parameters:   42,058
+		[INFO] --------------------------------------------------
+		[INFO] Epochs:             5000
+		[INFO] Batch Size:         32
+		[INFO] Learning Rate:      0.001
+		[INFO] Weight Decay:       0.001
+		[INFO] Dropout:            0.3
+		[INFO] --------------------------------------------------
+		[INFO] Hidden Layers:      [128, 32]
+		[INFO] Embedding Dim:      8
+		[INFO] Attention Heads:    4
+		[INFO]==================================================
+
+
+		[INFO]Epoch |    LR    | Trn RMSE | Val RMSE | Trn R2 | Val R2 | Stop
+-----------------------------------------------------------------
+		[INFO]    1 | 0.001000 |   5.7517 |   5.7338 |  0.505 |  0.372 | 0/60
+		[INFO]    2 | 0.001000 |   4.4639 |   4.5586 |  0.701 |  0.603 | 0/60
+		[INFO]    3 | 0.001000 |   4.2863 |   5.2881 |  0.724 |  0.466 | 0/60
+		[INFO]    4 | 0.001000 |   4.1136 |   4.9857 |  0.750 |  0.525 | 1/60
+		[INFO]    5 | 0.001000 |   3.9762 |   4.6181 |  0.768 |  0.593 | 2/60
+		[INFO]    6 | 0.001000 |   3.9699 |   5.0574 |  0.767 |  0.512 | 3/60
+		[INFO]    7 | 0.001000 |   3.8867 |   5.2765 |  0.776 |  0.468 | 4/60
+		[INFO]    8 | 0.001000 |   3.9336 |   4.4730 |  0.773 |  0.618 | 5/60
+		[INFO]    9 | 0.001000 |   3.8516 |   4.2475 |  0.784 |  0.656 | 0/60
+		[INFO]   10 | 0.001000 |   3.7811 |   4.5203 |  0.787 |  0.610 | 0/60
+		[INFO]   11 | 0.001000 |   3.7890 |   4.4695 |  0.789 |  0.619 | 1/60
+		[INFO]   12 | 0.001000 |   3.7622 |   4.9158 |  0.788 |  0.539 | 2/60
+		[INFO]   13 | 0.001000 |   3.7198 |   4.0202 |  0.795 |  0.691 | 3/60
+		[INFO]   14 | 0.001000 |   3.6737 |   4.3095 |  0.800 |  0.645 | 0/60
+		[INFO]   15 | 0.001000 |   3.6821 |   4.1181 |  0.800 |  0.676 | 1/60
+		[INFO]   16 | 0.001000 |   3.5529 |   4.3781 |  0.812 |  0.634 | 2/60
+		[INFO]   17 | 0.001000 |   3.5934 |   4.6834 |  0.813 |  0.581 | 3/60
+		[INFO]   18 | 0.001000 |   3.5797 |   4.2350 |  0.812 |  0.658 | 4/60
+		[INFO]   19 | 0.001000 |   3.5881 |   4.1700 |  0.807 |  0.668 | 5/60
+		[INFO]   20 | 0.001000 |   3.5564 |   4.3922 |  0.810 |  0.632 | 6/60
+		[INFO]   21 | 0.001000 |   3.5683 |   4.0773 |  0.808 |  0.683 | 7/60
+		[INFO]   22 | 0.001000 |   3.5218 |   4.1442 |  0.814 |  0.672 | 8/60
+		[INFO]   23 | 0.001000 |   3.5176 |   4.2165 |  0.817 |  0.661 | 9/60
+		[INFO]   24 | 0.001000 |   3.4854 |   4.2070 |  0.822 |  0.662 | 10/60
+		[INFO]   25 | 0.001000 |   3.5001 |   4.3125 |  0.819 |  0.645 | 11/60
+		[INFO]   26 | 0.001000 |   3.4643 |   4.0235 |  0.824 |  0.691 | 12/60
+		[INFO]   27 | 0.001000 |   3.4943 |   4.2240 |  0.821 |  0.659 | 13/60
+		[INFO]   28 | 0.001000 |   3.4151 |   4.0752 |  0.829 |  0.683 | 14/60
+		[INFO]   29 | 0.001000 |   3.4393 |   3.9258 |  0.825 |  0.706 | 15/60
+		[INFO]   30 | 0.001000 |   3.4064 |   4.4782 |  0.830 |  0.617 | 0/60
+		[INFO]   31 | 0.001000 |   3.4601 |   4.4168 |  0.821 |  0.628 | 1/60
+		[INFO]   32 | 0.001000 |   3.4268 |   4.1771 |  0.824 |  0.667 | 2/60
+		[INFO]   33 | 0.001000 |   3.3988 |   4.3870 |  0.831 |  0.633 | 3/60
+		[INFO]   34 | 0.001000 |   3.3766 |   4.2173 |  0.834 |  0.660 | 4/60
+		[INFO]   35 | 0.001000 |   3.4035 |   4.0315 |  0.828 |  0.690 | 5/60
+		[INFO]   36 | 0.001000 |   3.4092 |   4.1266 |  0.828 |  0.675 | 6/60
+		[INFO]   37 | 0.001000 |   3.4018 |   4.0888 |  0.828 |  0.681 | 7/60
+		[INFO]   38 | 0.001000 |   3.3313 |   4.1531 |  0.834 |  0.671 | 8/60
+		[INFO]   39 | 0.001000 |   3.3342 |   4.1664 |  0.834 |  0.669 | 9/60
+		[INFO]   40 | 0.001000 |   3.3086 |   3.8263 |  0.837 |  0.721 | 10/60
+		[INFO]   41 | 0.001000 |   3.3157 |   4.7250 |  0.839 |  0.574 | 0/60
+		[INFO]   42 | 0.001000 |   3.2811 |   4.0211 |  0.843 |  0.691 | 1/60
+		[INFO]   43 | 0.001000 |   3.3171 |   3.7225 |  0.836 |  0.735 | 2/60
+		[INFO]   44 | 0.001000 |   3.3315 |   4.3638 |  0.836 |  0.637 | 0/60
+		[INFO]   45 | 0.001000 |   3.2390 |   4.1300 |  0.847 |  0.674 | 1/60
+		[INFO]   46 | 0.001000 |   3.3036 |   4.0471 |  0.837 |  0.687 | 2/60
+		[INFO]   47 | 0.001000 |   3.3167 |   3.8342 |  0.839 |  0.719 | 3/60
+		[INFO]   48 | 0.001000 |   3.2883 |   4.4049 |  0.837 |  0.630 | 4/60
+		[INFO]   49 | 0.001000 |   3.3054 |   4.2851 |  0.837 |  0.649 | 5/60
+		[INFO]   50 | 0.001000 |   3.2898 |   4.6553 |  0.841 |  0.586 | 6/60
+		[INFO]   51 | 0.001000 |   3.3131 |   4.1357 |  0.836 |  0.673 | 7/60
+		[INFO]   52 | 0.001000 |   3.2426 |   4.4122 |  0.843 |  0.628 | 8/60
+		[INFO]   53 | 0.001000 |   3.2366 |   4.1526 |  0.847 |  0.671 | 9/60
+		[INFO]   54 | 0.001000 |   3.1995 |   4.1221 |  0.848 |  0.676 | 10/60
+		[INFO]   55 | 0.001000 |   3.2454 |   3.9443 |  0.843 |  0.703 | 11/60
+		[INFO]   56 | 0.001000 |   3.2341 |   3.8864 |  0.845 |  0.712 | 12/60
+		[INFO]   57 | 0.001000 |   3.2869 |   4.1753 |  0.841 |  0.667 | 13/60
+		[INFO]   58 | 0.001000 |   3.1703 |   4.4225 |  0.851 |  0.627 | 14/60
+		[INFO]   59 | 0.001000 |   3.2000 |   3.9347 |  0.848 |  0.704 | 15/60
+		[INFO]   60 | 0.001000 |   3.2597 |   4.1492 |  0.842 |  0.671 | 16/60
+		[INFO]   61 | 0.001000 |   3.2409 |   4.1746 |  0.847 |  0.667 | 17/60
+		[INFO]   62 | 0.001000 |   3.2764 |   4.0897 |  0.842 |  0.681 | 18/60
+		[INFO]   63 | 0.001000 |   3.2282 |   4.4250 |  0.845 |  0.626 | 19/60
+		[INFO]   64 | 0.001000 |   3.2286 |   3.7335 |  0.846 |  0.734 | 20/60
+		[INFO]   65 | 0.001000 |   3.1868 |   4.0637 |  0.849 |  0.685 | 21/60
+		[INFO]   66 | 0.001000 |   3.1791 |   3.9525 |  0.850 |  0.702 | 22/60
+		[INFO]   67 | 0.001000 |   3.3110 |   3.8845 |  0.837 |  0.712 | 23/60
+		[INFO]   68 | 0.001000 |   3.2051 |   3.8524 |  0.849 |  0.717 | 24/60
+		[INFO]   69 | 0.001000 |   3.2390 |   4.4487 |  0.846 |  0.622 | 25/60
+		[INFO]   70 | 0.001000 |   3.1506 |   3.8978 |  0.855 |  0.710 | 26/60
+		[INFO]   71 | 0.001000 |   3.1886 |   4.1552 |  0.849 |  0.670 | 27/60
+		[INFO]   72 | 0.001000 |   3.1979 |   3.9448 |  0.850 |  0.703 | 28/60
+		[INFO]   73 | 0.001000 |   3.1999 |   4.2229 |  0.849 |  0.660 | 29/60
+		[INFO]   74 | 0.001000 |   3.1796 |   3.9815 |  0.849 |  0.697 | 30/60
+		[INFO]   75 | 0.001000 |   3.1492 |   4.2400 |  0.852 |  0.657 | 31/60
+		[INFO]   76 | 0.001000 |   3.2185 |   4.0308 |  0.846 |  0.690 | 32/60
+		[INFO]   77 | 0.001000 |   3.2296 |   4.1306 |  0.844 |  0.674 | 33/60
+		[INFO]   78 | 0.001000 |   3.1965 |   3.6853 |  0.847 |  0.741 | 34/60
+		[INFO]   79 | 0.001000 |   3.1947 |   4.1301 |  0.849 |  0.674 | 0/60
+		[INFO]   80 | 0.001000 |   3.1798 |   4.7075 |  0.850 |  0.577 | 1/60
+		[INFO]   81 | 0.001000 |   3.1595 |   3.8298 |  0.853 |  0.720 | 2/60
+		[INFO]   82 | 0.001000 |   3.1906 |   3.7426 |  0.849 |  0.733 | 3/60
+		[INFO]   83 | 0.001000 |   3.1664 |   4.2371 |  0.852 |  0.657 | 4/60
+		[INFO]   84 | 0.001000 |   3.1876 |   4.7126 |  0.848 |  0.576 | 5/60
+		[INFO]   85 | 0.001000 |   3.1379 |   3.9176 |  0.854 |  0.707 | 6/60
+		[INFO]   86 | 0.001000 |   3.2085 |   3.9641 |  0.849 |  0.700 | 7/60
+		[INFO]   87 | 0.001000 |   3.1290 |   4.0675 |  0.855 |  0.684 | 8/60
+		[INFO]   88 | 0.001000 |   3.1417 |   3.9512 |  0.852 |  0.702 | 9/60
+		[INFO]   89 | 0.001000 |   3.1265 |   3.5589 |  0.855 |  0.758 | 10/60
+		[INFO]   90 | 0.001000 |   3.1990 |   4.2331 |  0.849 |  0.658 | 0/60
+		[INFO]   91 | 0.001000 |   3.1433 |   4.0300 |  0.856 |  0.690 | 1/60
+		[INFO]   92 | 0.001000 |   3.1273 |   3.8372 |  0.857 |  0.719 | 2/60
+		[INFO]   93 | 0.001000 |   3.1460 |   4.0816 |  0.853 |  0.682 | 3/60
+		[INFO]   94 | 0.001000 |   3.1902 |   4.4888 |  0.849 |  0.615 | 4/60
+		[INFO]   95 | 0.001000 |   3.1543 |   3.7838 |  0.854 |  0.727 | 5/60
+		[INFO]   96 | 0.001000 |   3.1083 |   4.3536 |  0.856 |  0.638 | 6/60
+		[INFO]   97 | 0.001000 |   3.0892 |   4.2719 |  0.857 |  0.652 | 7/60
+		[INFO]   98 | 0.001000 |   3.1379 |   4.3069 |  0.854 |  0.646 | 8/60
+		[INFO]   99 | 0.001000 |   3.1042 |   4.1409 |  0.855 |  0.673 | 9/60
+		[INFO]  100 | 0.001000 |   3.1794 |   4.1598 |  0.849 |  0.670 | 10/60
+		[INFO]  101 | 0.001000 |   3.1017 |   4.0086 |  0.857 |  0.693 | 11/60
+		[INFO]  102 | 0.001000 |   3.1601 |   3.7368 |  0.852 |  0.733 | 12/60
+		[INFO]  103 | 0.001000 |   3.1335 |   4.0305 |  0.856 |  0.690 | 13/60
+		[INFO]  104 | 0.001000 |   3.1490 |   3.6478 |  0.853 |  0.746 | 14/60
+		[INFO]  105 | 0.001000 |   3.1523 |   3.9414 |  0.851 |  0.703 | 15/60
+		[INFO]  106 | 0.001000 |   3.1337 |   3.6858 |  0.858 |  0.741 | 16/60
+		[INFO]  107 | 0.001000 |   3.1449 |   3.7011 |  0.853 |  0.739 | 17/60
+		[INFO]  108 | 0.001000 |   3.0995 |   4.0543 |  0.858 |  0.686 | 18/60
+		[INFO]  109 | 0.001000 |   3.1378 |   3.9749 |  0.853 |  0.698 | 19/60
+		[INFO]  110 | 0.001000 |   3.1732 |   3.9878 |  0.850 |  0.696 | 20/60
+		[INFO]  111 | 0.001000 |   3.1710 |   3.9173 |  0.853 |  0.707 | 21/60
+		[INFO]  112 | 0.001000 |   3.0649 |   4.0084 |  0.862 |  0.693 | 22/60
+		[INFO]  113 | 0.001000 |   3.0125 |   3.8188 |  0.864 |  0.722 | 23/60
+		[INFO]  114 | 0.001000 |   3.1362 |   4.0298 |  0.853 |  0.690 | 24/60
+		[INFO]  115 | 0.001000 |   3.1350 |   4.2058 |  0.855 |  0.662 | 25/60
+		[INFO]  116 | 0.001000 |   3.0773 |   3.9659 |  0.858 |  0.700 | 26/60
+		[INFO]  117 | 0.001000 |   3.0917 |   3.8920 |  0.860 |  0.711 | 27/60
+		[INFO]  118 | 0.001000 |   3.1305 |   4.1898 |  0.856 |  0.665 | 28/60
+		[INFO]  119 | 0.001000 |   3.1397 |   3.8155 |  0.855 |  0.722 | 29/60
+		[INFO]  120 | 0.001000 |   3.1531 |   4.1248 |  0.856 |  0.675 | 30/60
+		[INFO]  121 | 0.001000 |   3.1088 |   4.0005 |  0.857 |  0.694 | 31/60
+		[INFO]  122 | 0.001000 |   3.0952 |   3.7768 |  0.857 |  0.728 | 32/60
+		[INFO]  123 | 0.001000 |   3.0718 |   4.2292 |  0.860 |  0.658 | 33/60
+		[INFO]  124 | 0.001000 |   3.1099 |   3.8965 |  0.856 |  0.710 | 34/60
+		[INFO]  125 | 0.001000 |   3.1055 |   4.0286 |  0.857 |  0.690 | 35/60
+		[INFO]  126 | 0.001000 |   3.0541 |   3.8755 |  0.861 |  0.713 | 36/60
+		[INFO]  127 | 0.001000 |   3.1025 |   3.8487 |  0.857 |  0.717 | 37/60
+		[INFO]  128 | 0.001000 |   3.0694 |   4.1364 |  0.860 |  0.673 | 38/60
+		[INFO]  129 | 0.001000 |   3.1399 |   3.9612 |  0.852 |  0.700 | 39/60
+		[INFO]  130 | 0.001000 |   3.1334 |   3.9344 |  0.856 |  0.704 | 40/60
+		[INFO]  131 | 0.001000 |   3.1725 |   4.5384 |  0.852 |  0.607 | 41/60
+		[INFO]  132 | 0.001000 |   3.0886 |   4.0278 |  0.858 |  0.690 | 42/60
+		[INFO]  133 | 0.001000 |   3.0719 |   3.8367 |  0.859 |  0.719 | 43/60
+		[INFO]  134 | 0.001000 |   3.1002 |   4.0770 |  0.858 |  0.683 | 44/60
+		[INFO]  135 | 0.001000 |   3.0908 |   4.1264 |  0.861 |  0.675 | 45/60
+		[INFO]  136 | 0.001000 |   3.1340 |   4.2504 |  0.856 |  0.655 | 46/60
+		[INFO]  137 | 0.001000 |   3.1213 |   4.2808 |  0.858 |  0.650 | 47/60
+		[INFO]  138 | 0.001000 |   3.1345 |   3.9520 |  0.854 |  0.702 | 48/60
+		[INFO]  139 | 0.001000 |   3.0489 |   4.0101 |  0.860 |  0.693 | 49/60
+		[INFO]  140 | 0.001000 |   3.1491 |   3.9731 |  0.855 |  0.699 | 50/60
+		[INFO]  141 | 0.000500 |   3.0279 |   3.8776 |  0.866 |  0.713 | 51/60
+		[INFO]  142 | 0.000500 |   2.9995 |   3.6628 |  0.866 |  0.744 | 52/60
+		[INFO]  143 | 0.000500 |   3.0142 |   4.0035 |  0.865 |  0.694 | 53/60
+		[INFO]  144 | 0.000500 |   3.0076 |   3.9857 |  0.867 |  0.697 | 54/60
+		[INFO]  145 | 0.000500 |   2.9788 |   3.8282 |  0.868 |  0.720 | 55/60
+		[INFO]  146 | 0.000500 |   3.0058 |   3.8501 |  0.867 |  0.717 | 56/60
+		[INFO]  147 | 0.000500 |   2.9776 |   3.8636 |  0.868 |  0.715 | 57/60
+		[INFO]  148 | 0.000500 |   2.9749 |   3.7015 |  0.869 |  0.738 | 58/60
+		[INFO]  149 | 0.000500 |   2.9690 |   3.9507 |  0.871 |  0.702 | 59/60
+
+[Stopping] Early stopping triggered after 149 epochs.
+Training Complete. Results saved to: ./data/training_results/STAF_currentSOC_V7_CASE2
+		[INFO] Case 2 completed.
+
+	3.1 Training Case 1...
+
+=== Starting Training Run: STAF_currentSOC_V7_CASE1 ===
+Device: cuda
+		[INFO] Starting Preprocessing for Case 1...
+		[INFO] Unique quantized indices: 6686
+		[INFO] Suggested num_embeddings: 8023
+		[INFO] Generating sliding windows...
+Column names ['sin_hour', 'cos_hour', 'sin_day', 'cos_day', 'building_T1', 'building_T2', 'building_T3', 'building_T4', 'building_T5', 'building_T6', 'building_T7', 'building_T8', 'building_T9', 'building_T10', 'building_T11', 'building_T12', 'building_T13', 'building_T14', 'building_T15', 'building_T16', 'building_T17', 'building_T18', 'building_T19', 'building_T20', 'building_T21', 'building_T22', 'building_T23', 'building_T24', 'radiation_T1', 'radiation_T2', 'radiation_T3', 'radiation_T4', 'radiation_T5', 'radiation_T6', 'radiation_T7', 'radiation_T8', 'radiation_T9', 'radiation_T10', 'radiation_T11', 'radiation_T12', 'radiation_T13', 'radiation_T14', 'radiation_T15', 'radiation_T16', 'radiation_T17', 'radiation_T18', 'radiation_T19', 'radiation_T20', 'radiation_T21', 'radiation_T22', 'radiation_T23', 'radiation_T24', 'temperature_T1', 'temperature_T2', 'temperature_T3', 'temperature_T4', 'temperature_T5', 'temperature_T6', 'temperature_T7', 'temperature_T8', 'temperature_T9', 'temperature_T10', 'temperature_T11', 'temperature_T12', 'temperature_T13', 'temperature_T14', 'temperature_T15', 'temperature_T16', 'temperature_T17', 'temperature_T18', 'temperature_T19', 'temperature_T20', 'temperature_T21', 'temperature_T22', 'temperature_T23', 'temperature_T24', 'priceG2B_T1', 'priceG2B_T2', 'priceG2B_T3', 'priceG2B_T4', 'priceG2B_T5', 'priceG2B_T6', 'priceG2B_T7', 'priceG2B_T8', 'priceG2B_T9', 'priceG2B_T10', 'priceG2B_T11', 'priceG2B_T12', 'priceG2B_T13', 'priceG2B_T14', 'priceG2B_T15', 'priceG2B_T16', 'priceG2B_T17', 'priceG2B_T18', 'priceG2B_T19', 'priceG2B_T20', 'priceG2B_T21', 'priceG2B_T22', 'priceG2B_T23', 'priceG2B_T24', 'priceG2V_T1', 'priceG2V_T2', 'priceG2V_T3', 'priceG2V_T4', 'priceG2V_T5', 'priceG2V_T6', 'priceG2V_T7', 'priceG2V_T8', 'priceG2V_T9', 'priceG2V_T10', 'priceG2V_T11', 'priceG2V_T12', 'priceG2V_T13', 'priceG2V_T14', 'priceG2V_T15', 'priceG2V_T16', 'priceG2V_T17', 'priceG2V_T18', 'priceG2V_T19', 'priceG2V_T20', 'priceG2V_T21', 'priceG2V_T22', 'priceG2V_T23', 'priceG2V_T24', 'battery_T1', 'battery_T2', 'battery_T3', 'battery_T4', 'battery_T5', 'battery_T6', 'battery_T7', 'battery_T8', 'battery_T9', 'battery_T10', 'battery_T11', 'battery_T12', 'battery_T13', 'battery_T14', 'battery_T15', 'battery_T16', 'battery_T17', 'battery_T18', 'battery_T19', 'battery_T20', 'battery_T21', 'battery_T22', 'battery_T23', 'battery_T24', 'SOC_V1', 'SOC_V2', 'SOC_V3', 'SOC_V4', 'SOC_V5', 'SOC_V6', 'SOC_V7', 'SOC_V8', 'SOC_V9', 'SOC_V10', 'SOC_V11', 'SOC_V12', 'SOC_V13', 'SOC_V14', 'SOC_V15', 'SOC_V16', 'SOC_V17', 'SOC_V18', 'SOC_V19', 'SOC_V20', 'SOC_V21', 'SOC_V22', 'SOC_V23', 'SOC_V24', 'SOC_V25', 'SOC_V26', 'SOC_V27', 'SOC_V28', 'SOC_V29', 'SOC_V30', 'SOC_V31', 'SOC_V32', 'SOC_V33', 'SOC_V34', 'SOC_V35', 'SOC_V36', 'SOC_V37', 'SOC_V38', 'SOC_V39', 'SOC_V40', 'SOC_V41', 'SOC_V42', 'SOC_V43', 'SOC_V44', 'SOC_V45', 'SOC_V46', 'SOC_V47', 'SOC_V48', 'SOC_V49', 'SOC_V50', 'SOC_V51', 'SOC_V52', 'SOC_V53', 'SOC_V54', 'SOC_V55', 'SOC_V56', 'SOC_V57', 'SOC_V58', 'SOC_V59', 'SOC_V60', 'SOC_V61', 'SOC_V62', 'SOC_V63', 'SOC_V64', 'SOC_V65', 'SOC_V66', 'SOC_V67', 'SOC_V68', 'SOC_V69', 'SOC_V70', 'SOC_V71', 'SOC_V72', 'SOC_V73', 'SOC_V74', 'SOC_V75', 'SOC_V76', 'target']
+Number of columns: 225
+Number of rows: 2016
+		[INFO] Saved dataset: ./data/training_results/STAF_currentSOC_V7_CASE1/merged_dataset_STAF_currentSOC_V7_CASE1.csv (Shape: (2016, 225))
+		[INFO] Saved metadata: ./data/training_results/STAF_currentSOC_V7_CASE1/feature_info_STAF_currentSOC_V7_CASE1.json
+	[Model Config] Detected Dims: {'static': 4, 'series_count': 6, 'seq_len': 24, 'vehicle': 76, 'emb_vocab': 1000}
+		[INFO] Data loaded. Train: 1411, Val: 605
+		[INFO] Fitting new scalers on training data...
+		[INFO] Calculating weights for imbalanced regression...
+		[INFO] 
+==================================================
+		[INFO] 🚀 TRAINING SESSION: STAF_currentSOC_V7_CASE1
+		[INFO] ==================================================
+		[INFO] Device:             cuda
+		[INFO] Model Parameters:   42,058
+		[INFO] --------------------------------------------------
+		[INFO] Epochs:             5000
+		[INFO] Batch Size:         32
+		[INFO] Learning Rate:      0.001
+		[INFO] Weight Decay:       0.001
+		[INFO] Dropout:            0.3
+		[INFO] --------------------------------------------------
+		[INFO] Hidden Layers:      [128, 32]
+		[INFO] Embedding Dim:      8
+		[INFO] Attention Heads:    4
+		[INFO]==================================================
+
+
+		[INFO]Epoch |    LR    | Trn RMSE | Val RMSE | Trn R2 | Val R2 | Stop
+-----------------------------------------------------------------
+		[INFO]    1 | 0.001000 |   7.6421 |   9.8880 |  0.127 | -0.910 | 0/60
+		[INFO]    2 | 0.001000 |   6.8478 |   8.5622 |  0.284 | -0.432 | 0/60
+		[INFO]    3 | 0.001000 |   6.0759 |   7.8294 |  0.432 | -0.198 | 0/60
+		[INFO]    4 | 0.001000 |   5.3603 |   6.8858 |  0.550 |  0.074 | 0/60
+		[INFO]    5 | 0.001000 |   4.7304 |   6.4673 |  0.665 |  0.183 | 0/60
+		[INFO]    6 | 0.001000 |   4.6305 |   5.4098 |  0.717 |  0.428 | 0/60
+		[INFO]    7 | 0.001000 |   4.4182 |   5.5104 |  0.725 |  0.407 | 0/60
+		[INFO]    8 | 0.001000 |   4.0823 |   5.6912 |  0.756 |  0.367 | 1/60
+		[INFO]    9 | 0.001000 |   3.9496 |   5.0901 |  0.758 |  0.494 | 2/60
+		[INFO]   10 | 0.001000 |   3.6525 |   5.2580 |  0.794 |  0.459 | 0/60
+		[INFO]   11 | 0.001000 |   3.7775 |   5.3464 |  0.796 |  0.441 | 1/60
+		[INFO]   12 | 0.001000 |   3.6923 |   4.8299 |  0.805 |  0.544 | 2/60
+		[INFO]   13 | 0.001000 |   3.8277 |   5.5661 |  0.779 |  0.395 | 0/60
+		[INFO]   14 | 0.001000 |   3.6360 |   5.7409 |  0.802 |  0.356 | 1/60
+		[INFO]   15 | 0.001000 |   3.6274 |   5.5483 |  0.801 |  0.399 | 2/60
+		[INFO]   16 | 0.001000 |   3.7977 |   5.5757 |  0.810 |  0.392 | 3/60
+		[INFO]   17 | 0.001000 |   3.5795 |   4.9094 |  0.812 |  0.529 | 4/60
+		[INFO]   18 | 0.001000 |   3.4707 |   5.3181 |  0.827 |  0.447 | 5/60
+		[INFO]   19 | 0.001000 |   3.9491 |   4.7810 |  0.820 |  0.553 | 6/60
+		[INFO]   20 | 0.001000 |   3.7544 |   5.2224 |  0.806 |  0.466 | 0/60
+		[INFO]   21 | 0.001000 |   3.5678 |   4.9225 |  0.811 |  0.526 | 1/60
+		[INFO]   22 | 0.001000 |   3.9156 |   5.1138 |  0.817 |  0.489 | 2/60
+		[INFO]   23 | 0.001000 |   3.7827 |   5.9475 |  0.787 |  0.308 | 3/60
+		[INFO]   24 | 0.001000 |   3.4202 |   5.4468 |  0.834 |  0.420 | 4/60
+		[INFO]   25 | 0.001000 |   3.5692 |   5.3426 |  0.822 |  0.442 | 5/60
+		[INFO]   26 | 0.001000 |   3.5659 |   5.5431 |  0.804 |  0.399 | 6/60
+		[INFO]   27 | 0.001000 |   3.4311 |   4.9667 |  0.822 |  0.518 | 7/60
+		[INFO]   28 | 0.001000 |   3.2413 |   5.1451 |  0.838 |  0.482 | 8/60
+		[INFO]   29 | 0.001000 |   3.2511 |   4.6883 |  0.845 |  0.570 | 9/60
+		[INFO]   30 | 0.001000 |   3.2272 |   5.0281 |  0.844 |  0.506 | 0/60
+		[INFO]   31 | 0.001000 |   3.2508 |   4.8949 |  0.841 |  0.531 | 1/60
+		[INFO]   32 | 0.001000 |   3.7859 |   5.5151 |  0.805 |  0.405 | 2/60
+		[INFO]   33 | 0.001000 |   3.2430 |   5.2897 |  0.844 |  0.453 | 3/60
+		[INFO]   34 | 0.001000 |   3.1707 |   4.8627 |  0.847 |  0.537 | 4/60
+		[INFO]   35 | 0.001000 |   3.5581 |   4.6055 |  0.840 |  0.585 | 5/60
+		[INFO]   36 | 0.001000 |   3.5636 |   4.7195 |  0.846 |  0.564 | 0/60
+		[INFO]   37 | 0.001000 |   3.1207 |   4.9071 |  0.857 |  0.529 | 1/60
+		[INFO]   38 | 0.001000 |   3.2684 |   5.0032 |  0.839 |  0.510 | 2/60
+		[INFO]   39 | 0.001000 |   3.2455 |   4.5314 |  0.851 |  0.598 | 3/60
+		[INFO]   40 | 0.001000 |   3.3277 |   4.9927 |  0.842 |  0.512 | 0/60
+		[INFO]   41 | 0.001000 |   2.9948 |   4.8786 |  0.862 |  0.534 | 1/60
+		[INFO]   42 | 0.001000 |   3.1844 |   4.5285 |  0.851 |  0.599 | 2/60
+		[INFO]   43 | 0.001000 |   3.1136 |   4.7197 |  0.854 |  0.564 | 0/60
+		[INFO]   44 | 0.001000 |   3.1595 |   4.9180 |  0.850 |  0.527 | 1/60
+		[INFO]   45 | 0.001000 |   3.2480 |   4.5460 |  0.839 |  0.595 | 2/60
+		[INFO]   46 | 0.001000 |   3.0990 |   4.4276 |  0.861 |  0.616 | 3/60
+		[INFO]   47 | 0.001000 |   3.1409 |   4.5541 |  0.854 |  0.594 | 0/60
+		[INFO]   48 | 0.001000 |   3.2913 |   4.5759 |  0.852 |  0.590 | 1/60
+		[INFO]   49 | 0.001000 |   3.2165 |   4.5167 |  0.846 |  0.601 | 2/60
+		[INFO]   50 | 0.001000 |   2.8741 |   4.6815 |  0.870 |  0.571 | 3/60
+		[INFO]   51 | 0.001000 |   3.2170 |   4.6954 |  0.841 |  0.569 | 4/60
+		[INFO]   52 | 0.001000 |   3.4270 |   4.3886 |  0.857 |  0.623 | 5/60
+		[INFO]   53 | 0.001000 |   3.1117 |   4.4366 |  0.860 |  0.615 | 0/60
+		[INFO]   54 | 0.001000 |   3.1108 |   4.9961 |  0.854 |  0.512 | 1/60
+		[INFO]   55 | 0.001000 |   3.5670 |   5.2673 |  0.843 |  0.457 | 2/60
+		[INFO]   56 | 0.001000 |   3.2986 |   4.7204 |  0.851 |  0.564 | 3/60
+		[INFO]   57 | 0.001000 |   3.1236 |   5.0935 |  0.853 |  0.492 | 4/60
+		[INFO]   58 | 0.001000 |   3.5867 |   4.7057 |  0.854 |  0.567 | 5/60
+		[INFO]   59 | 0.001000 |   3.3139 |   4.7359 |  0.853 |  0.561 | 6/60
+		[INFO]   60 | 0.001000 |   3.0366 |   5.6527 |  0.860 |  0.375 | 7/60
+		[INFO]   61 | 0.001000 |   3.1453 |   4.9915 |  0.851 |  0.513 | 8/60
+		[INFO]   62 | 0.001000 |   3.3150 |   4.9292 |  0.839 |  0.524 | 9/60
+		[INFO]   63 | 0.001000 |   3.0101 |   4.9070 |  0.860 |  0.529 | 10/60
+		[INFO]   64 | 0.001000 |   3.2613 |   4.3751 |  0.854 |  0.625 | 11/60
+		[INFO]   65 | 0.001000 |   3.4062 |   4.8443 |  0.858 |  0.541 | 0/60
+		[INFO]   66 | 0.001000 |   3.3885 |   4.5289 |  0.830 |  0.598 | 1/60
+		[INFO]   67 | 0.001000 |   3.1257 |   4.8609 |  0.851 |  0.538 | 2/60
+		[INFO]   68 | 0.001000 |   3.1511 |   4.9276 |  0.851 |  0.525 | 3/60
+		[INFO]   69 | 0.001000 |   3.2595 |   4.9440 |  0.856 |  0.522 | 4/60
+		[INFO]   70 | 0.001000 |   3.0133 |   4.7189 |  0.867 |  0.564 | 5/60
+		[INFO]   71 | 0.001000 |   3.3530 |   5.1360 |  0.837 |  0.484 | 6/60
+		[INFO]   72 | 0.001000 |   3.1937 |   5.3519 |  0.851 |  0.440 | 7/60
+		[INFO]   73 | 0.001000 |   3.0296 |   4.8610 |  0.864 |  0.538 | 8/60
+		[INFO]   74 | 0.001000 |   3.0302 |   4.8227 |  0.860 |  0.545 | 9/60
+		[INFO]   75 | 0.001000 |   3.2184 |   4.9071 |  0.847 |  0.529 | 10/60
+		[INFO]   76 | 0.001000 |   3.1605 |   4.7175 |  0.854 |  0.565 | 11/60
+		[INFO]   77 | 0.001000 |   3.0297 |   4.9978 |  0.865 |  0.512 | 12/60
+		[INFO]   78 | 0.001000 |   3.3258 |   4.4908 |  0.871 |  0.605 | 13/60
+		[INFO]   79 | 0.001000 |   3.2464 |   4.5188 |  0.847 |  0.600 | 14/60
+		[INFO]   80 | 0.001000 |   3.3359 |   5.1404 |  0.827 |  0.483 | 15/60
+		[INFO]   81 | 0.001000 |   3.1025 |   4.9377 |  0.859 |  0.523 | 16/60
+		[INFO]   82 | 0.001000 |   3.5657 |   4.6977 |  0.840 |  0.568 | 17/60
+		[INFO]   83 | 0.001000 |   3.4253 |   4.9790 |  0.857 |  0.515 | 18/60
+		[INFO]   84 | 0.001000 |   3.7406 |   4.8901 |  0.837 |  0.532 | 19/60
+		[INFO]   85 | 0.001000 |   2.9862 |   5.0967 |  0.866 |  0.492 | 20/60
+		[INFO]   86 | 0.001000 |   3.1036 |   4.4512 |  0.863 |  0.612 | 21/60
+		[INFO]   87 | 0.001000 |   3.0195 |   4.4233 |  0.862 |  0.617 | 22/60
+		[INFO]   88 | 0.001000 |   2.9565 |   4.3689 |  0.870 |  0.626 | 23/60
+		[INFO]   89 | 0.001000 |   3.0490 |   4.2818 |  0.869 |  0.641 | 0/60
+		[INFO]   90 | 0.001000 |   2.9433 |   4.6349 |  0.868 |  0.580 | 0/60
+		[INFO]   91 | 0.001000 |   3.0009 |   4.0878 |  0.871 |  0.673 | 1/60
+		[INFO]   92 | 0.001000 |   3.1046 |   5.0021 |  0.855 |  0.511 | 0/60
+		[INFO]   93 | 0.001000 |   3.0128 |   4.6334 |  0.865 |  0.580 | 1/60
+		[INFO]   94 | 0.001000 |   2.8861 |   4.9480 |  0.878 |  0.521 | 2/60
+		[INFO]   95 | 0.001000 |   2.9943 |   5.2605 |  0.868 |  0.459 | 3/60
+		[INFO]   96 | 0.001000 |   3.5528 |   4.5082 |  0.857 |  0.602 | 4/60
+		[INFO]   97 | 0.001000 |   2.8551 |   4.3554 |  0.879 |  0.629 | 5/60
+		[INFO]   98 | 0.001000 |   3.3701 |   5.5068 |  0.877 |  0.407 | 6/60
+		[INFO]   99 | 0.001000 |   2.9120 |   4.2762 |  0.878 |  0.642 | 7/60
+		[INFO]  100 | 0.001000 |   3.2778 |   4.8985 |  0.864 |  0.530 | 8/60
+		[INFO]  101 | 0.001000 |   2.8188 |   4.1870 |  0.878 |  0.657 | 9/60
+		[INFO]  102 | 0.001000 |   3.1747 |   4.7332 |  0.859 |  0.562 | 10/60
+		[INFO]  103 | 0.001000 |   3.0178 |   4.6566 |  0.865 |  0.576 | 11/60
+		[INFO]  104 | 0.001000 |   2.9928 |   4.5635 |  0.868 |  0.592 | 12/60
+		[INFO]  105 | 0.001000 |   3.0203 |   4.2575 |  0.861 |  0.645 | 13/60
+		[INFO]  106 | 0.001000 |   2.8041 |   4.9113 |  0.878 |  0.528 | 14/60
+		[INFO]  107 | 0.001000 |   3.1801 |   5.0040 |  0.874 |  0.510 | 15/60
+		[INFO]  108 | 0.001000 |   2.9439 |   4.3573 |  0.887 |  0.628 | 16/60
+		[INFO]  109 | 0.001000 |   2.7440 |   5.0424 |  0.889 |  0.503 | 17/60
+		[INFO]  110 | 0.001000 |   3.0682 |   4.2500 |  0.868 |  0.646 | 18/60
+		[INFO]  111 | 0.001000 |   2.8919 |   4.6003 |  0.872 |  0.586 | 19/60
+		[INFO]  112 | 0.001000 |   3.1079 |   4.2213 |  0.872 |  0.651 | 20/60
+		[INFO]  113 | 0.001000 |   2.8829 |   5.0530 |  0.876 |  0.501 | 21/60
+		[INFO]  114 | 0.001000 |   3.2586 |   4.3792 |  0.873 |  0.625 | 22/60
+		[INFO]  115 | 0.001000 |   3.0916 |   4.5041 |  0.861 |  0.603 | 23/60
+		[INFO]  116 | 0.001000 |   3.0261 |   4.6564 |  0.870 |  0.576 | 24/60
+		[INFO]  117 | 0.001000 |   3.0626 |   4.8807 |  0.877 |  0.534 | 25/60
+		[INFO]  118 | 0.001000 |   2.8227 |   4.8145 |  0.882 |  0.547 | 26/60
+		[INFO]  119 | 0.001000 |   2.7907 |   4.4039 |  0.882 |  0.620 | 27/60
+		[INFO]  120 | 0.001000 |   3.1767 |   4.4787 |  0.863 |  0.607 | 28/60
+		[INFO]  121 | 0.001000 |   2.9604 |   4.4389 |  0.872 |  0.614 | 29/60
+		[INFO]  122 | 0.001000 |   2.9581 |   4.4118 |  0.872 |  0.619 | 30/60
+		[INFO]  123 | 0.001000 |   3.2419 |   4.4376 |  0.855 |  0.615 | 31/60
+		[INFO]  124 | 0.001000 |   3.0994 |   4.1757 |  0.875 |  0.659 | 32/60
+		[INFO]  125 | 0.001000 |   2.9962 |   4.7422 |  0.860 |  0.560 | 33/60
+		[INFO]  126 | 0.001000 |   2.8963 |   5.2387 |  0.864 |  0.463 | 34/60
+		[INFO]  127 | 0.001000 |   3.1615 |   4.5636 |  0.884 |  0.592 | 35/60
+		[INFO]  128 | 0.001000 |   2.9290 |   4.8494 |  0.874 |  0.540 | 36/60
+		[INFO]  129 | 0.001000 |   3.0600 |   4.4334 |  0.878 |  0.615 | 37/60
+		[INFO]  130 | 0.001000 |   3.3412 |   5.2955 |  0.860 |  0.451 | 38/60
+		[INFO]  131 | 0.001000 |   3.0771 |   4.5485 |  0.873 |  0.595 | 39/60
+		[INFO]  132 | 0.001000 |   2.9720 |   4.6908 |  0.872 |  0.570 | 40/60
+		[INFO]  133 | 0.001000 |   3.3096 |   4.5790 |  0.876 |  0.590 | 41/60
+		[INFO]  134 | 0.001000 |   3.0259 |   4.5912 |  0.860 |  0.588 | 42/60
+		[INFO]  135 | 0.001000 |   3.3814 |   4.2647 |  0.856 |  0.644 | 43/60
+		[INFO]  136 | 0.001000 |   3.5743 |   4.6619 |  0.839 |  0.575 | 44/60
+		[INFO]  137 | 0.001000 |   2.9854 |   4.2005 |  0.882 |  0.654 | 45/60
+		[INFO]  138 | 0.001000 |   3.5765 |   4.4495 |  0.857 |  0.612 | 46/60
+		[INFO]  139 | 0.001000 |   2.9750 |   4.6978 |  0.870 |  0.568 | 47/60
+		[INFO]  140 | 0.001000 |   2.9906 |   4.5624 |  0.875 |  0.593 | 48/60
+		[INFO]  141 | 0.001000 |   2.8777 |   4.5906 |  0.877 |  0.588 | 49/60
+		[INFO]  142 | 0.001000 |   2.8373 |   4.7913 |  0.884 |  0.551 | 50/60
+		[INFO]  143 | 0.000500 |   2.9208 |   4.9353 |  0.877 |  0.524 | 51/60
+		[INFO]  144 | 0.000500 |   2.7668 |   4.4091 |  0.880 |  0.619 | 52/60
+		[INFO]  145 | 0.000500 |   2.7773 |   4.5531 |  0.883 |  0.594 | 53/60
+		[INFO]  146 | 0.000500 |   2.7643 |   4.6972 |  0.892 |  0.568 | 54/60
+		[INFO]  147 | 0.000500 |   2.9619 |   4.6896 |  0.892 |  0.570 | 55/60
+		[INFO]  148 | 0.000500 |   2.9686 |   4.4776 |  0.875 |  0.607 | 56/60
+		[INFO]  149 | 0.000500 |   2.9220 |   4.2036 |  0.871 |  0.654 | 57/60
+		[INFO]  150 | 0.000500 |   2.8208 |   4.3855 |  0.891 |  0.624 | 58/60
+/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/testcase/testcaseV4.py:208: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  model = STAF(dims["static"], dims["series"], dims["seq"], dims["veh"], dims["vocab"],
+/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/testcase/testcaseV4.py:208: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  model = STAF(dims["static"], dims["series"], dims["seq"], dims["veh"], dims["vocab"],
+		[INFO]  151 | 0.000500 |   2.6729 |   4.7530 |  0.891 |  0.558 | 59/60
+
+[Stopping] Early stopping triggered after 151 epochs.
+Training Complete. Results saved to: ./data/training_results/STAF_currentSOC_V7_CASE1
+		[INFO] Case 1 completed.
+
+
+==================================================
+PART 4: Testing...
+==================================================
+
+	4.2 Testing Case 2...
+🚀 Starting Dynamic Simulation (Updating SOC per hour)
+[INFO] Loading Initial State from Optimization file...
+Initial SOC State: (2, 48, 272)
+Initial SOC State: (272,)
+battery_detail (4, 2, 272)
+(272,)
+Hour 24: AI Request=12.54kW | Executed=0.00kW | Avg SOC=0.20
+battery_detail (4, 2, 272)
+(272,)
+Hour 25: AI Request=11.99kW | Executed=0.00kW | Avg SOC=0.90
+battery_detail (4, 2, 272)
+(272,)
+Hour 26: AI Request=11.52kW | Executed=0.00kW | Avg SOC=0.90
+battery_detail (4, 2, 272)
+(272,)
+Hour 27: AI Request=10.71kW | Executed=0.00kW | Avg SOC=0.90
+battery_detail (4, 2, 272)
+(272,)
+Hour 28: AI Request=10.09kW | Executed=0.00kW | Avg SOC=0.90
+battery_detail (4, 2, 272)
+(272,)
+Hour 29: AI Request=9.73kW | Executed=0.00kW | Avg SOC=0.90
+battery_detail (4, 2, 272)
+(272,)
+Hour 30: AI Request=10.17kW | Executed=0.00kW | Avg SOC=0.90
+battery_detail (4, 2, 272)
+(272,)
+Hour 31: AI Request=10.07kW | Executed=0.00kW | Avg SOC=0.90
+battery_detail (4, 2, 272)
+(272,)
+Hour 32: AI Request=9.27kW | Executed=0.00kW | Avg SOC=0.90
+battery_detail (4, 2, 272)
+(272,)
+Hour 33: AI Request=8.00kW | Executed=0.00kW | Avg SOC=0.74
+battery_detail (4, 2, 272)
+(272,)
+Hour 34: AI Request=6.85kW | Executed=0.00kW | Avg SOC=0.68
+battery_detail (4, 2, 272)
+(272,)
+Hour 35: AI Request=7.91kW | Executed=0.00kW | Avg SOC=0.68
+battery_detail (4, 2, 272)
+(272,)
+Hour 36: AI Request=7.32kW | Executed=0.00kW | Avg SOC=0.68
+battery_detail (4, 2, 272)
+(272,)
+Hour 37: AI Request=6.19kW | Executed=0.00kW | Avg SOC=0.68
+battery_detail (4, 2, 272)
+(272,)
+Hour 38: AI Request=7.07kW | Executed=0.00kW | Avg SOC=0.64
+battery_detail (4, 2, 272)
+(272,)
+Hour 39: AI Request=8.43kW | Executed=0.00kW | Avg SOC=0.59
+battery_detail (4, 2, 272)
+(272,)
+Hour 40: AI Request=8.10kW | Executed=0.00kW | Avg SOC=0.59
+battery_detail (4, 2, 272)
+(272,)
+Hour 41: AI Request=7.68kW | Executed=0.00kW | Avg SOC=0.59
+battery_detail (4, 2, 272)
+(272,)
+Hour 42: AI Request=6.92kW | Executed=0.00kW | Avg SOC=0.46
+battery_detail (4, 2, 272)
+(272,)
+Hour 43: AI Request=7.72kW | Executed=0.00kW | Avg SOC=0.38
+battery_detail (4, 2, 272)
+(272,)
+Hour 44: AI Request=8.15kW | Executed=0.00kW | Avg SOC=0.38
+battery_detail (4, 2, 272)
+(272,)
+Hour 45: AI Request=8.30kW | Executed=0.00kW | Avg SOC=0.38
+battery_detail (4, 2, 272)
+(272,)
+Hour 46: AI Request=8.86kW | Executed=0.00kW | Avg SOC=0.34
+battery_detail (4, 2, 272)
+(272,)
+Hour 47: AI Request=9.36kW | Executed=0.00kW | Avg SOC=0.20
+
+✅ Simulation Complete.
+		[INFO] Case 2 completed.
+
+	4.1 Testing Case 1...
+🚀 Starting Dynamic Simulation (Updating SOC per hour)
+[INFO] Loading Initial State from Optimization file...
+Initial SOC State: (2, 48, 272)
+Initial SOC State: (272,)
+battery_detail (4, 2, 272)
+(272,)
+Hour 24: AI Request=10.23kW | Executed=0.00kW | Avg SOC=0.20
+battery_detail (4, 2, 272)
+(272,)
+Hour 25: AI Request=10.03kW | Executed=0.00kW | Avg SOC=0.90
+battery_detail (4, 2, 272)
+(272,)
+Hour 26: AI Request=9.82kW | Executed=0.00kW | Avg SOC=0.90
+battery_detail (4, 2, 272)
+(272,)
+Hour 27: AI Request=9.88kW | Executed=0.00kW | Avg SOC=0.90
+battery_detail (4, 2, 272)
+(272,)
+Hour 28: AI Request=9.03kW | Executed=0.00kW | Avg SOC=0.90
+battery_detail (4, 2, 272)
+(272,)
+Hour 29: AI Request=9.14kW | Executed=0.00kW | Avg SOC=0.90
+battery_detail (4, 2, 272)
+(272,)
+Hour 30: AI Request=8.79kW | Executed=0.00kW | Avg SOC=0.90
+battery_detail (4, 2, 272)
+(272,)
+Hour 31: AI Request=9.00kW | Executed=0.00kW | Avg SOC=0.90
+battery_detail (4, 2, 272)
+(272,)
+Hour 32: AI Request=9.41kW | Executed=0.00kW | Avg SOC=0.90
+battery_detail (4, 2, 272)
+(272,)
+Hour 33: AI Request=8.41kW | Executed=0.00kW | Avg SOC=0.74
+battery_detail (4, 2, 272)
+(272,)
+Hour 34: AI Request=6.65kW | Executed=0.00kW | Avg SOC=0.68
+battery_detail (4, 2, 272)
+(272,)
+Hour 35: AI Request=7.65kW | Executed=0.00kW | Avg SOC=0.68
+battery_detail (4, 2, 272)
+(272,)
+Hour 36: AI Request=8.86kW | Executed=0.00kW | Avg SOC=0.68
+battery_detail (4, 2, 272)
+(272,)
+Hour 37: AI Request=7.91kW | Executed=0.00kW | Avg SOC=0.68
+battery_detail (4, 2, 272)
+(272,)
+Hour 38: AI Request=7.23kW | Executed=0.00kW | Avg SOC=0.64
+battery_detail (4, 2, 272)
+(272,)
+Hour 39: AI Request=7.78kW | Executed=0.00kW | Avg SOC=0.59
+battery_detail (4, 2, 272)
+(272,)
+Hour 40: AI Request=7.80kW | Executed=0.00kW | Avg SOC=0.59
+battery_detail (4, 2, 272)
+(272,)
+Hour 41: AI Request=7.96kW | Executed=0.00kW | Avg SOC=0.59
+battery_detail (4, 2, 272)
+(272,)
+Hour 42: AI Request=8.10kW | Executed=0.00kW | Avg SOC=0.46
+battery_detail (4, 2, 272)
+(272,)
+Hour 43: AI Request=8.45kW | Executed=0.00kW | Avg SOC=0.38
+battery_detail (4, 2, 272)
+(272,)
+Hour 44: AI Request=7.99kW | Executed=0.00kW | Avg SOC=0.38
+battery_detail (4, 2, 272)
+(272,)
+Hour 45: AI Request=8.11kW | Executed=0.00kW | Avg SOC=0.38
+battery_detail (4, 2, 272)
+(272,)
+Hour 46: AI Request=8.19kW | Executed=0.00kW | Avg SOC=0.34
+battery_detail (4, 2, 272)
+(272,)
+Hour 47: AI Request=9.02kW | Executed=0.00kW | Avg SOC=0.20
+
+✅ Simulation Complete.
+		[INFO] Case 1 completed.

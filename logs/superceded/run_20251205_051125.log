@@ -1,0 +1,241 @@
+nohup: ignoring input
+/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/testcase/testcaseV4.py:208: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  model.load_state_dict(torch.load(os.path.join(base_path, "checkpoints", "best_model.pth"), map_location=cfg.DEVICE))
+/home/lisa4090/Documents/GitHub/V2B_Optimization_with_AI_on_BSS/testcase/testcaseV4.py:208: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  model.load_state_dict(torch.load(os.path.join(base_path, "checkpoints", "best_model.pth"), map_location=cfg.DEVICE))
+Crash diagnostics ON
+
+
+==================================================
+PART 1: Data preprocess for 2023-01-01 00:00:00 to 2024-09-30 23:00:00...
+==================================================
+
+	1.1 Preprocessing radiation data...
+		[INFO] Radiation data already exists at './data/timeseries/radiation_data.csv'
+
+	1.2 Preprocessing temperature data...
+		[INFO] Temperature data already exists at './data/timeseries/temperature_data.csv'
+
+	1.3 Preprocessing building data...
+		[INFO] Building data already exists at './data/timeseries/building_data.csv'
+
+	1.4 Preprocessing electricity cost data...
+		[INFO] Electricity cost data already exists at './data/timeseries/electricitycostG2B_data.csv' and './data/timeseries/electricitycostG2V_data.csv'
+
+	1.5 Preprocessing battery demand series data...
+		[INFO] Found existing battery data at 'data/battery_demandV2/resample_full.csv' and 'data/battery_demandV2/resample_train.csv'
+
+		[INFO] Number of series for clean windows = (168, 37)
+		[INFO] Number of eligible series for Case 2 = (1395, 37)
+		[INFO] Case 1 exists — loaded battery demand from 'data/battery_demandV2/case1_real_only/battery_demand.npy' with shape (168, 37).
+		[INFO] Case 2 exists — loaded battery demand from 'data/battery_demandV2/case2_nan_filled/battery_demand.npy' with shape (1563, 37).
+		[INFO] Case 0 exists — loaded battery demand from 'data/battery_demandV2/case0_test/battery_demand.npy' with shape (2, 49).
+
+	1.6 Generating battery schedule...
+		[INFO] Case 0 exists — loaded from 'data/battery_demandV2/case0_test/battery_availability.npy' and 'data/battery_demandV2/case0_test/battery_details.npy' shape (2, 272, 48) and (4, 2, 272)
+		[INFO] Case 1 exists — loaded from 'data/battery_demandV2/case1_real_only/battery_availability.npy' and 'data/battery_demandV2/case1_real_only/battery_details.npy' shape (168, 237, 36) and (4, 168, 237)
+		[INFO] Case 2 exists — loaded from 'data/battery_demandV2/case2_nan_filled/battery_availability.npy' and 'data/battery_demandV2/case2_nan_filled/battery_details.npy' shape (1563, 237, 36) and (4, 1563, 237)
+		[ERROR] Could not load battery demand from 'data/battery_demandV2/case3_extended_generated/battery_demand.npy': [Errno 2] No such file or directory: 'data/battery_demandV2/case3_extended_generated/battery_demand.npy'
+
+
+==================================================
+PART 2: MILP Optimization...
+==================================================
+
+	2.0 Optimizing Case 0...
+		[INFO] Loaded 2 samples from 'data/battery_demandV2/case0_test'
+		[INFO] Results already exist at 'data/optimization_resultsV2/case0_test/immediate_charging/V2B.npy'. Skipping immediate_charging run.
+		[INFO] Results already exist at 'data/optimization_resultsV2/case0_test/optimization/V2B.npy'. Skipping optimization run.
+		[INFO] Case 0 completed.
+
+	2.1 Optimizing Case 1...
+		[INFO] Loaded 168 samples from 'data/battery_demandV2/case1_real_only'
+		[INFO] Results already exist at 'data/optimization_resultsV2/case1_real_only/immediate_charging/V2B.npy'. Skipping immediate_charging run.
+		[INFO] Results already exist at 'data/optimization_resultsV2/case1_real_only/optimization/V2B.npy'. Skipping optimization run.
+		[INFO] Case 1 completed.
+
+	2.2 Optimizing Case 2...
+		[INFO] Loaded 1563 samples from 'data/battery_demandV2/case2_nan_filled'
+		[INFO] Results already exist at 'data/optimization_resultsV2/case2_nan_filled/immediate_charging/V2B.npy'. Skipping immediate_charging run.
+		[INFO] Results already exist at 'data/optimization_resultsV2/case2_nan_filled/optimization/V2B.npy'. Skipping optimization run.
+		[INFO] Case 2 completed.
+
+
+==================================================
+PART 3: Supervised Learning...
+==================================================
+
+	3.2 Training Case 2...
+		[INFO] Found existing model checkpoint at ./data/training_results/STAFV7_CASE2/checkpoints. Skipping training as rerun is False.
+		[INFO] Case 2 completed.
+
+	3.1 Training Case 1...
+		[INFO] Found existing model checkpoint at ./data/training_results/STAFV7_CASE1/checkpoints. Skipping training as rerun is False.
+		[INFO] Case 1 completed.
+
+
+==================================================
+PART 4: Testing...
+==================================================
+
+	4.2 Testing Case 2...
+🚀 Starting Dynamic Simulation (Updating SOC per hour)
+[INFO] Loading Initial State from Optimization file...
+Initial SOC State: (2, 48, 272)
+Initial SOC State: (272,)
+battery_detail (4, 2, 272)
+(272,)
+Hour 24: AI Request=9.51kW | Executed=0.00kW | Avg SOC=0.20
+battery_detail (4, 2, 272)
+(272,)
+Hour 25: AI Request=9.63kW | Executed=0.00kW | Avg SOC=0.90
+battery_detail (4, 2, 272)
+(272,)
+Hour 26: AI Request=9.42kW | Executed=0.00kW | Avg SOC=0.90
+battery_detail (4, 2, 272)
+(272,)
+Hour 27: AI Request=9.32kW | Executed=0.00kW | Avg SOC=0.90
+battery_detail (4, 2, 272)
+(272,)
+Hour 28: AI Request=9.28kW | Executed=0.00kW | Avg SOC=0.90
+battery_detail (4, 2, 272)
+(272,)
+Hour 29: AI Request=9.39kW | Executed=0.00kW | Avg SOC=0.90
+battery_detail (4, 2, 272)
+(272,)
+Hour 30: AI Request=9.33kW | Executed=0.00kW | Avg SOC=0.90
+battery_detail (4, 2, 272)
+(272,)
+Hour 31: AI Request=9.34kW | Executed=0.00kW | Avg SOC=0.90
+battery_detail (4, 2, 272)
+(272,)
+Hour 32: AI Request=8.89kW | Executed=0.00kW | Avg SOC=0.90
+battery_detail (4, 2, 272)
+(272,)
+Hour 33: AI Request=8.33kW | Executed=0.00kW | Avg SOC=0.74
+battery_detail (4, 2, 272)
+(272,)
+Hour 34: AI Request=9.02kW | Executed=0.00kW | Avg SOC=0.68
+battery_detail (4, 2, 272)
+(272,)
+Hour 35: AI Request=8.91kW | Executed=0.00kW | Avg SOC=0.68
+battery_detail (4, 2, 272)
+(272,)
+Hour 36: AI Request=8.81kW | Executed=0.00kW | Avg SOC=0.68
+battery_detail (4, 2, 272)
+(272,)
+Hour 37: AI Request=8.59kW | Executed=0.00kW | Avg SOC=0.68
+battery_detail (4, 2, 272)
+(272,)
+Hour 38: AI Request=8.60kW | Executed=0.00kW | Avg SOC=0.64
+battery_detail (4, 2, 272)
+(272,)
+Hour 39: AI Request=8.39kW | Executed=0.00kW | Avg SOC=0.59
+battery_detail (4, 2, 272)
+(272,)
+Hour 40: AI Request=8.08kW | Executed=0.00kW | Avg SOC=0.59
+battery_detail (4, 2, 272)
+(272,)
+Hour 41: AI Request=7.95kW | Executed=0.00kW | Avg SOC=0.59
+battery_detail (4, 2, 272)
+(272,)
+Hour 42: AI Request=7.56kW | Executed=0.00kW | Avg SOC=0.46
+battery_detail (4, 2, 272)
+(272,)
+Hour 43: AI Request=8.02kW | Executed=0.00kW | Avg SOC=0.38
+battery_detail (4, 2, 272)
+(272,)
+Hour 44: AI Request=8.20kW | Executed=0.00kW | Avg SOC=0.38
+battery_detail (4, 2, 272)
+(272,)
+Hour 45: AI Request=8.30kW | Executed=0.00kW | Avg SOC=0.38
+battery_detail (4, 2, 272)
+(272,)
+Hour 46: AI Request=8.38kW | Executed=0.00kW | Avg SOC=0.34
+battery_detail (4, 2, 272)
+(272,)
+Hour 47: AI Request=8.78kW | Executed=0.00kW | Avg SOC=0.20
+
+✅ Simulation Complete.
+		[INFO] Case 2 completed.
+
+	4.1 Testing Case 1...
+🚀 Starting Dynamic Simulation (Updating SOC per hour)
+[INFO] Loading Initial State from Optimization file...
+Initial SOC State: (2, 48, 272)
+Initial SOC State: (272,)
+battery_detail (4, 2, 272)
+(272,)
+Hour 24: AI Request=9.66kW | Executed=0.00kW | Avg SOC=0.20
+battery_detail (4, 2, 272)
+(272,)
+Hour 25: AI Request=10.42kW | Executed=0.00kW | Avg SOC=0.90
+battery_detail (4, 2, 272)
+(272,)
+Hour 26: AI Request=10.57kW | Executed=0.00kW | Avg SOC=0.90
+battery_detail (4, 2, 272)
+(272,)
+Hour 27: AI Request=10.83kW | Executed=0.00kW | Avg SOC=0.90
+battery_detail (4, 2, 272)
+(272,)
+Hour 28: AI Request=10.39kW | Executed=0.00kW | Avg SOC=0.90
+battery_detail (4, 2, 272)
+(272,)
+Hour 29: AI Request=10.93kW | Executed=0.00kW | Avg SOC=0.90
+battery_detail (4, 2, 272)
+(272,)
+Hour 30: AI Request=11.01kW | Executed=0.00kW | Avg SOC=0.90
+battery_detail (4, 2, 272)
+(272,)
+Hour 31: AI Request=11.32kW | Executed=0.00kW | Avg SOC=0.90
+battery_detail (4, 2, 272)
+(272,)
+Hour 32: AI Request=11.38kW | Executed=0.00kW | Avg SOC=0.90
+battery_detail (4, 2, 272)
+(272,)
+Hour 33: AI Request=11.35kW | Executed=0.00kW | Avg SOC=0.74
+battery_detail (4, 2, 272)
+(272,)
+Hour 34: AI Request=10.73kW | Executed=0.00kW | Avg SOC=0.68
+battery_detail (4, 2, 272)
+(272,)
+Hour 35: AI Request=11.43kW | Executed=0.00kW | Avg SOC=0.68
+battery_detail (4, 2, 272)
+(272,)
+Hour 36: AI Request=11.20kW | Executed=0.00kW | Avg SOC=0.68
+battery_detail (4, 2, 272)
+(272,)
+Hour 37: AI Request=11.08kW | Executed=0.00kW | Avg SOC=0.68
+battery_detail (4, 2, 272)
+(272,)
+Hour 38: AI Request=11.07kW | Executed=0.00kW | Avg SOC=0.64
+battery_detail (4, 2, 272)
+(272,)
+Hour 39: AI Request=10.26kW | Executed=0.00kW | Avg SOC=0.59
+battery_detail (4, 2, 272)
+(272,)
+Hour 40: AI Request=9.07kW | Executed=0.00kW | Avg SOC=0.59
+battery_detail (4, 2, 272)
+(272,)
+Hour 41: AI Request=7.79kW | Executed=0.00kW | Avg SOC=0.59
+battery_detail (4, 2, 272)
+(272,)
+Hour 42: AI Request=7.89kW | Executed=0.00kW | Avg SOC=0.46
+battery_detail (4, 2, 272)
+(272,)
+Hour 43: AI Request=6.96kW | Executed=0.00kW | Avg SOC=0.38
+battery_detail (4, 2, 272)
+(272,)
+Hour 44: AI Request=5.92kW | Executed=0.00kW | Avg SOC=0.38
+battery_detail (4, 2, 272)
+(272,)
+Hour 45: AI Request=6.13kW | Executed=0.00kW | Avg SOC=0.38
+battery_detail (4, 2, 272)
+(272,)
+Hour 46: AI Request=6.52kW | Executed=0.00kW | Avg SOC=0.34
+battery_detail (4, 2, 272)
+(272,)
+Hour 47: AI Request=7.05kW | Executed=0.00kW | Avg SOC=0.20
+
+✅ Simulation Complete.
+		[INFO] Case 1 completed.
